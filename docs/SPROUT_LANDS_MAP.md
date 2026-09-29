@@ -25,7 +25,25 @@ Mapeamento inicial:
 - 8 frames por direcao
 - frame 0 usado quando parado
 
-As demais linhas contem acoes/ferramentas e serao mapeadas separadamente antes de serem usadas.
+As linhas posteriores do premium sheet contem acoes adicionais, mas o gameplay usa o arquivo dedicado de acoes abaixo.
+
+### Acoes de ferramenta
+
+Arquivo:
+`assets/sprout_lands/characters/player_actions.png`
+
+Dimensoes:
+- imagem: 96x576
+- grade: 3 colunas x 12 linhas
+- frame: 32x48
+- 3 frames por acao
+
+Mapeamento usado no GameSlime:
+- linhas 0..3: swing do Machado (baixo, cima, esquerda, direita)
+- linhas 4..7: swing compartilhado por Enxada/Picareta (baixo, cima, esquerda, direita)
+- linhas 8..11: Regador (baixo, cima, esquerda, direita)
+
+A Enxada e a Picareta compartilham o segundo conjunto visual temporariamente. O efeito de gameplay continua diferente para cada ferramenta.
 
 ### Culturas
 
