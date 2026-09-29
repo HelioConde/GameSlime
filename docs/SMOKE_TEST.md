@@ -21,14 +21,16 @@ Execute `scenes/world/main.tscn`.
 10. Use E na planta madura.
 11. Confirme que Nabo do Vale aparece no inventario.
 
-## 3. Carga
-1. Use Enxada ou Regador.
-2. Clique rapido: 1 tile.
-3. Segure aproximadamente 0,45 s: 3x1.
-4. Segure aproximadamente 0,90 s: 5x1.
-5. Confirme que o preview aumenta antes de soltar.
-6. Confirme que ainda e possivel mover durante a carga.
-7. Confirme breve pausa enquanto a animacao final da ferramenta toca.
+## 3. Carga e upgrades
+1. No inicio, Enxada e Regador nivel 0 devem afetar apenas 1 tile.
+2. Colete Madeira e Pedra.
+3. Selecione uma ferramenta e interaja com a bancada perto da casa usando E.
+4. Confirme consumo de recursos e aumento do nivel no HUD.
+5. No nivel 1, segure aproximadamente 0,45 s e confirme area 3x1.
+6. No nivel 2, segure aproximadamente 0,90 s e confirme area 5x1.
+7. Confirme que o preview aumenta antes de soltar.
+8. Confirme que ainda e possivel mover durante a carga.
+9. Confirme breve pausa enquanto a animacao final da ferramenta toca.
 
 ## 4. Agua
 1. Regue ate reduzir o reservatorio.
@@ -101,3 +103,18 @@ Execute `scenes/world/main.tscn`.
 1. Confirme que a casa usa os sprites do Sprout Lands.
 2. A antiga casa geometrica nao deve aparecer.
 3. A interacao de sono deve funcionar junto a porta.
+
+## 14. Obstaculos por nivel
+1. Tente destruir o tronco grande com Machado nivel 0.
+2. Confirme mensagem de nivel insuficiente.
+3. Melhore o Machado para nivel 1.
+4. Confirme que o tronco grande agora pode ser destruido.
+5. Repita com a rocha grande e Picareta nivel 1.
+
+## 15. Calendario de eventos
+1. Pressione C.
+2. Confirme que o mundo pausa.
+3. Confirme grade de 28 dias.
+4. O dia atual deve ter marcador *.
+5. Dias com eventos devem ter marcador !.
+6. Pressione C novamente e confirme retorno ao jogo.
