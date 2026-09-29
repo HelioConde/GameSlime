@@ -24,6 +24,7 @@ signal feedback_requested(text: String)
 @export var wood_item: ItemDefinition
 @export var stone_item: ItemDefinition
 @export var slime_gel_item: ItemDefinition
+@export var copper_ore_item: ItemDefinition
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
@@ -429,6 +430,7 @@ func _seed_starting_inventory() -> void:
 		wood_item,
 		stone_item,
 		slime_gel_item,
+		copper_ore_item,
 	]
 
 	for definition in definitions:
