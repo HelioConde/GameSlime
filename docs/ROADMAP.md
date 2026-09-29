@@ -77,8 +77,8 @@
 ## Marco 5 - breeding e descobertas
 - [x] reproducao controlada no ninho
 - [x] heranca dos pais
-- [ ] mutacoes por ambiente
-- [ ] raridades condicionais
+- [x] mutacoes por ambiente
+- [ ] raridades condicionais / tiers de raridade
 - [x] bestiario genetico
 - [x] descobertas geneticas registradas
 - [ ] especies especiais por clima/horario/bioma
