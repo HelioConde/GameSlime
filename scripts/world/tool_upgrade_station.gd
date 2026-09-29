@@ -94,6 +94,7 @@ func interact(player: PlayerController) -> String:
 		_refund_materials(player, copper_cost, iron_cost, silver_cost, gold_ore_cost, crystal_cost)
 		return "Nao foi possivel melhorar a ferramenta."
 
+	Sfx.play_cue(&"upgrade")
 	return "%s melhorada para nivel %d!" % [
 		player.tools.get_tool_display_name(tool_type),
 		player.tools.get_tool_level(tool_type),
