@@ -393,6 +393,21 @@ func _refresh_habitat_panel() -> void:
 		habitat.registered_slimes.size(),
 		habitat.capacity,
 	])
+
+	var care_total := 0.0
+	var attention_count := 0
+	for resident in habitat.registered_slimes:
+		if resident == null or not is_instance_valid(resident):
+			continue
+		care_total += resident.get_care_score()
+		if resident.get_priority_need_text() not in ["BEM CUIDADO", "PRONTO PARA REPRODUCAO"]:
+			attention_count += 1
+
+	var valid_count := maxi(habitat.registered_slimes.size(), 1)
+	lines.append("Cuidado medio: %.0f%% · Precisam de atencao: %d" % [
+		care_total / float(valid_count),
+		attention_count,
+	])
 	lines.append("")
 	lines.append("Moradores:")
 
@@ -412,6 +427,7 @@ func _refresh_habitat_panel() -> void:
 				slime.happiness,
 				slime.affection,
 			])
+			lines.append("    Acao: %s" % slime.get_priority_need_text())
 
 	lines.append("")
 	lines.append("Nascimentos especiais neste bioma:")
