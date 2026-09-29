@@ -22,6 +22,8 @@ signal shop_requested(shop: SeedShop)
 @export var starting_seed_amount: int = 15
 @export var movement_animation_fps: float = 8.0
 @export var tool_action_animation_fps: float = 10.0
+@export var morning_spawn_position: Vector2 = Vector2(640.0, 560.0)
+@export_range(0.1, 1.0, 0.05) var passout_energy_ratio: float = 0.65
 
 @export_group("Starting Items")
 @export var starter_hoe_item: ItemDefinition
@@ -771,6 +773,13 @@ func _find_world_systems() -> void:
 	farm_field = get_tree().get_first_node_in_group("farm_field") as FarmField
 
 func _on_day_started(_day: int) -> void:
+	if GameClock.last_transition_was_passout:
+		global_position = morning_spawn_position
+		velocity = Vector2.ZERO
+		energy.set_current_energy(energy.maximum_energy * passout_energy_ratio)
+		feedback_requested.emit("Voce desmaiou as 02:00 e acordou cansado.")
+		return
+
 	energy.restore_full()
 
 func _draw() -> void:
