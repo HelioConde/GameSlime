@@ -166,7 +166,20 @@ func _get_lifetime_for_item(item: ItemDefinition) -> int:
 		return MATERIAL_LIFETIME_DAYS
 	return FORAGE_LIFETIME_DAYS
 
+func get_current_spawn_pool_ids() -> Array[StringName]:
+	var result: Array[StringName] = []
+	for item in _build_spawn_pool():
+		if item != null:
+			result.append(item.id)
+	return result
+
 func _pick_item_for_season(rng: RandomNumberGenerator) -> ItemDefinition:
+	var pool := _build_spawn_pool()
+	if pool.is_empty():
+		return null
+	return pool[rng.randi_range(0, pool.size() - 1)]
+
+func _build_spawn_pool() -> Array[ItemDefinition]:
 	var pool: Array[ItemDefinition] = []
 
 	match GameClock.season_index:
@@ -193,9 +206,34 @@ func _pick_item_for_season(rng: RandomNumberGenerator) -> ItemDefinition:
 		_:
 			pool = [WOOD, STONE]
 
-	if pool.is_empty():
-		return null
-	return pool[rng.randi_range(0, pool.size() - 1)]
+	match WeatherManager.current_weather:
+		WeatherManager.Weather.RAIN:
+			match GameClock.season_index:
+				GameClock.Season.SPRING:
+					pool.append(WILD_FLOWER)
+					pool.append(WILD_MUSHROOM)
+				GameClock.Season.SUMMER:
+					pool.append(WILD_BERRY)
+					pool.append(WILD_MUSHROOM)
+				GameClock.Season.FALL:
+					pool.append(WILD_MUSHROOM)
+					pool.append(WILD_MUSHROOM)
+		WeatherManager.Weather.SNOW:
+			if GameClock.season_index == GameClock.Season.WINTER:
+				pool.append(WILD_ROOT)
+				pool.append(WILD_ROOT)
+		WeatherManager.Weather.CLEAR:
+			match GameClock.season_index:
+				GameClock.Season.SPRING:
+					pool.append(WILD_FLOWER)
+				GameClock.Season.SUMMER:
+					pool.append(WILD_BERRY)
+				GameClock.Season.FALL:
+					pool.append(WILD_BERRY)
+				GameClock.Season.WINTER:
+					pool.append(STONE)
+
+	return pool
 
 func _seed_for_current_day() -> int:
 	return int(
