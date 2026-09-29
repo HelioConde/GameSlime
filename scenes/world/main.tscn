@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/water_source.tscn" id="6_water"]
 [ext_resource type="PackedScene" path="res://scenes/world/tree_resource.tscn" id="7_tree"]
 [ext_resource type="PackedScene" path="res://scenes/world/rock_resource.tscn" id="8_rock"]
+[ext_resource type="PackedScene" path="res://scenes/ui/weather_fx.tscn" id="9_weather"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -44,3 +45,5 @@ position = Vector2(945, 450)
 position = Vector2(640, 560)
 
 [node name="GameHUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="WeatherFX" parent="." instance=ExtResource("9_weather")]
