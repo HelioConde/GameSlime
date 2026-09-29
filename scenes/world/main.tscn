@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -20,6 +20,9 @@
 [ext_resource type="PackedScene" path="res://scenes/world/seed_shop.tscn" id="18_shop"]
 [ext_resource type="PackedScene" path="res://scenes/world/copper_patch.tscn" id="19_copper_patch"]
 [ext_resource type="PackedScene" path="res://scenes/world/slime_crystallizer.tscn" id="20_crystallizer"]
+[ext_resource type="PackedScene" path="res://scenes/world/mine_area.tscn" id="21_mine"]
+[ext_resource type="PackedScene" path="res://scenes/world/world_transition.tscn" id="22_transition"]
+[ext_resource type="PackedScene" path="res://scenes/world/iron_patch.tscn" id="23_iron_patch"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -107,6 +110,35 @@ gene_metabolism = 0.92
 gene_vitality = 1.10
 gene_production = 1.24
 slime_color = Color(0.26, 0.80, 0.58, 1)
+
+[node name="MineArea" parent="." instance=ExtResource("21_mine")]
+position = Vector2(1900, 360)
+
+[node name="MineEntrance" parent="." instance=ExtResource("22_transition")]
+position = Vector2(1200, 175)
+target_position = Vector2(1640, 560)
+minimum_pickaxe_level = 1
+transition_name = "Mina Rasa"
+entrance_style = true
+
+[node name="MineExit" parent="." instance=ExtResource("22_transition")]
+position = Vector2(1615, 610)
+target_position = Vector2(1160, 220)
+minimum_pickaxe_level = 0
+transition_name = "Mina Rasa"
+entrance_style = false
+
+[node name="IronPatch" parent="." instance=ExtResource("23_iron_patch")]
+position = Vector2(1940, 350)
+
+[node name="MineRockA" parent="." instance=ExtResource("8_rock")]
+position = Vector2(1780, 455)
+
+[node name="MineRockB" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2080, 470)
+
+[node name="MineRockC" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2160, 250)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(640, 560)
