@@ -15,7 +15,10 @@ func _ready() -> void:
 		call_deferred("ensure_resources")
 
 func _on_day_started(_day: int) -> void:
-	call_deferred("ensure_resources")
+	# Must run synchronously: SleepSpot saves immediately after GameClock
+	# emits day_started. Deferring this allowed the new day to be saved
+	# before daily ore deposits had respawned.
+	ensure_resources()
 
 func ensure_resources() -> void:
 	if resource_scene == null or get_parent() == null:
