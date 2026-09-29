@@ -10,17 +10,6 @@ func _ready() -> void:
 func _draw() -> void:
 	_draw_grass_background()
 
-	# Temporary farmhouse silhouette until building tiles are integrated.
-	draw_rect(Rect2(290, 110, 180, 130), Color(0.46, 0.31, 0.20), true)
-	draw_colored_polygon(
-		PackedVector2Array([
-			Vector2(270, 115),
-			Vector2(380, 45),
-			Vector2(490, 115),
-		]),
-		Color(0.56, 0.20, 0.16)
-	)
-	draw_rect(Rect2(358, 170, 44, 70), Color(0.24, 0.14, 0.10), true)
 
 func _draw_grass_background() -> void:
 	for y in range(0, 720, WORLD_TILE_SIZE):
