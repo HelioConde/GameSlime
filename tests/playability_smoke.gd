@@ -464,6 +464,57 @@ func _run() -> void:
 		_check(save_manager.has_save(), "day rollover keeps a valid save")
 	_check(int(game_clock.day) == seven_day_start + 7, "seven consecutive days advance without softlock")
 
+	# Calendar, season changes, crop withering and seasonal shop must stay coherent.
+	if player != null and farm != null:
+		var season_crop := player.starter_seed_item.crop_to_plant
+		var season_cell := Vector2i(3, 2)
+		farm.apply_hoe([season_cell])
+		if season_crop != null:
+			farm.plant_crop(season_cell, season_crop)
+
+	game_clock.load_save_data({
+		"day": 28,
+		"minute_of_day": GameClock.START_MINUTE,
+		"year": 1,
+		"season_index": GameClock.Season.SPRING,
+		"day_of_season": 28,
+	})
+	WeatherManager.refresh_for_current_day()
+	var spring_weather := int(WeatherManager.current_weather)
+	WeatherManager.refresh_for_current_day()
+	_check(int(WeatherManager.current_weather) == spring_weather, "weather is deterministic for the same date")
+	game_clock.sleep_and_start_next_day()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(game_clock.season_index == GameClock.Season.SUMMER, "spring day 28 advances to summer")
+	_check(game_clock.day_of_season == 1, "new season begins on day one")
+	if farm != null:
+		_check(farm.get_cell(Vector2i(3, 2)).crop == null, "out-of-season spring crop withers in summer")
+
+	var seasonal_shop := main.get_node_or_null("SeedShop") as SeedShop
+	if seasonal_shop != null:
+		var summer_offers := seasonal_shop.get_current_offers()
+		var has_summer_seed := false
+		for offer in summer_offers:
+			if offer != null and offer.id == &"summer_tomato_seed":
+				has_summer_seed = true
+				break
+		_check(has_summer_seed, "seed shop switches to summer offers")
+
+	game_clock.load_save_data({
+		"day": 112,
+		"minute_of_day": GameClock.START_MINUTE,
+		"year": 1,
+		"season_index": GameClock.Season.WINTER,
+		"day_of_season": 28,
+	})
+	game_clock.sleep_and_start_next_day()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	_check(game_clock.year == 2, "winter day 28 advances to next year")
+	_check(game_clock.season_index == GameClock.Season.SPRING, "new year returns to spring")
+	_check(game_clock.day_of_season == 1, "new year starts on spring day one")
+
 	save_manager.delete_save()
 	main.queue_free()
 	await get_tree().process_frame
