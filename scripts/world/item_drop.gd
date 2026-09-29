@@ -6,6 +6,10 @@ extends Node2D
 @export var pickup_radius: float = 30.0
 @export var tint: Color = Color.WHITE
 
+var natural_spawn: bool = false
+var spawned_day: int = -1
+var expires_after_days: int = 0
+
 var _bob_time: float = 0.0
 
 func _ready() -> void:
@@ -21,6 +25,17 @@ func configure(new_item_id: StringName, new_amount: int, new_tint: Color) -> voi
 	amount = maxi(new_amount, 1)
 	tint = new_tint
 	queue_redraw()
+
+func configure_natural_spawn(day: int, lifetime_days: int) -> void:
+	natural_spawn = true
+	spawned_day = day
+	expires_after_days = maxi(lifetime_days, 1)
+	add_to_group("daily_world_spawn")
+
+func is_natural_spawn_expired(current_day: int) -> bool:
+	if not natural_spawn or spawned_day < 0 or expires_after_days <= 0:
+		return false
+	return current_day - spawned_day >= expires_after_days
 
 func can_pickup(player_position: Vector2) -> bool:
 	return global_position.distance_to(player_position) <= pickup_radius
