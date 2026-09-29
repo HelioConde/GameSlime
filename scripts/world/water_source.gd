@@ -1,11 +1,27 @@
 class_name WaterSource
 extends Node2D
 
+const WATER_FRAMES: Array[Texture2D] = [
+	preload("res://assets/sprout_lands/tiles/water_1.png"),
+	preload("res://assets/sprout_lands/tiles/water_2.png"),
+	preload("res://assets/sprout_lands/tiles/water_3.png"),
+	preload("res://assets/sprout_lands/tiles/water_4.png"),
+]
+
 @export var interaction_radius: float = 72.0
+@export var animation_fps: float = 5.0
+
+@onready var visual: Sprite2D = $Visual
+
+var _animation_time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("water_source")
-	queue_redraw()
+	_update_frame()
+
+func _process(delta: float) -> void:
+	_animation_time += delta
+	_update_frame()
 
 func can_interact(player_position: Vector2) -> bool:
 	return global_position.distance_to(player_position) <= interaction_radius
@@ -17,8 +33,9 @@ func interact(player: PlayerController) -> String:
 	player.refill_watering_can()
 	return "Regador cheio."
 
-func _draw() -> void:
-	draw_circle(Vector2.ZERO, 34.0, Color(0.16, 0.49, 0.73, 0.95))
-	draw_circle(Vector2.ZERO, 29.0, Color(0.23, 0.67, 0.93, 0.95))
-	draw_arc(Vector2.ZERO, 35.0, 0.0, TAU, 32, Color(0.10, 0.25, 0.34), 3.0)
-	draw_arc(Vector2.ZERO, 20.0, 0.2, 2.9, 18, Color(0.68, 0.91, 1.0, 0.55), 2.0)
+func _update_frame() -> void:
+	if visual == null or WATER_FRAMES.is_empty():
+		return
+
+	var frame_index := int(floor(_animation_time * animation_fps)) % WATER_FRAMES.size()
+	visual.texture = WATER_FRAMES[frame_index]
