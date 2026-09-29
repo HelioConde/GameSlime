@@ -16,6 +16,8 @@ var farm_field: FarmField
 
 func _ready() -> void:
 	add_to_group("player")
+	if not GameClock.day_started.is_connected(_on_day_started):
+		GameClock.day_started.connect(_on_day_started)
 	call_deferred("_find_world_systems")
 	queue_redraw()
 
@@ -160,6 +162,9 @@ func _update_facing(direction: Vector2) -> void:
 
 func _find_world_systems() -> void:
 	farm_field = get_tree().get_first_node_in_group("farm_field") as FarmField
+
+func _on_day_started(_day: int) -> void:
+	energy.restore_full()
 
 func _draw() -> void:
 	_draw_player()
