@@ -34,6 +34,7 @@ func interact(player: PlayerController) -> String:
 		player.inventory.add_item(item, amount, quality)
 		return "Nao foi possivel registrar a remessa."
 
+	Sfx.play_cue(&"confirm")
 	var quality_name := InventorySlotData.get_quality_name(quality)
 	return "Enviado: %s x%d · %s · %dg amanha." % [
 		item.display_name,
