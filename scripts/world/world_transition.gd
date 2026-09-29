@@ -28,6 +28,10 @@ func interact(player: PlayerController) -> String:
 	player.velocity = Vector2.ZERO
 	player.global_position = target_position
 
+	var camera := player.get_node_or_null("Camera2D") as Camera2D
+	if camera != null:
+		camera.reset_smoothing()
+
 	if entrance_style:
 		return "Voce entrou em %s." % transition_name
 	return "Voce saiu de %s." % transition_name
