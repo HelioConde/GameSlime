@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/shipping_bin.tscn" id="17_shipping"]
 [ext_resource type="PackedScene" path="res://scenes/world/seed_shop.tscn" id="18_shop"]
 [ext_resource type="PackedScene" path="res://scenes/world/copper_patch.tscn" id="19_copper_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/slime_crystallizer.tscn" id="20_crystallizer"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -35,6 +36,9 @@ position = Vector2(330, 295)
 
 [node name="SeedShop" parent="." instance=ExtResource("18_shop")]
 position = Vector2(330, 360)
+
+[node name="SlimeCrystallizer" parent="." instance=ExtResource("20_crystallizer")]
+position = Vector2(610, 180)
 
 [node name="FarmField" parent="." instance=ExtResource("3_farm")]
 position = Vector2(448, 240)
