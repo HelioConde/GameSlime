@@ -118,6 +118,45 @@ func _run() -> void:
 			_check(player.global_position == entrance.target_position, "mine opens at pickaxe level 1")
 			_check(entered_message.contains("entrou"), "mine confirms entry")
 
+			var deep_entrance := main.get_node_or_null("DeepMineEntrance") as WorldTransition
+			var deep_area := main.get_node_or_null("DeepMineArea") as MineArea
+			_check(deep_entrance != null, "deep mine entrance exists")
+			_check(deep_area != null, "deep mine area exists")
+			if deep_entrance != null and deep_area != null:
+				player.global_position = deep_entrance.global_position
+				player.tools.pickaxe_level = 1
+				var deep_before := player.global_position
+				var deep_blocked := deep_entrance.interact(player)
+				_check(player.global_position == deep_before, "deep mine blocks pickaxe level 1")
+				_check(deep_blocked.contains("Picareta Nv.2"), "deep mine explains level 2 requirement")
+				player.tools.pickaxe_level = 2
+				var deep_entered := deep_entrance.interact(player)
+				_check(deep_entered.contains("entrou"), "deep mine confirms entry")
+				_check(deep_area.contains_position(player.global_position), "player arrives inside deep mine")
+
+			var abyss_entrance := main.get_node_or_null("AbyssMineEntrance") as WorldTransition
+			var abyss_area := main.get_node_or_null("AbyssMineArea") as MineArea
+			_check(abyss_entrance != null, "abyss mine entrance exists")
+			_check(abyss_area != null, "abyss mine area exists")
+			if abyss_entrance != null and abyss_area != null:
+				player.global_position = abyss_entrance.global_position
+				player.tools.pickaxe_level = 2
+				var abyss_before := player.global_position
+				var abyss_blocked := abyss_entrance.interact(player)
+				_check(player.global_position == abyss_before, "abyss mine blocks pickaxe level 2")
+				_check(abyss_blocked.contains("Picareta Nv.3"), "abyss mine explains level 3 requirement")
+				player.tools.pickaxe_level = 3
+				var abyss_entered := abyss_entrance.interact(player)
+				_check(abyss_entered.contains("entrou"), "abyss mine confirms entry")
+				_check(abyss_area.contains_position(player.global_position), "player arrives inside abyss mine")
+
+				var saved_mine_position := player.global_position
+				_check(save_manager.save_game(), "save inside abyss mine succeeds")
+				player.global_position = Vector2(640.0, 560.0)
+				_check(save_manager.load_game(), "load inside abyss mine succeeds")
+				_check(player.global_position.is_equal_approx(saved_mine_position), "mine position survives save and load")
+				_check(abyss_area.contains_position(player.global_position), "loaded player remains inside abyss mine")
+
 	var old_day := int(game_clock.day)
 	game_clock.sleep_and_start_next_day()
 	await get_tree().process_frame
