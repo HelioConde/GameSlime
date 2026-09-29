@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/rock_resource.tscn" id="8_rock"]
 
 [node name="Main" type="Node2D"]
+texture_filter = 1
 script = ExtResource("1_world")
 
 [node name="FarmField" parent="." instance=ExtResource("3_farm")]
