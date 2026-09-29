@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
@@ -21,6 +21,14 @@
 [ext_resource type="Resource" path="res://resources/items/fall_pumpkin.tres" id="19_fall_crop"]
 [ext_resource type="Resource" path="res://resources/items/winter_root_seed.tres" id="20_winter_seed"]
 [ext_resource type="Resource" path="res://resources/items/winter_root.tres" id="21_winter_crop"]
+[ext_resource type="Resource" path="res://resources/items/spring_berry_seed.tres" id="22_spring_berry_seed"]
+[ext_resource type="Resource" path="res://resources/items/spring_berry.tres" id="23_spring_berry_crop"]
+[ext_resource type="Resource" path="res://resources/items/summer_corn_seed.tres" id="24_summer_corn_seed"]
+[ext_resource type="Resource" path="res://resources/items/summer_corn.tres" id="25_summer_corn_crop"]
+[ext_resource type="Resource" path="res://resources/items/fall_eggplant_seed.tres" id="26_fall_eggplant_seed"]
+[ext_resource type="Resource" path="res://resources/items/fall_eggplant.tres" id="27_fall_eggplant_crop"]
+[ext_resource type="Resource" path="res://resources/items/winter_kale_seed.tres" id="28_winter_kale_seed"]
+[ext_resource type="Resource" path="res://resources/items/winter_kale.tres" id="29_winter_kale_crop"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -45,6 +53,14 @@ fall_seed_item = ExtResource("18_fall_seed")
 fall_crop_item = ExtResource("19_fall_crop")
 winter_seed_item = ExtResource("20_winter_seed")
 winter_crop_item = ExtResource("21_winter_crop")
+spring_berry_seed_item = ExtResource("22_spring_berry_seed")
+spring_berry_crop_item = ExtResource("23_spring_berry_crop")
+summer_corn_seed_item = ExtResource("24_summer_corn_seed")
+summer_corn_crop_item = ExtResource("25_summer_corn_crop")
+fall_eggplant_seed_item = ExtResource("26_fall_eggplant_seed")
+fall_eggplant_crop_item = ExtResource("27_fall_eggplant_crop")
+winter_kale_seed_item = ExtResource("28_winter_kale_seed")
+winter_kale_crop_item = ExtResource("29_winter_kale_crop")
 
 [node name="Visual" type="Sprite2D" parent="."]
 texture_filter = 1
