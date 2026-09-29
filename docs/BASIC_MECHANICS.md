@@ -15,7 +15,8 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 ## 2. Tempo, dia e calendario
 - [x] relogio correndo em tempo real
 - [x] virada automatica as 02:00
-- [x] dormir manualmente
+- [x] desmaio as 02:00 retorna o player para casa com energia parcial
+- [x] dormir manualmente recupera energia completa
 - [x] 28 dias por estacao
 - [x] quatro estacoes
 - [x] mudanca de ano
@@ -35,6 +36,7 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] bloqueio quando energia e insuficiente
 - [x] sono restaura energia
 - [x] comida/forrageaveis restauram energia
+- [x] exaustao reduz velocidade de movimento ate recuperar energia
 
 ## 5. Agricultura
 - [x] solo aravel
@@ -48,8 +50,12 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] bloqueio de colheita com inventario cheio
 - [x] quantidade de colheita deterministica e variavel
 - [x] culturas de rebrota
+- [x] culturas multiestacao
+- [x] solo abandonado retorna naturalmente para grama
+- [x] fertilizante basico persistente
+- [x] qualidade Normal/Prata/Ouro por stack
+- [x] qualidade altera o valor de venda
 - [x] persistencia completa da horta no save
-- [ ] fertilizante e qualidade de cultivo (progressao, nao necessario para base v1)
 - [ ] plantacoes gigantes/especiais (conteudo avancado)
 
 ## 6. Inventario e hotbar
@@ -63,6 +69,8 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] organizar
 - [x] selecao persistente
 - [x] save/load da ordem
+- [x] stacks de qualidades diferentes permanecem separados
+- [x] qualidade preservada em mover/dividir/organizar/save
 - [x] protecao contra perda/duplicacao em inventario cheio
 
 ## 7. Ferramentas
@@ -101,6 +109,9 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] sementes silvestres da estacao correta
 - [x] persistencia de spawns no save/load
 - [x] novo conjunto de spawns a cada novo dia
+- [x] spawns nao coletados persistem entre dias
+- [x] expiracao natural por tipo de recurso
+- [x] limite global evita acumulo infinito
 - [x] sem reroll diferente ao recarregar o mesmo dia
 - [ ] biomas adicionais com tabelas proprias (expansao de mapa)
 - [ ] raridades especiais/eventos de spawn (conteudo avancado)
@@ -116,6 +127,8 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] remessa persiste no save
 - [x] pagamento ocorre uma unica vez
 - [x] itens de forrageio possuem valor de venda
+- [x] adubo vendido como insumo permanente
+- [x] qualidade Prata/Ouro aumenta valor da remessa
 
 ## 11. Minas
 - [x] Mina Rasa
@@ -135,7 +148,7 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] save temporario atomico
 - [x] backup automatico
 - [x] fallback para backup corrompido
-- [x] migracao de saves antigos
+- [x] save v7 com migracao aditiva de v5/v6
 - [x] inventario
 - [x] player
 - [x] ferramentas
@@ -173,6 +186,9 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] sete viradas de dia automatizadas
 - [x] spawn diario deterministico
 - [x] rebrota e rendimento variavel de culturas
+- [x] fertilizante, qualidade e valor de venda
+- [x] desmaio as 02:00 e penalidade de exaustao
+- [x] ecologia persistente com expiracao/cap
 - [ ] campanha manual completa em gameplay real
 
 ## Fora da definicao de "mecanica basica v1"
