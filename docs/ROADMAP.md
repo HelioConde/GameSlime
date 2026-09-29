@@ -34,8 +34,8 @@
 - [x] arvore e pedra usando sprites reais
 - [x] grama e solo arado usando tiles reais
 - [x] hotbar visual com icones de ferramentas
-- [ ] painel completo de inventario
-- [ ] drag-and-drop de slots
+- [x] painel completo de inventario
+- [x] drag-and-drop de slots
 
 ## Marco 2 - ferramentas e recursos do mapa
 - [x] machado
