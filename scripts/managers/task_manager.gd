@@ -75,6 +75,9 @@ func release_task(task: TaskData, slime: Node2D = null) -> void:
 	task_released.emit(task)
 
 func cleanup_finished() -> void:
-	_tasks = _tasks.filter(func(task: TaskData) -> bool:
-		return task.state != GameEnums.TaskState.COMPLETED and task.state != GameEnums.TaskState.CANCELED
-	)
+	var remaining: Array[TaskData] = []
+	for task in _tasks:
+		if task.state in [GameEnums.TaskState.COMPLETED, GameEnums.TaskState.CANCELED]:
+			continue
+		remaining.append(task)
+	_tasks = remaining
