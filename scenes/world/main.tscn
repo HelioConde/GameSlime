@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -26,9 +26,35 @@
 [ext_resource type="PackedScene" path="res://scenes/world/silver_patch.tscn" id="24_silver_patch"]
 [ext_resource type="PackedScene" path="res://scenes/world/gold_patch.tscn" id="25_gold_patch"]
 
+
+[sub_resource type="RectangleShape2D" id="WorldHorizontalBoundary"]
+size = Vector2(4192, 32)
+
+[sub_resource type="RectangleShape2D" id="WorldVerticalBoundary"]
+size = Vector2(32, 752)
+
 [node name="Main" type="Node2D"]
 texture_filter = 1
 script = ExtResource("1_world")
+
+
+[node name="WorldBounds" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(2080, -16)
+shape = SubResource("WorldHorizontalBoundary")
+
+[node name="Bottom" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(2080, 736)
+shape = SubResource("WorldHorizontalBoundary")
+
+[node name="Left" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(-16, 360)
+shape = SubResource("WorldVerticalBoundary")
+
+[node name="Right" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(4176, 360)
+shape = SubResource("WorldVerticalBoundary")
 
 [node name="Farmhouse" parent="." instance=ExtResource("10_house")]
 position = Vector2(380, 185)
