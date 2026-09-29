@@ -48,7 +48,7 @@ func _run() -> void:
 	var world_bounds := main.get_node_or_null("WorldBounds") as StaticBody2D
 	_check(world_bounds != null, "world bounds exist")
 	if world_bounds != null:
-		_check(world_bounds.get_child_count() == 4, "world bounds cover all four outer edges")
+		_check(world_bounds.get_child_count() == 5, "world bounds cover outer edges and farm divider")
 
 	if player != null and world_bounds != null:
 		var original_position := player.global_position
@@ -56,6 +56,10 @@ func _run() -> void:
 		var boundary_collision := player.move_and_collide(Vector2(0.0, -80.0))
 		_check(boundary_collision != null, "north world boundary blocks the player")
 		_check(player.global_position.y >= 0.0, "player cannot leave the visible world vertically")
+		player.global_position = Vector2(1240.0, 360.0)
+		var farm_divider_collision := player.move_and_collide(Vector2(100.0, 0.0))
+		_check(farm_divider_collision != null, "farm divider blocks hidden mine staging area")
+		_check(player.global_position.x < 1280.0, "player stays on farm side without using mine transition")
 		player.global_position = original_position
 
 	var solid_interactables := ["ShippingBin", "SeedShop", "ToolUpgradeStation", "WaterSource"]
