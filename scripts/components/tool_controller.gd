@@ -178,3 +178,52 @@ func load_save_data(data: Dictionary) -> void:
 	pickaxe_level = clampi(int(data.get("pickaxe_level", pickaxe_level)), 0, 5)
 	current_water = clampi(int(data.get("current_water", get_water_capacity())), 0, get_water_capacity())
 	water_changed.emit(current_water, get_water_capacity())
+
+func can_upgrade_tool(tool: int = selected_tool) -> bool:
+	return get_tool_level(tool) < 5
+
+func get_upgrade_cost(tool: int = selected_tool) -> Dictionary:
+	var level := get_tool_level(tool)
+	if level >= 5:
+		return {}
+
+	var next_level := level + 1
+	return {
+		"wood": 10 * next_level,
+		"stone": 5 * next_level,
+	}
+
+func upgrade_tool(tool: int = selected_tool) -> bool:
+	if not can_upgrade_tool(tool):
+		return false
+
+	var next_level := get_tool_level(tool) + 1
+
+	match tool:
+		ToolType.HOE:
+			hoe_level = next_level
+		ToolType.WATERING_CAN:
+			watering_can_level = next_level
+			current_water = mini(current_water, get_water_capacity())
+			water_changed.emit(current_water, get_water_capacity())
+		ToolType.AXE:
+			axe_level = next_level
+		ToolType.PICKAXE:
+			pickaxe_level = next_level
+		_:
+			return false
+
+	return true
+
+func get_tool_display_name(tool: int = selected_tool) -> String:
+	match tool:
+		ToolType.HOE:
+			return "Enxada"
+		ToolType.WATERING_CAN:
+			return "Regador"
+		ToolType.AXE:
+			return "Machado"
+		ToolType.PICKAXE:
+			return "Picareta"
+		_:
+			return "Ferramenta"
