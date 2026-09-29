@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" path="res://scenes/slimes/slime_habitat.tscn" id="16_habitat"]
 [ext_resource type="PackedScene" path="res://scenes/world/shipping_bin.tscn" id="17_shipping"]
 [ext_resource type="PackedScene" path="res://scenes/world/seed_shop.tscn" id="18_shop"]
+[ext_resource type="PackedScene" path="res://scenes/world/copper_rock.tscn" id="19_copper"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -62,6 +63,15 @@ position = Vector2(355, 505)
 
 [node name="RockC" parent="." instance=ExtResource("8_rock")]
 position = Vector2(945, 450)
+
+[node name="CopperRockA" parent="." instance=ExtResource("19_copper")]
+position = Vector2(890, 245)
+
+[node name="CopperRockB" parent="." instance=ExtResource("19_copper")]
+position = Vector2(940, 275)
+
+[node name="CopperRockC" parent="." instance=ExtResource("19_copper")]
+position = Vector2(990, 240)
 
 [node name="LargeStumpGate" parent="." instance=ExtResource("12_stump")]
 position = Vector2(1080, 230)
