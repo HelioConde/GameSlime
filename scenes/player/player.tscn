@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=34 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
@@ -31,6 +31,7 @@
 [ext_resource type="Resource" path="res://resources/items/winter_kale.tres" id="29_winter_kale_crop"]
 [ext_resource type="Resource" path="res://resources/items/slime_crystal.tres" id="30_slime_crystal"]
 [ext_resource type="Resource" path="res://resources/items/iron_ore.tres" id="31_iron"]
+[ext_resource type="Resource" path="res://resources/items/silver_ore.tres" id="32_silver"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -65,6 +66,7 @@ winter_kale_seed_item = ExtResource("28_winter_kale_seed")
 winter_kale_crop_item = ExtResource("29_winter_kale_crop")
 slime_crystal_item = ExtResource("30_slime_crystal")
 iron_ore_item = ExtResource("31_iron")
+silver_ore_item = ExtResource("32_silver")
 
 [node name="Visual" type="Sprite2D" parent="."]
 texture_filter = 1
@@ -100,5 +102,5 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 limit_left = 0
 limit_top = 0
-limit_right = 2360
+limit_right = 3260
 limit_bottom = 720
