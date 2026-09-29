@@ -16,7 +16,11 @@ func interact(player: PlayerController) -> String:
 
 	GameClock.sleep_and_start_next_day()
 	player.restore_after_sleep()
-	return "Voce dormiu. Dia %d comecou." % GameClock.day
+
+	var saved := SaveManager.save_game()
+	if saved:
+		return "Voce dormiu. %s comecou. Jogo salvo." % GameClock.get_date_text()
+	return "Voce dormiu. %s comecou." % GameClock.get_date_text()
 
 func _draw() -> void:
 	draw_rect(Rect2(-26, -16, 52, 32), Color(0.40, 0.25, 0.16), true)
