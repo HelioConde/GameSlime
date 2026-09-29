@@ -7,7 +7,6 @@ signal crop_harvested(cell: Vector2i, crop: CropDefinition, amount: int)
 
 @export var grid_size: Vector2i = Vector2i(12, 8)
 @export var cell_size: int = 32
-@export var starter_crop: CropDefinition
 
 var harvested_total: int = 0
 var _cells: Dictionary = {}
@@ -72,37 +71,60 @@ func apply_water(cells: Array[Vector2i]) -> int:
 		queue_redraw()
 	return changed
 
-func interact_cell(cell: Vector2i) -> String:
-	if not is_valid_cell(cell):
-		return ""
+func can_plant(cell: Vector2i) -> bool:
+	var data := get_cell(cell)
+	return data != null and data.tilled and data.crop == null
 
+func plant_crop(cell: Vector2i, crop: CropDefinition) -> bool:
+	if crop == null or not can_plant(cell):
+		return false
+
+	var data := get_cell(cell)
+	data.crop = crop
+	data.growth_days_completed = 0
+	data.crop_stage = 0
+	data.ready_to_harvest = false
+	crop_planted.emit(cell, crop)
+	cell_changed.emit(cell)
+	queue_redraw()
+	return true
+
+func can_harvest(cell: Vector2i) -> bool:
+	var data := get_cell(cell)
+	return data != null and data.ready_to_harvest and data.crop != null
+
+func harvest_cell(cell: Vector2i) -> Dictionary:
+	if not can_harvest(cell):
+		return {}
+
+	var data := get_cell(cell)
+	var harvested_crop := data.crop
+	var amount := 1
+
+	data.clear_crop()
+	harvested_total += amount
+	crop_harvested.emit(cell, harvested_crop, amount)
+	cell_changed.emit(cell)
+	queue_redraw()
+
+	return {
+		"crop": harvested_crop,
+		"amount": amount,
+	}
+
+func get_cell_hint(cell: Vector2i) -> String:
 	var data := get_cell(cell)
 	if data == null:
 		return ""
-
-	if data.ready_to_harvest and data.crop != null:
-		var harvested_crop := data.crop
-		data.clear_crop()
-		harvested_total += 1
-		crop_harvested.emit(cell, harvested_crop, 1)
-		cell_changed.emit(cell)
-		queue_redraw()
-		return "Colheu %s" % harvested_crop.display_name
-
-	if data.tilled and data.crop == null and starter_crop != null:
-		data.crop = starter_crop
-		data.growth_days_completed = 0
-		data.crop_stage = 0
-		data.ready_to_harvest = false
-		crop_planted.emit(cell, starter_crop)
-		cell_changed.emit(cell)
-		queue_redraw()
-		return "Plantou %s" % starter_crop.display_name
-
 	if not data.tilled:
-		return "Use a enxada primeiro"
-
-	return ""
+		return "Use a enxada primeiro."
+	if data.crop == null:
+		return "Selecione uma semente na hotbar."
+	if data.ready_to_harvest:
+		return "Pronto para colher."
+	if not data.watered_today:
+		return "A planta precisa de agua hoje."
+	return "%s esta crescendo." % data.crop.display_name
 
 func _on_day_ended(_day: int) -> void:
 	for key in _cells.keys():
