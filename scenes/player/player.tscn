@@ -1,8 +1,13 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
 [ext_resource type="Script" path="res://scripts/components/tool_controller.gd" id="3_tools"]
+[ext_resource type="Script" path="res://scripts/components/inventory_component.gd" id="4_inventory"]
+[ext_resource type="Resource" path="res://resources/items/hoe.tres" id="5_hoe"]
+[ext_resource type="Resource" path="res://resources/items/watering_can.tres" id="6_water"]
+[ext_resource type="Resource" path="res://resources/items/starter_turnip_seed.tres" id="7_seed"]
+[ext_resource type="Resource" path="res://resources/items/starter_turnip.tres" id="8_crop"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -11,6 +16,10 @@ height = 26.0
 [node name="Player" type="CharacterBody2D"]
 motion_mode = 1
 script = ExtResource("1_player")
+starter_hoe_item = ExtResource("5_hoe")
+starter_watering_can_item = ExtResource("6_water")
+starter_seed_item = ExtResource("7_seed")
+starter_crop_item = ExtResource("8_crop")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 4)
@@ -25,6 +34,10 @@ starting_energy = 270.0
 script = ExtResource("3_tools")
 hoe_level = 2
 watering_can_level = 2
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("4_inventory")
+slot_count = 12
 
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = true
