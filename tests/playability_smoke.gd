@@ -45,6 +45,20 @@ func _run() -> void:
 	_check(player != null, "player exists")
 	_check(farm != null, "farm exists")
 
+	var world_spawner := main.get_node_or_null("WorldSpawnManager") as WorldSpawnManager
+	_check(world_spawner != null, "world spawn manager exists")
+	if world_spawner != null:
+		var daily_spawns := get_tree().get_nodes_in_group("daily_world_spawn")
+		_check(daily_spawns.size() >= 4 and daily_spawns.size() <= 7, "new day creates bounded random world spawns")
+		var first_snapshot := world_spawner.get_daily_spawn_snapshot()
+		world_spawner.refresh_for_current_day()
+		var second_snapshot := world_spawner.get_daily_spawn_snapshot()
+		_check(first_snapshot == second_snapshot, "same day world spawns are deterministic")
+		_check(save_manager.save_game(), "world spawn snapshot save succeeds")
+		world_spawner.refresh_for_current_day()
+		_check(save_manager.load_game(), "world spawn snapshot reload succeeds")
+		_check(world_spawner.get_daily_spawn_snapshot() == first_snapshot, "world spawns survive save and load")
+
 	var world_bounds := main.get_node_or_null("WorldBounds") as StaticBody2D
 	_check(world_bounds != null, "world bounds exist")
 	if world_bounds != null:
@@ -74,6 +88,19 @@ func _run() -> void:
 
 	if player != null:
 		_check(player.inventory.slots.size() == 12, "inventory has 12 slots")
+		_check(player.inventory.get_definition(&"wild_flower") != null, "wild flower definition registered")
+		_check(player.inventory.get_definition(&"wild_berry") != null, "wild berry definition registered")
+		_check(player.inventory.get_definition(&"wild_mushroom") != null, "wild mushroom definition registered")
+		_check(player.inventory.get_definition(&"wild_root") != null, "wild root definition registered")
+
+		var forage_food := player.inventory.get_definition(&"wild_berry")
+		if forage_food != null:
+			player.inventory.seed_slot(11, forage_food, 1)
+			player.inventory.set_selected_slot(11)
+			player.energy.set_current_energy(100.0)
+			player.call("_primary_action_pressed")
+			_check(player.inventory.count_item(&"wild_berry") == 0, "eating forage consumes one item")
+			_check(player.energy.current_energy > 100.0, "eating forage restores energy")
 		_check(player.inventory.get_definition(&"copper_ore") != null, "copper definition registered")
 		_check(player.inventory.get_definition(&"iron_ore") != null, "iron definition registered")
 		_check(player.inventory.get_definition(&"silver_ore") != null, "silver definition registered")
@@ -237,6 +264,24 @@ func _run() -> void:
 						_check(not farm.can_harvest(harvest_cell), "harvest succeeds after freeing one slot")
 						_check(player.inventory.count_item(harvest_item.id) == 1, "successful harvest adds exactly one item")
 
+						# Regrowing crops remain planted and use deterministic multi-yield harvests.
+						var berry_crop := load("res://resources/crops/spring_berry.tres") as CropDefinition
+						var berry_item := player.inventory.get_definition(&"spring_berry")
+						_check(berry_crop != null and berry_crop.regrow_days > 0, "regrowing crop definition exists")
+						if berry_crop != null and berry_item != null:
+							var regrow_cell := Vector2i(6, 4)
+							farm.apply_hoe([regrow_cell])
+							_check(farm.plant_crop(regrow_cell, berry_crop), "regrowing crop can be planted")
+							var regrow_data := farm.get_cell(regrow_cell)
+							regrow_data.ready_to_harvest = true
+							regrow_data.growth_days_completed = berry_crop.growth_days
+							regrow_data.crop_stage = berry_crop.visual_stages
+							var expected_berry_amount := farm.get_harvest_amount(regrow_cell)
+							var berry_harvest := farm.harvest_cell(regrow_cell)
+							_check(int(berry_harvest.get("amount", 0)) == expected_berry_amount, "crop harvest yield is deterministic")
+							_check(regrow_data.crop == berry_crop, "regrowing crop remains planted after harvest")
+							_check(not regrow_data.ready_to_harvest, "regrowing crop returns to growth state")
+
 						# Shipping must survive save/load and pay exactly once on the next day.
 						var harvest_slot := -1
 						for slot_index in range(player.inventory.slots.size()):
@@ -271,6 +316,34 @@ func _run() -> void:
 								await get_tree().process_frame
 								await get_tree().process_frame
 								_check(int(economy.gold) == gold_after_shipping, "shipment cannot pay twice")
+
+	if player != null:
+		# Inventory manipulation must conserve item totals.
+		var stone_def := player.inventory.get_definition(&"stone")
+		var wood_def := player.inventory.get_definition(&"wood")
+		if stone_def != null and wood_def != null:
+			player.inventory.clear_all()
+			player.inventory.seed_slot(0, stone_def, 10)
+			player.inventory.seed_slot(1, stone_def, 5)
+			player.inventory.seed_slot(2, wood_def, 7)
+			var total_stone_before := player.inventory.count_item(&"stone")
+			var total_wood_before := player.inventory.count_item(&"wood")
+			_check(player.inventory.split_stack_half(0, 3), "inventory can split stacks")
+			_check(player.inventory.move_or_merge_stack(1, 0), "inventory can merge equal stacks")
+			_check(player.inventory.move_or_merge_stack(2, 4), "inventory can move stacks")
+			player.inventory.organize_slots()
+			_check(player.inventory.count_item(&"stone") == total_stone_before, "inventory operations conserve stone")
+			_check(player.inventory.count_item(&"wood") == total_wood_before, "inventory operations conserve wood")
+
+	# Seven consecutive day rollovers must remain playable and autosaved.
+	var seven_day_start := int(game_clock.day)
+	for _index in range(7):
+		game_clock.sleep_and_start_next_day()
+		await get_tree().process_frame
+		await get_tree().process_frame
+		_check(not get_tree().paused, "day rollover never leaves game paused")
+		_check(save_manager.has_save(), "day rollover keeps a valid save")
+	_check(int(game_clock.day) == seven_day_start + 7, "seven consecutive days advance without softlock")
 
 	save_manager.delete_save()
 	main.queue_free()
