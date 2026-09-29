@@ -845,7 +845,9 @@ func _refresh_mine_status() -> void:
 		return
 
 	mine_panel.visible = true
-	mine_status.text = "Mina Rasa · Picareta Nv.%d · Ferro: %d" % [
+	mine_status.text = "%s · Picareta Nv.%d · Ferro %d · Prata %d" % [
+		active_mine.area_name.capitalize(),
 		player.tools.get_tool_level(ToolController.ToolType.PICKAXE),
 		player.inventory.count_item(&"iron_ore"),
+		player.inventory.count_item(&"silver_ore"),
 	]
