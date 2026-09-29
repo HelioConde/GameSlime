@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
+[ext_resource type="Script" path="res://scripts/components/tool_controller.gd" id="3_tools"]
+
+[sub_resource type="CapsuleShape2D" id="Capsule_player"]
+radius = 8.0
+height = 26.0
+
+[node name="Player" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_player")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("Capsule_player")
+
+[node name="Energy" type="Node" parent="."]
+script = ExtResource("2_energy")
+maximum_energy = 270.0
+starting_energy = 270.0
+
+[node name="ToolController" type="Node" parent="."]
+script = ExtResource("3_tools")
+hoe_level = 2
+watering_can_level = 2
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+limit_left = 0
+limit_top = 0
+limit_right = 1280
+limit_bottom = 720
