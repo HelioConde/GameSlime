@@ -48,7 +48,7 @@ func get_slot(index: int) -> InventorySlotData:
 		return null
 	return slots[index]
 
-func seed_slot(index: int, item: ItemDefinition, amount: int = 1) -> void:
+func seed_slot(index: int, item: ItemDefinition, amount: int = 1, quality: int = InventorySlotData.Quality.NORMAL) -> void:
 	if item == null or index < 0 or index >= slots.size():
 		return
 
@@ -56,22 +56,24 @@ func seed_slot(index: int, item: ItemDefinition, amount: int = 1) -> void:
 	var slot := slots[index]
 	slot.item = item
 	slot.amount = clampi(amount, 0, item.max_stack)
+	slot.quality = InventorySlotData.clamp_quality(quality)
 
 	if slot.amount <= 0:
 		slot.clear()
 
 	inventory_changed.emit()
 
-func can_add_item(item: ItemDefinition, amount: int = 1) -> bool:
+func can_add_item(item: ItemDefinition, amount: int = 1, quality: int = InventorySlotData.Quality.NORMAL) -> bool:
 	if item == null or amount <= 0:
 		return true
 
 	var remaining := amount
+	var target_quality := InventorySlotData.clamp_quality(quality)
 
 	for slot in slots:
 		if slot.is_empty():
 			remaining -= mini(item.max_stack, remaining)
-		elif slot.item.id == item.id:
+		elif slot.item.id == item.id and slot.quality == target_quality:
 			remaining -= mini(item.max_stack - slot.amount, remaining)
 
 		if remaining <= 0:
@@ -79,15 +81,16 @@ func can_add_item(item: ItemDefinition, amount: int = 1) -> bool:
 
 	return false
 
-func add_item(item: ItemDefinition, amount: int = 1) -> int:
+func add_item(item: ItemDefinition, amount: int = 1, quality: int = InventorySlotData.Quality.NORMAL) -> int:
 	if item == null or amount <= 0:
 		return amount
 
 	register_definition(item)
 	var remaining := amount
+	var target_quality := InventorySlotData.clamp_quality(quality)
 
 	for slot in slots:
-		if slot.is_empty() or slot.item.id != item.id:
+		if slot.is_empty() or slot.item.id != item.id or slot.quality != target_quality:
 			continue
 
 		var available := item.max_stack - slot.amount
@@ -109,6 +112,7 @@ func add_item(item: ItemDefinition, amount: int = 1) -> int:
 		var moved := mini(item.max_stack, remaining)
 		slot.item = item
 		slot.amount = moved
+		slot.quality = target_quality
 		remaining -= moved
 
 		if remaining <= 0:
@@ -118,16 +122,18 @@ func add_item(item: ItemDefinition, amount: int = 1) -> int:
 	inventory_changed.emit()
 	return remaining
 
-func remove_item(item_id: StringName, amount: int = 1) -> bool:
+func remove_item(item_id: StringName, amount: int = 1, quality: int = -1) -> bool:
 	if amount <= 0:
 		return true
-	if count_item(item_id) < amount:
+	if count_item(item_id, quality) < amount:
 		return false
 
 	var remaining := amount
 
 	for slot in slots:
 		if slot.is_empty() or slot.item.id != item_id:
+			continue
+		if quality >= 0 and slot.quality != InventorySlotData.clamp_quality(quality):
 			continue
 
 		var removed := mini(slot.amount, remaining)
@@ -143,14 +149,28 @@ func remove_item(item_id: StringName, amount: int = 1) -> bool:
 
 	return false
 
-func count_item(item_id: StringName) -> int:
+func count_item(item_id: StringName, quality: int = -1) -> int:
 	var total := 0
 
 	for slot in slots:
-		if not slot.is_empty() and slot.item.id == item_id:
-			total += slot.amount
+		if slot.is_empty() or slot.item.id != item_id:
+			continue
+		if quality >= 0 and slot.quality != InventorySlotData.clamp_quality(quality):
+			continue
+		total += slot.amount
 
 	return total
+
+func remove_from_slot(index: int, amount: int = 1) -> bool:
+	var slot := get_slot(index)
+	if slot == null or slot.is_empty() or amount <= 0 or slot.amount < amount:
+		return false
+
+	slot.amount -= amount
+	if slot.amount <= 0:
+		slot.clear()
+	inventory_changed.emit()
+	return true
 
 func get_used_slot_count() -> int:
 	var used := 0
@@ -174,16 +194,19 @@ func move_or_merge_stack(from_index: int, to_index: int) -> bool:
 		return false
 
 	var selected_item_id := StringName()
+	var selected_quality := -1
 	if selected_slot >= 0 and selected_slot < slots.size():
 		var selected_stack := slots[selected_slot]
 		if selected_stack != null and not selected_stack.is_empty():
 			selected_item_id = selected_stack.item.id
+			selected_quality = selected_stack.quality
 
 	if target == null or target.is_empty():
 		target.item = source.item
 		target.amount = source.amount
+		target.quality = source.quality
 		source.clear()
-	elif target.item.id == source.item.id and source.item.max_stack > 1:
+	elif target.item.id == source.item.id and target.quality == source.quality and source.item.max_stack > 1:
 		var available := maxi(target.item.max_stack - target.amount, 0)
 		if available <= 0:
 			return false
@@ -197,12 +220,15 @@ func move_or_merge_stack(from_index: int, to_index: int) -> bool:
 	else:
 		var temp_item := target.item
 		var temp_amount := target.amount
+		var temp_quality := target.quality
 		target.item = source.item
 		target.amount = source.amount
+		target.quality = source.quality
 		source.item = temp_item
 		source.amount = temp_amount
+		source.quality = temp_quality
 
-	_restore_selection_by_item(selected_item_id)
+	_restore_selection_by_item(selected_item_id, selected_quality)
 	inventory_changed.emit()
 	selected_slot_changed.emit(selected_slot)
 	return true
@@ -227,6 +253,7 @@ func split_stack_half(from_index: int, to_index: int) -> bool:
 	var moved := int(ceil(float(source.amount) * 0.5))
 	target.item = source.item
 	target.amount = moved
+	target.quality = source.quality
 	source.amount -= moved
 
 	inventory_changed.emit()
@@ -237,59 +264,67 @@ func organize_slots() -> void:
 		return
 
 	var selected_item_id := StringName()
+	var selected_quality := -1
 	var selected_stack := get_selected_stack()
 	if selected_stack != null and not selected_stack.is_empty():
 		selected_item_id = selected_stack.item.id
+		selected_quality = selected_stack.quality
 
 	var totals: Dictionary = {}
-	var order: Array[StringName] = []
+	var order: Array[String] = []
 
 	for slot in slots:
 		if slot == null or slot.is_empty():
 			continue
 
-		var item_id := slot.item.id
-		if not totals.has(item_id):
-			totals[item_id] = {
+		var key := "%s#%d" % [String(slot.item.id), slot.quality]
+		if not totals.has(key):
+			totals[key] = {
 				"item": slot.item,
+				"quality": slot.quality,
 				"amount": 0,
 			}
-			order.append(item_id)
+			order.append(key)
 
-		var entry := totals[item_id] as Dictionary
+		var entry := totals[key] as Dictionary
 		entry["amount"] = int(entry.get("amount", 0)) + slot.amount
-		totals[item_id] = entry
+		totals[key] = entry
 
 	for slot in slots:
 		slot.clear()
 
 	var write_index := 0
-	for item_id in order:
-		var entry := totals[item_id] as Dictionary
+	for key in order:
+		var entry := totals[key] as Dictionary
 		var item := entry.get("item") as ItemDefinition
+		var quality := int(entry.get("quality", InventorySlotData.Quality.NORMAL))
 		var remaining := int(entry.get("amount", 0))
 
 		while remaining > 0 and write_index < slots.size():
 			var moved := mini(item.max_stack, remaining)
 			slots[write_index].item = item
 			slots[write_index].amount = moved
+			slots[write_index].quality = quality
 			remaining -= moved
 			write_index += 1
 
-	_restore_selection_by_item(selected_item_id)
+	_restore_selection_by_item(selected_item_id, selected_quality)
 	inventory_changed.emit()
 	selected_slot_changed.emit(selected_slot)
 
-func _restore_selection_by_item(item_id: StringName) -> void:
+func _restore_selection_by_item(item_id: StringName, quality: int = -1) -> void:
 	if item_id == &"":
 		selected_slot = clampi(selected_slot, 0, maxi(slots.size() - 1, 0))
 		return
 
 	for index in range(slots.size()):
 		var slot := slots[index]
-		if slot != null and not slot.is_empty() and slot.item.id == item_id:
-			selected_slot = index
-			return
+		if slot == null or slot.is_empty() or slot.item.id != item_id:
+			continue
+		if quality >= 0 and slot.quality != InventorySlotData.clamp_quality(quality):
+			continue
+		selected_slot = index
+		return
 
 	selected_slot = clampi(selected_slot, 0, maxi(slots.size() - 1, 0))
 
@@ -307,6 +342,7 @@ func get_save_data() -> Array:
 			data.append({
 				"item_id": String(slot.item.id),
 				"amount": slot.amount,
+				"quality": slot.quality,
 			})
 	return data
 
@@ -327,6 +363,11 @@ func load_save_data(data: Array) -> void:
 		if definition == null:
 			continue
 
-		seed_slot(index, definition, int(entry.get("amount", 0)))
+		seed_slot(
+			index,
+			definition,
+			int(entry.get("amount", 0)),
+			int(entry.get("quality", InventorySlotData.Quality.NORMAL))
+		)
 
 	inventory_changed.emit()
