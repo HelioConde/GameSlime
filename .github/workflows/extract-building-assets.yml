@@ -1,0 +1,47 @@
+name: Extract Building Assets
+
+on:
+  push:
+    branches:
+      - feat/stardew-foundation-4.7.2
+    paths:
+      - ".github/workflows/extract-building-assets.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract selected building assets from main pack
+        shell: bash
+        run: |
+          set -e
+          git fetch origin main:refs/remotes/origin/main
+          git show origin/main:"sprites/Sprout Lands - Sprites - premium pack.zip" > /tmp/sprout.zip
+
+          ROOT="Sprout Lands - Sprites - premium pack"
+          mkdir -p assets/sprout_lands/buildings
+
+          unzip -p /tmp/sprout.zip "$ROOT/Tilesets/Building parts/Wooden_House_Roof_Tilset.png" > assets/sprout_lands/buildings/wooden_house_roof.png
+          unzip -p /tmp/sprout.zip "$ROOT/Tilesets/Building parts/Wooden_House_Walls_Tilset.png" > assets/sprout_lands/buildings/wooden_house_walls.png
+          unzip -p /tmp/sprout.zip "$ROOT/Tilesets/Building parts/door animation sprites.png" > assets/sprout_lands/buildings/door_animation.png
+          unzip -p /tmp/sprout.zip "$ROOT/Tilesets/Building parts/Fences.png" > assets/sprout_lands/buildings/fences.png
+          unzip -p /tmp/sprout.zip "$ROOT/Tilesets/Building parts/Paths.png" > assets/sprout_lands/buildings/paths.png
+          unzip -p /tmp/sprout.zip "$ROOT/Tilesets/Building parts/Mailbox Animation Frames.png" > assets/sprout_lands/buildings/mailbox_animation.png
+
+          file assets/sprout_lands/buildings/*.png
+
+      - name: Commit selected assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/sprout_lands/buildings
+          git commit -m "assets: add selected Sprout Lands building sprites"
+          git push
