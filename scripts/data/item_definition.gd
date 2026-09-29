@@ -21,6 +21,10 @@ enum IconSheet {
 @export_range(1, 999, 1) var max_stack: int = 99
 @export var tint: Color = Color.WHITE
 
+@export_group("Economy")
+@export_range(0, 999999, 1) var buy_price: int = 0
+@export_range(0, 999999, 1) var sell_price: int = 0
+
 @export_group("Icon")
 @export var icon_sheet: IconSheet = IconSheet.NONE
 @export var icon_cell: Vector2i = Vector2i.ZERO
