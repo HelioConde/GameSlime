@@ -5,7 +5,7 @@ signal game_saved(path: String)
 signal game_loaded(path: String)
 signal save_failed(message: String)
 
-const SAVE_VERSION := 4
+const SAVE_VERSION := 5
 const SAVE_PATH := "user://savegame.json"
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 const SLIME_SCENE := preload("res://scenes/slimes/slime_creature.tscn")
@@ -102,6 +102,7 @@ func _get_world_save_data() -> Dictionary:
 	var alive_resources: Array[String] = []
 	var slimes: Array[Dictionary] = []
 	var drops: Array[Dictionary] = []
+	var processors: Array[Dictionary] = []
 
 	for node in get_tree().get_nodes_in_group("harvestable_resource"):
 		if node is HarvestableResource:
@@ -111,6 +112,11 @@ func _get_world_save_data() -> Dictionary:
 		var slime := node as SlimeCreature
 		if slime != null:
 			slimes.append(slime.get_save_data())
+
+	for node in get_tree().get_nodes_in_group("slime_crystallizer"):
+		var processor := node as SlimeCrystallizer
+		if processor != null:
+			processors.append(processor.get_save_data())
 
 	for node in get_tree().get_nodes_in_group("world_drop"):
 		var drop := node as ItemDrop
@@ -127,6 +133,7 @@ func _get_world_save_data() -> Dictionary:
 		"alive_resources": alive_resources,
 		"slimes": slimes,
 		"drops": drops,
+		"processors": processors,
 	}
 
 func _load_world_save_data(data: Dictionary) -> void:
@@ -137,6 +144,7 @@ func _load_world_save_data(data: Dictionary) -> void:
 
 	_load_resource_state(data)
 	_load_slime_state(data)
+	_load_processor_state(data)
 	_load_drop_state(data)
 
 func _load_resource_state(data: Dictionary) -> void:
@@ -236,3 +244,25 @@ func _load_drop_state(data: Dictionary) -> void:
 			)
 
 		drop.configure(item_id, amount, tint)
+
+
+func _load_processor_state(data: Dictionary) -> void:
+	var saved_processors: Array = data.get("processors", [])
+	if saved_processors.is_empty():
+		return
+
+	var by_name: Dictionary = {}
+	for entry_variant in saved_processors:
+		if not (entry_variant is Dictionary):
+			continue
+		var entry := entry_variant as Dictionary
+		by_name[str(entry.get("node_name", ""))] = entry
+
+	for node in get_tree().get_nodes_in_group("slime_crystallizer"):
+		var processor := node as SlimeCrystallizer
+		if processor == null:
+			continue
+
+		var key := String(processor.name)
+		if by_name.has(key):
+			processor.load_save_data(by_name[key] as Dictionary)
