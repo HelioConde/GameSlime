@@ -168,6 +168,67 @@ func _run() -> void:
 						"full inventory purchase explains why it failed"
 					)
 
+					# A mature crop must remain in the ground when the inventory is full.
+					var crop := player.starter_seed_item.crop_to_plant
+					var harvest_item := player.inventory.get_definition(crop.harvest_item_id) if crop != null else null
+					_check(crop != null, "starter crop definition exists")
+					_check(harvest_item != null, "starter harvest item is registered")
+					if crop != null and harvest_item != null and farm != null:
+						var harvest_cell := Vector2i(5, 4)
+						farm.apply_hoe([harvest_cell])
+						_check(farm.plant_crop(harvest_cell, crop), "test crop can be planted")
+						var crop_data := farm.get_cell(harvest_cell)
+						crop_data.ready_to_harvest = true
+						crop_data.growth_days_completed = crop.growth_days
+						crop_data.crop_stage = crop.visual_stages
+
+						player.global_position = farm.cell_to_world(harvest_cell) - Vector2(farm.cell_size, 0)
+						player.facing = Vector2i.RIGHT
+						player.call("_interact")
+						_check(farm.can_harvest(harvest_cell), "full inventory does not destroy mature crop")
+						_check(player.inventory.count_item(harvest_item.id) == 0, "blocked harvest adds no item")
+
+						player.inventory.get_slot(player.inventory.slots.size() - 1).clear()
+						player.inventory.inventory_changed.emit()
+						player.call("_interact")
+						_check(not farm.can_harvest(harvest_cell), "harvest succeeds after freeing one slot")
+						_check(player.inventory.count_item(harvest_item.id) == 1, "successful harvest adds exactly one item")
+
+						# Shipping must survive save/load and pay exactly once on the next day.
+						var harvest_slot := -1
+						for slot_index in range(player.inventory.slots.size()):
+							var slot := player.inventory.get_slot(slot_index)
+							if slot != null and not slot.is_empty() and slot.item.id == harvest_item.id:
+								harvest_slot = slot_index
+								break
+						_check(harvest_slot >= 0, "harvest stack can be selected for shipping")
+						if harvest_slot >= 0:
+							player.inventory.set_selected_slot(harvest_slot)
+							var shipping_bin := main.get_node_or_null("ShippingBin") as ShippingBin
+							_check(shipping_bin != null, "shipping bin exists")
+							if shipping_bin != null:
+								player.global_position = shipping_bin.global_position
+								var shipping_message := shipping_bin.interact(player)
+								var expected_value := harvest_item.sell_price
+								_check(shipping_message.contains("Enviado"), "shipping accepts sellable crop")
+								_check(player.inventory.count_item(harvest_item.id) == 0, "shipping removes crop once")
+								_check(economy.get_pending_total() == expected_value, "shipping queues exact sale value")
+								_check(save_manager.save_game(), "pending shipment save succeeds")
+								_check(save_manager.load_game(), "pending shipment reload succeeds")
+								_check(economy.get_pending_total() == expected_value, "pending shipment survives reload")
+
+								var gold_before_shipping := int(economy.gold)
+								game_clock.sleep_and_start_next_day()
+								await get_tree().process_frame
+								await get_tree().process_frame
+								_check(int(economy.gold) == gold_before_shipping + expected_value, "shipment pays exact value next day")
+								_check(economy.get_pending_total() == 0, "shipment clears after payout")
+								var gold_after_shipping := int(economy.gold)
+								game_clock.sleep_and_start_next_day()
+								await get_tree().process_frame
+								await get_tree().process_frame
+								_check(int(economy.gold) == gold_after_shipping, "shipment cannot pay twice")
+
 	save_manager.delete_save()
 	main.queue_free()
 	await get_tree().process_frame
