@@ -44,6 +44,7 @@ signal shop_requested(shop: SeedShop)
 @export var slime_crystal_item: ItemDefinition
 @export var iron_ore_item: ItemDefinition
 @export var silver_ore_item: ItemDefinition
+@export var gold_ore_item: ItemDefinition
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
@@ -501,6 +502,7 @@ func _seed_starting_inventory() -> void:
 		slime_crystal_item,
 		iron_ore_item,
 		silver_ore_item,
+		gold_ore_item,
 	]
 
 	for definition in definitions:
