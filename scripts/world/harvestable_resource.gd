@@ -25,6 +25,8 @@ var _hits_taken: int = 0
 var _required_hits: int = 1
 var _hit_flash: float = 0.0
 
+@onready var visual: Sprite2D = get_node_or_null("Visual") as Sprite2D
+
 func _ready() -> void:
 	add_to_group("harvestable_resource")
 	queue_redraw()
@@ -32,6 +34,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _hit_flash > 0.0:
 		_hit_flash -= delta
+
+	if visual != null:
+		visual.modulate = Color(1.0, 0.82, 0.82) if _hit_flash > 0.0 else Color.WHITE
+	else:
 		queue_redraw()
 
 func can_be_hit_by(tool_type: int, tool_level: int) -> bool:
@@ -83,6 +89,9 @@ func _spawn_drop() -> void:
 	drop.configure(drop_item_id, drop_amount, drop_tint)
 
 func _draw() -> void:
+	if visual != null and visual.texture != null:
+		return
+
 	var flash := 0.28 if _hit_flash > 0.0 else 0.0
 
 	match resource_kind:
