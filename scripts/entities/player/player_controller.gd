@@ -592,3 +592,38 @@ func _draw_action_flash() -> void:
 	for cell in _action_flash_cells:
 		var center_local := to_local(farm_field.cell_to_world(cell))
 		draw_circle(center_local, 8.0, Color(1.0, 1.0, 1.0, 0.45))
+
+func get_save_data() -> Dictionary:
+	return {
+		"position": [global_position.x, global_position.y],
+		"facing": [facing.x, facing.y],
+		"energy": energy.current_energy,
+		"selected_slot": inventory.selected_slot,
+		"inventory": inventory.get_save_data(),
+		"tools": tools.get_save_data(),
+	}
+
+func load_save_data(data: Dictionary) -> void:
+	var saved_position: Array = data.get("position", [])
+	if saved_position.size() >= 2:
+		global_position = Vector2(float(saved_position[0]), float(saved_position[1]))
+
+	var saved_facing: Array = data.get("facing", [])
+	if saved_facing.size() >= 2:
+		facing = Vector2i(int(saved_facing[0]), int(saved_facing[1]))
+		if facing == Vector2i.ZERO:
+			facing = Vector2i.DOWN
+
+	energy.set_current_energy(float(data.get("energy", energy.maximum_energy)))
+
+	var inventory_data: Array = data.get("inventory", [])
+	inventory.load_save_data(inventory_data)
+	inventory.set_selected_slot(int(data.get("selected_slot", 0)))
+
+	var tool_data: Dictionary = data.get("tools", {})
+	tools.load_save_data(tool_data)
+	_sync_selected_item()
+
+	_tool_action_active = false
+	_finish_tool_action()
+	queue_redraw()
