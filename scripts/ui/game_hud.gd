@@ -131,16 +131,20 @@ func _refresh_status() -> void:
 	if not current_event.is_empty():
 		event_text = "\nEvento: %s" % current_event
 
+	var tool_level_text := ""
 	var water_text := ""
 	var selected := player.inventory.get_selected_stack()
 	if selected != null and not selected.is_empty():
-		if selected.item.kind == ItemDefinition.ItemKind.TOOL and selected.item.tool_type == ToolController.ToolType.WATERING_CAN:
-			water_text = "\nAgua: %d / %d" % [
-				player.tools.current_water,
-				player.tools.get_water_capacity(),
-			]
+		if selected.item.kind == ItemDefinition.ItemKind.TOOL:
+			tool_level_text = " · Nv.%d" % player.tools.get_tool_level(selected.item.tool_type)
 
-	status_label.text = "%s  %s\nClima: %s · Amanha: %s%s\nEnergia: %.0f / %.0f\nSelecionado: %s%s%s" % [
+			if selected.item.tool_type == ToolController.ToolType.WATERING_CAN:
+				water_text = "\nAgua: %d / %d" % [
+					player.tools.current_water,
+					player.tools.get_water_capacity(),
+				]
+
+	status_label.text = "%s  %s\nClima: %s · Amanha: %s%s\nEnergia: %.0f / %.0f\nSelecionado: %s%s%s%s" % [
 		GameClock.get_date_text(),
 		GameClock.get_time_text(),
 		WeatherManager.get_weather_name(),
@@ -149,6 +153,7 @@ func _refresh_status() -> void:
 		player.energy.current_energy,
 		player.energy.maximum_energy,
 		player.get_selected_item_name(),
+		tool_level_text,
 		charge_text,
 		water_text,
 	]
