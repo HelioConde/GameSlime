@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
@@ -8,6 +8,10 @@
 [ext_resource type="Resource" path="res://resources/items/watering_can.tres" id="6_water"]
 [ext_resource type="Resource" path="res://resources/items/starter_turnip_seed.tres" id="7_seed"]
 [ext_resource type="Resource" path="res://resources/items/starter_turnip.tres" id="8_crop"]
+[ext_resource type="Resource" path="res://resources/items/axe.tres" id="9_axe"]
+[ext_resource type="Resource" path="res://resources/items/pickaxe.tres" id="10_pickaxe"]
+[ext_resource type="Resource" path="res://resources/items/wood.tres" id="11_wood"]
+[ext_resource type="Resource" path="res://resources/items/stone.tres" id="12_stone"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -18,8 +22,12 @@ motion_mode = 1
 script = ExtResource("1_player")
 starter_hoe_item = ExtResource("5_hoe")
 starter_watering_can_item = ExtResource("6_water")
+starter_axe_item = ExtResource("9_axe")
+starter_pickaxe_item = ExtResource("10_pickaxe")
 starter_seed_item = ExtResource("7_seed")
 starter_crop_item = ExtResource("8_crop")
+wood_item = ExtResource("11_wood")
+stone_item = ExtResource("12_stone")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 4)
@@ -34,6 +42,8 @@ starting_energy = 270.0
 script = ExtResource("3_tools")
 hoe_level = 2
 watering_can_level = 2
+axe_level = 0
+pickaxe_level = 0
 
 [node name="Inventory" type="Node" parent="."]
 script = ExtResource("4_inventory")
