@@ -45,9 +45,9 @@
 - [x] drops fisicos
 - [x] coleta automatica por proximidade
 - [x] madeira e pedra integradas ao inventario
-- [x] upgrades de ferramenta com custo em recursos (prototipo)
+- [x] upgrades de ferramenta com Ouro + Minerio de Cobre
 - [x] obstaculos que exigem nivel de ferramenta
-- [ ] tipos adicionais de arvore/pedra/minerio
+- [x] primeiro minerio: Cobre com jazida diaria
 - [ ] feedback sonoro por material
 - [ ] particulas de impacto
 
@@ -60,6 +60,26 @@
 - [x] calendario
 - [x] eventos por dia
 - [x] salvamento na virada do dia
+
+
+## Marco 3B - economia manual da fazenda
+- [x] carteira / Ouro
+- [x] precos de compra e venda por item
+- [x] caixa de remessa
+- [x] pagamento das vendas na manha seguinte
+- [x] economia persistida no save
+- [x] banca de sementes
+- [x] oferta de semente muda por estacao
+- [x] Nabo do Vale - Primavera
+- [x] Tomate Solar - Verao
+- [x] Abobora Ambar - Outono
+- [x] Raiz de Gelo - Inverno
+- [x] Minerio de Cobre
+- [x] jazida de Cobre se recompõe no novo dia
+- [x] ferreiro consome Ouro + Cobre
+- [ ] menu de loja com multiplos produtos por estacao
+- [ ] processamento de produtos
+- [ ] produtos artesanais
 
 ## Marco 4 - slimes como identidade central
 - [x] slime base
@@ -78,10 +98,10 @@
 - [x] reproducao controlada no ninho
 - [x] heranca dos pais
 - [x] mutacoes por ambiente
-- [ ] raridades condicionais / tiers de raridade
+- [x] raridades condicionais / tiers de raridade
 - [x] bestiario genetico
 - [x] descobertas geneticas registradas
-- [ ] especies especiais por clima/horario/bioma
+- [x] especies especiais por clima/horario/bioma
 
 ## Marco 6 - progressao e automacao
 - [ ] sprinklers
