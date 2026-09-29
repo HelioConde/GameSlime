@@ -433,18 +433,8 @@ func _on_day_started(_day: int) -> void:
 	energy.restore_full()
 
 func _draw() -> void:
-	_draw_player()
 	_draw_target_preview()
 	_draw_action_flash()
-
-func _draw_player() -> void:
-	draw_circle(Vector2(0, -13), 8.0, Color(0.94, 0.78, 0.59))
-	draw_rect(Rect2(-8, -5, 16, 22), Color(0.34, 0.58, 0.92), true)
-	draw_rect(Rect2(-8, 9, 6, 12), Color(0.20, 0.24, 0.35), true)
-	draw_rect(Rect2(2, 9, 6, 12), Color(0.20, 0.24, 0.35), true)
-
-	var facing_line := Vector2(facing) * 18.0
-	draw_line(Vector2.ZERO, facing_line, Color(1.0, 0.93, 0.47), 2.0)
 
 func _draw_target_preview() -> void:
 	if farm_field == null:
