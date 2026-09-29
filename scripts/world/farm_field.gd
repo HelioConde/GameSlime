@@ -222,3 +222,64 @@ func _draw_crop(center: Vector2, data: FarmCellData) -> void:
 
 	if data.ready_to_harvest:
 		draw_arc(center, 14.0, 0.0, TAU, 24, Color(1.0, 0.92, 0.42, 0.7), 1.5)
+
+func get_save_data() -> Dictionary:
+	var saved_cells: Array = []
+
+	for key in _cells.keys():
+		var cell: Vector2i = key
+		var data := _cells[key] as FarmCellData
+		if data == null:
+			continue
+
+		saved_cells.append({
+			"x": cell.x,
+			"y": cell.y,
+			"tilled": data.tilled,
+			"watered_today": data.watered_today,
+			"crop_id": String(data.crop.id) if data.crop != null else "",
+			"growth_days_completed": data.growth_days_completed,
+			"crop_stage": data.crop_stage,
+			"ready_to_harvest": data.ready_to_harvest,
+		})
+
+	return {
+		"harvested_total": harvested_total,
+		"cells": saved_cells,
+	}
+
+func load_save_data(data: Dictionary) -> void:
+	_cells.clear()
+	harvested_total = int(data.get("harvested_total", 0))
+
+	var saved_cells: Array = data.get("cells", [])
+	for entry_variant in saved_cells:
+		if not (entry_variant is Dictionary):
+			continue
+
+		var entry := entry_variant as Dictionary
+		var cell := Vector2i(int(entry.get("x", -1)), int(entry.get("y", -1)))
+		if not is_valid_cell(cell):
+			continue
+
+		var cell_data := get_cell(cell)
+		if cell_data == null:
+			continue
+
+		cell_data.tilled = bool(entry.get("tilled", false))
+		cell_data.watered_today = bool(entry.get("watered_today", false))
+		cell_data.growth_days_completed = int(entry.get("growth_days_completed", 0))
+		cell_data.crop_stage = int(entry.get("crop_stage", 0))
+		cell_data.ready_to_harvest = bool(entry.get("ready_to_harvest", false))
+
+		var crop_id := StringName(str(entry.get("crop_id", "")))
+		if crop_id != &"":
+			cell_data.crop = _load_crop_definition(crop_id)
+
+	queue_redraw()
+
+func _load_crop_definition(crop_id: StringName) -> CropDefinition:
+	var path := "res://resources/crops/%s.tres" % String(crop_id)
+	if not ResourceLoader.exists(path):
+		return null
+	return load(path) as CropDefinition
