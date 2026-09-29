@@ -2,6 +2,7 @@ extends CanvasLayer
 
 const TOOL_ATLAS: Texture2D = preload("res://assets/sprout_lands/tools/tools.png")
 const ITEM_ATLAS: Texture2D = preload("res://assets/sprout_lands/items/all_items.png")
+const INVENTORY_SLOT_WIDGET := preload("res://scripts/ui/inventory_slot_widget.gd")
 
 @onready var status_label: Label = $StatusPanel/Margin/Status
 @onready var hotbar_container: HBoxContainer = $HotbarPanel/Margin/Hotbar
@@ -18,6 +19,13 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/sprout_lands/items/all_items
 @onready var habitat_panel: PanelContainer = $HabitatPanel
 @onready var habitat_title: Label = $HabitatPanel/Margin/Content/Title
 @onready var habitat_body: Label = $HabitatPanel/Margin/Content/Body
+@onready var inventory_panel: PanelContainer = $InventoryPanel
+@onready var inventory_title: Label = $InventoryPanel/Margin/Content/Title
+@onready var inventory_summary: Label = $InventoryPanel/Margin/Content/Summary
+@onready var inventory_grid: GridContainer = $InventoryPanel/Margin/Content/Grid
+@onready var inventory_detail: Label = $InventoryPanel/Margin/Content/Detail
+@onready var inventory_organize_button: Button = $InventoryPanel/Margin/Content/Actions/OrganizeButton
+@onready var inventory_close_button: Button = $InventoryPanel/Margin/Content/Actions/CloseButton
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -26,14 +34,21 @@ var _slot_panels: Array[PanelContainer] = []
 var _slot_icons: Array[TextureRect] = []
 var _slot_names: Array[Label] = []
 var _slot_amounts: Array[Label] = []
+var _inventory_built: bool = false
+var _inventory_slot_widgets: Array[InventorySlotWidget] = []
+var _pending_split_source: int = -1
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	call_deferred("_bind_player")
-	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario | B bestiario | H habitat"
+	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | I inventario | C calendario | B bestiario | H habitat"
 	calendar_panel.visible = false
 	bestiary_panel.visible = false
 	habitat_panel.visible = false
+	inventory_panel.visible = false
+
+	inventory_organize_button.pressed.connect(_on_inventory_organize_pressed)
+	inventory_close_button.pressed.connect(_close_inventory)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -46,6 +61,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 			KEY_H:
 				_toggle_habitat()
+				get_viewport().set_input_as_handled()
+			KEY_I:
+				_toggle_inventory()
 				get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
@@ -69,8 +87,15 @@ func _bind_player() -> void:
 	if not player.feedback_requested.is_connected(_show_feedback):
 		player.feedback_requested.connect(_show_feedback)
 
+	if not player.inventory.inventory_changed.is_connected(_on_inventory_changed):
+		player.inventory.inventory_changed.connect(_on_inventory_changed)
+
 	if not _hotbar_built:
 		_build_hotbar()
+	if not _inventory_built:
+		_build_inventory_panel()
+
+	_refresh_inventory_panel()
 
 func _build_hotbar() -> void:
 	if player == null:
@@ -247,6 +272,7 @@ func _toggle_calendar() -> void:
 	var next_visible := not calendar_panel.visible
 	bestiary_panel.visible = false
 	habitat_panel.visible = false
+	inventory_panel.visible = false
 	calendar_panel.visible = next_visible
 	_update_menu_pause()
 
@@ -257,6 +283,7 @@ func _toggle_bestiary() -> void:
 	var next_visible := not bestiary_panel.visible
 	calendar_panel.visible = false
 	habitat_panel.visible = false
+	inventory_panel.visible = false
 	bestiary_panel.visible = next_visible
 	_update_menu_pause()
 
@@ -267,14 +294,37 @@ func _toggle_habitat() -> void:
 	var next_visible := not habitat_panel.visible
 	calendar_panel.visible = false
 	bestiary_panel.visible = false
+	inventory_panel.visible = false
 	habitat_panel.visible = next_visible
 	_update_menu_pause()
 
 	if habitat_panel.visible:
 		_refresh_habitat_panel()
 
+func _toggle_inventory() -> void:
+	var next_visible := not inventory_panel.visible
+	calendar_panel.visible = false
+	bestiary_panel.visible = false
+	habitat_panel.visible = false
+	inventory_panel.visible = next_visible
+	_pending_split_source = -1
+	_update_menu_pause()
+
+	if inventory_panel.visible:
+		_refresh_inventory_panel()
+
+func _close_inventory() -> void:
+	inventory_panel.visible = false
+	_pending_split_source = -1
+	_update_menu_pause()
+
 func _update_menu_pause() -> void:
-	get_tree().paused = calendar_panel.visible or bestiary_panel.visible or habitat_panel.visible
+	get_tree().paused = (
+		calendar_panel.visible
+		or bestiary_panel.visible
+		or habitat_panel.visible
+		or inventory_panel.visible
+	)
 
 func _refresh_calendar_panel() -> void:
 	calendar_title.text = "%s · Ano %d" % [
@@ -445,3 +495,167 @@ func _refresh_habitat_panel() -> void:
 
 	lines.append("Outras condicoes: chuva noturna, neve, sol de Verao e noite profunda.")
 	habitat_body.text = "\n".join(lines)
+
+
+func _build_inventory_panel() -> void:
+	if player == null or _inventory_built:
+		return
+
+	for child in inventory_grid.get_children():
+		child.queue_free()
+
+	_inventory_slot_widgets.clear()
+
+	for index in range(player.inventory.slots.size()):
+		var widget := INVENTORY_SLOT_WIDGET.new() as InventorySlotWidget
+		inventory_grid.add_child(widget)
+		widget.slot_selected.connect(_on_inventory_slot_selected)
+		widget.slot_drop_requested.connect(_on_inventory_slot_drop_requested)
+		widget.split_requested.connect(_on_inventory_split_requested)
+		_inventory_slot_widgets.append(widget)
+
+	_inventory_built = true
+
+func _refresh_inventory_panel() -> void:
+	if player == null or not _inventory_built:
+		return
+
+	inventory_title.text = "Inventario"
+	inventory_summary.text = "%d / %d slots usados · %dg" % [
+		player.inventory.get_used_slot_count(),
+		player.inventory.slots.size(),
+		Economy.gold,
+	]
+
+	for index in range(player.inventory.slots.size()):
+		var slot := player.inventory.get_slot(index)
+		var item: ItemDefinition = null
+		var amount := 0
+		var texture: Texture2D = null
+
+		if slot != null and not slot.is_empty():
+			item = slot.item
+			amount = slot.amount
+			texture = _get_item_icon(item)
+
+		_inventory_slot_widgets[index].configure(
+			index,
+			item,
+			amount,
+			texture,
+			index == player.inventory.selected_slot
+		)
+
+	_refresh_inventory_detail()
+
+func _refresh_inventory_detail() -> void:
+	if player == null:
+		inventory_detail.text = ""
+		return
+
+	var stack := player.inventory.get_selected_stack()
+	if stack == null or stack.is_empty():
+		inventory_detail.text = "Slot selecionado vazio."
+		return
+
+	var item := stack.item
+	var details: Array[String] = []
+	details.append("%s · x%d" % [item.display_name, stack.amount])
+	details.append("Tipo: %s" % _item_kind_name(item.kind))
+
+	if item.buy_price > 0:
+		details.append("Compra: %dg" % item.buy_price)
+	if item.sell_price > 0:
+		details.append("Venda: %dg cada · Stack: %dg" % [
+			item.sell_price,
+			item.sell_price * stack.amount,
+		])
+
+	if item.kind == ItemDefinition.ItemKind.TOOL:
+		details.append("Nivel: %d" % player.tools.get_tool_level(item.tool_type))
+	elif item.kind == ItemDefinition.ItemKind.SEED and item.crop_to_plant != null:
+		details.append("Cultivo: %s · %d dias" % [
+			item.crop_to_plant.display_name,
+			item.crop_to_plant.growth_days,
+		])
+		details.append("Estacao: %s" % item.crop_to_plant.get_season_names())
+
+	if _pending_split_source >= 0:
+		details.append("Dividir stack: clique direito em um slot vazio.")
+
+	inventory_detail.text = "\n".join(details)
+
+func _item_kind_name(kind: int) -> String:
+	match kind:
+		ItemDefinition.ItemKind.TOOL:
+			return "Ferramenta"
+		ItemDefinition.ItemKind.SEED:
+			return "Semente"
+		ItemDefinition.ItemKind.CROP:
+			return "Colheita"
+		ItemDefinition.ItemKind.MATERIAL:
+			return "Material"
+		ItemDefinition.ItemKind.FOOD:
+			return "Alimento"
+		_:
+			return "Item"
+
+func _on_inventory_slot_selected(index: int) -> void:
+	if player == null:
+		return
+
+	player.inventory.set_selected_slot(index)
+	_pending_split_source = -1
+	_refresh_inventory_panel()
+
+func _on_inventory_slot_drop_requested(from_index: int, to_index: int) -> void:
+	if player == null:
+		return
+
+	_pending_split_source = -1
+	if player.inventory.move_or_merge_stack(from_index, to_index):
+		_show_feedback("Inventario reorganizado.")
+	_refresh_inventory_panel()
+
+func _on_inventory_split_requested(index: int) -> void:
+	if player == null:
+		return
+
+	if _pending_split_source < 0:
+		var source := player.inventory.get_slot(index)
+		if source == null or source.is_empty() or source.amount <= 1 or source.item.max_stack <= 1:
+			_show_feedback("Esse stack nao pode ser dividido.")
+			return
+
+		_pending_split_source = index
+		player.inventory.set_selected_slot(index)
+		_show_feedback("Clique direito em um slot vazio para dividir o stack.")
+		_refresh_inventory_panel()
+		return
+
+	var source_index := _pending_split_source
+	_pending_split_source = -1
+
+	if source_index == index:
+		_show_feedback("Divisao cancelada.")
+		_refresh_inventory_panel()
+		return
+
+	if player.inventory.split_stack_half(source_index, index):
+		_show_feedback("Stack dividido.")
+	else:
+		_show_feedback("O destino precisa estar vazio.")
+
+	_refresh_inventory_panel()
+
+func _on_inventory_organize_pressed() -> void:
+	if player == null:
+		return
+
+	_pending_split_source = -1
+	player.inventory.organize_slots()
+	_show_feedback("Stacks organizados.")
+	_refresh_inventory_panel()
+
+func _on_inventory_changed() -> void:
+	_refresh_inventory_panel()
