@@ -513,10 +513,11 @@ func _interact() -> void:
 			return
 
 		var expected_amount := farm_field.get_harvest_amount(target)
+		var expected_quality := farm_field.get_harvest_quality(target)
 		if expected_amount <= 0:
 			return
 
-		if not inventory.can_add_item(harvest_item, expected_amount):
+		if not inventory.can_add_item(harvest_item, expected_amount, expected_quality):
 			feedback_requested.emit("Inventario cheio.")
 			return
 
@@ -525,8 +526,10 @@ func _interact() -> void:
 			return
 
 		var amount := int(harvest["amount"])
-		inventory.add_item(harvest_item, amount)
-		feedback_requested.emit("Colheu %s x%d." % [harvest_item.display_name, amount])
+		var quality := int(harvest.get("quality", InventorySlotData.Quality.NORMAL))
+		inventory.add_item(harvest_item, amount, quality)
+		var quality_text := InventorySlotData.get_quality_name(quality)
+		feedback_requested.emit("Colheu %s x%d · %s." % [harvest_item.display_name, amount, quality_text])
 		_flash_cells([target])
 		_spawn_feedback_burst(
 			farm_field.cell_to_world(target),
