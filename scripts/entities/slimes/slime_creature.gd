@@ -47,6 +47,7 @@ var affection: float
 var age_days: int = 0
 var last_petted_day: int = -1
 var last_bred_day: int = -1
+var mutation_tag: String = ""
 var habitat: SlimeHabitat
 
 var _home_position: Vector2
@@ -132,10 +133,12 @@ func interact(player: PlayerController) -> String:
 	return "Voce fez carinho em %s. Afeto %.0f%%" % [display_name, affection]
 
 func get_status_text() -> String:
-	return "%s · %s · %s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
+	var mutation_text := "" if mutation_tag.is_empty() else " · Mutacao %s" % mutation_tag
+	return "%s · %s · %s%s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
 		display_name,
 		get_sex_name(),
 		get_personality_name(),
+		mutation_text,
 		satiety,
 		energy,
 		happiness,
@@ -205,6 +208,9 @@ func configure_child_from_parents(parent_a: SlimeCreature, parent_b: SlimeCreatu
 	slime_color.g = clampf(slime_color.g + child_rng.randf_range(-0.025, 0.025), 0.0, 1.0)
 	slime_color.b = clampf(slime_color.b + child_rng.randf_range(-0.025, 0.025), 0.0, 1.0)
 
+	mutation_tag = ""
+	_apply_environmental_mutation(child_rng)
+
 	satiety = 82.0
 	energy = 88.0
 	happiness = 68.0
@@ -217,6 +223,32 @@ func configure_child_from_parents(parent_a: SlimeCreature, parent_b: SlimeCreatu
 	needs_changed.emit(self)
 	SlimeDiscovery.register_slime(self)
 	queue_redraw()
+
+func _apply_environmental_mutation(child_rng: RandomNumberGenerator) -> void:
+	var roll := child_rng.randf()
+
+	if WeatherManager.is_snowing() and GameClock.season_index == GameClock.Season.WINTER and roll < 0.18:
+		mutation_tag = "Neve"
+		slime_color = slime_color.lerp(Color(0.62, 0.90, 1.0), 0.42)
+		gene_vitality = clampf(gene_vitality + 0.08, 0.75, 1.35)
+		return
+
+	if WeatherManager.is_raining() and roll < 0.14:
+		mutation_tag = "Chuva"
+		slime_color = slime_color.lerp(Color(0.30, 0.67, 1.0), 0.32)
+		gene_production = clampf(gene_production + 0.08, 0.75, 1.50)
+		return
+
+	if GameClock.season_index == GameClock.Season.SUMMER and WeatherManager.current_weather == WeatherManager.Weather.CLEAR and roll < 0.10:
+		mutation_tag = "Solar"
+		slime_color = slime_color.lerp(Color(1.0, 0.83, 0.30), 0.28)
+		gene_vitality = clampf(gene_vitality + 0.04, 0.75, 1.35)
+		return
+
+	if GameClock.season_index == GameClock.Season.FALL and roll < 0.08:
+		mutation_tag = "Outono"
+		slime_color = slime_color.lerp(Color(0.88, 0.48, 0.24), 0.25)
+		gene_metabolism = clampf(gene_metabolism - 0.05, 0.75, 1.35)
 
 func _inherit_gene(value_a: float, value_b: float, child_rng: RandomNumberGenerator) -> float:
 	return clampf((value_a + value_b) * 0.5 + child_rng.randf_range(-0.05, 0.05), 0.75, 1.35)
@@ -241,6 +273,7 @@ func get_save_data() -> Dictionary:
 		"gene_metabolism": gene_metabolism,
 		"gene_vitality": gene_vitality,
 		"gene_production": gene_production,
+		"mutation_tag": mutation_tag,
 		"slime_color": [slime_color.r, slime_color.g, slime_color.b, slime_color.a],
 	}
 
@@ -269,6 +302,7 @@ func load_save_data(data: Dictionary) -> void:
 	gene_metabolism = clampf(float(data.get("gene_metabolism", gene_metabolism)), 0.75, 1.35)
 	gene_vitality = clampf(float(data.get("gene_vitality", gene_vitality)), 0.75, 1.35)
 	gene_production = clampf(float(data.get("gene_production", gene_production)), 0.75, 1.50)
+	mutation_tag = str(data.get("mutation_tag", mutation_tag))
 
 	var saved_color: Array = data.get("slime_color", [])
 	if saved_color.size() >= 4:
