@@ -1,8 +1,8 @@
-extends SceneTree
+extends Node
 
 var _failures: Array[String] = []
 
-func _initialize() -> void:
+func _ready() -> void:
 	call_deferred("_run")
 
 func _check(condition: bool, message: String) -> void:
@@ -13,8 +13,8 @@ func _check(condition: bool, message: String) -> void:
 		_failures.append(message)
 
 func _run() -> void:
-	var save_manager = root.get_node_or_null("SaveManager")
-	var game_clock = root.get_node_or_null("GameClock")
+	var save_manager = get_tree().root.get_node_or_null("SaveManager")
+	var game_clock = get_tree().root.get_node_or_null("GameClock")
 
 	_check(save_manager != null, "SaveManager autoload exists")
 	_check(game_clock != null, "GameClock autoload exists")
@@ -31,14 +31,14 @@ func _run() -> void:
 		return
 
 	var main := packed.instantiate()
-	root.add_child(main)
+	add_child(main)
 
-	await process_frame
-	await process_frame
-	await process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 
-	var player := get_first_node_in_group("player") as PlayerController
-	var farm := get_first_node_in_group("farm_field") as FarmField
+	var player := get_tree().get_first_node_in_group("player") as PlayerController
+	var farm := get_tree().get_first_node_in_group("farm_field") as FarmField
 
 	_check(player != null, "player exists")
 	_check(farm != null, "farm exists")
@@ -50,7 +50,7 @@ func _run() -> void:
 		_check(player.inventory.get_definition(&"silver_ore") != null, "silver definition registered")
 		_check(player.inventory.get_definition(&"gold_ore") != null, "gold definition registered")
 
-	var patches := get_nodes_in_group("daily_resource_patch")
+	var patches := get_tree().get_nodes_in_group("daily_resource_patch")
 	_check(patches.size() >= 4, "daily resource patches exist")
 
 	for node in patches:
@@ -83,8 +83,8 @@ func _run() -> void:
 
 	var old_day := int(game_clock.day)
 	game_clock.sleep_and_start_next_day()
-	await process_frame
-	await process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 	_check(int(game_clock.day) == old_day + 1, "day rollover advances exactly one day")
 	_check(save_manager.has_save(), "day rollover creates autosave")
@@ -112,16 +112,16 @@ func _run() -> void:
 
 	save_manager.delete_save()
 	main.queue_free()
-	await process_frame
+	await get_tree().process_frame
 	_finish()
 
 func _finish() -> void:
 	if _failures.is_empty():
 		print("[PLAYABILITY] PASS")
-		quit(0)
+		get_tree().quit(0)
 		return
 
 	print("[PLAYABILITY] FAILURES: ", _failures.size())
 	for failure in _failures:
 		print(" - ", failure)
-	quit(1)
+	get_tree().quit(1)
