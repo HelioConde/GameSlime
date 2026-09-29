@@ -130,6 +130,11 @@ func _get_world_save_data() -> Dictionary:
 	}
 
 func _load_world_save_data(data: Dictionary) -> void:
+	for node in get_tree().get_nodes_in_group("daily_resource_patch"):
+		var patch := node as DailyResourcePatch
+		if patch != null:
+			patch.ensure_resources()
+
 	_load_resource_state(data)
 	_load_slime_state(data)
 	_load_drop_state(data)
