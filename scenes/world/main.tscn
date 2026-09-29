@@ -39,6 +39,9 @@ texture_filter = 1
 script = ExtResource("1_world")
 
 
+[node name="DayNightTint" type="CanvasModulate" parent="."]
+color = Color(1, 1, 1, 1)
+
 [node name="WorldBounds" type="StaticBody2D" parent="."]
 
 [node name="Top" type="CollisionShape2D" parent="WorldBounds"]
