@@ -1,0 +1,61 @@
+name: Sync Sprout Lands Assets
+
+on:
+  push:
+    branches:
+      - feat/stardew-foundation-4.7.2
+    paths:
+      - ".github/workflows/sync-sprout-assets.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract selected assets
+        shell: bash
+        run: |
+          set -e
+          ZIP="sprites/Sprout Lands - Sprites - premium pack.zip"
+          ROOT="Sprout Lands - Sprites - premium pack"
+
+          mkdir -p assets/sprout_lands/{characters,tools,crops,items,world,tiles}
+
+          unzip -p "$ZIP" "$ROOT/Characters/Premium Charakter Spritesheet.png" > "assets/sprout_lands/characters/player_premium.png"
+          unzip -p "$ZIP" "$ROOT/Characters/Basic Charakter Actions.png" > "assets/sprout_lands/characters/player_actions.png"
+          unzip -p "$ZIP" "$ROOT/Characters/Tools.png" > "assets/sprout_lands/tools/tools.png"
+          unzip -p "$ZIP" "$ROOT/Characters/water from wateringcan frames.png" > "assets/sprout_lands/tools/watering_effect.png"
+
+          unzip -p "$ZIP" "$ROOT/Objects/Farming Plants.png" > "assets/sprout_lands/crops/farming_plants.png"
+          unzip -p "$ZIP" "$ROOT/Objects/Items/All items.png" > "assets/sprout_lands/items/all_items.png"
+          unzip -p "$ZIP" "$ROOT/Objects/Mushrooms, Flowers, Stones.png" > "assets/sprout_lands/world/stones_flora.png"
+          unzip -p "$ZIP" "$ROOT/Objects/Trees, stumps and bushes.png" > "assets/sprout_lands/world/trees_bushes.png"
+
+          unzip -p "$ZIP" "$ROOT/Tilesets/ground tiles/New tiles/Grass_tiles_v2.png" > "assets/sprout_lands/tiles/grass_tiles.png"
+          unzip -p "$ZIP" "$ROOT/Tilesets/ground tiles/Old tiles/Tilled_Dirt_v2.png" > "assets/sprout_lands/tiles/tilled_dirt.png"
+          unzip -p "$ZIP" "$ROOT/Tilesets/ground tiles/water frames/Water_1.png" > "assets/sprout_lands/tiles/water_1.png"
+          unzip -p "$ZIP" "$ROOT/Tilesets/ground tiles/water frames/Water_2.png" > "assets/sprout_lands/tiles/water_2.png"
+          unzip -p "$ZIP" "$ROOT/Tilesets/ground tiles/water frames/Water_3.png" > "assets/sprout_lands/tiles/water_3.png"
+          unzip -p "$ZIP" "$ROOT/Tilesets/ground tiles/water frames/Water_4.png" > "assets/sprout_lands/tiles/water_4.png"
+
+          cp sprites/read_me.txt assets/sprout_lands/LICENSE.txt
+
+          echo "Selected PNG metadata:"
+          file assets/sprout_lands/**/*.png
+
+      - name: Commit extracted assets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/sprout_lands
+          if git diff --cached --quiet; then
+            echo "No asset changes."
+            exit 0
+          fi
+          git commit -m "assets: add selected Sprout Lands sprites"
+          git push
