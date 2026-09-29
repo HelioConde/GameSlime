@@ -1,0 +1,24 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/main_controller.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/base/base_core.tscn" id="2_base"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/slimes/slime_worker.tscn" id="4_slime"]
+[ext_resource type="PackedScene" path="res://scenes/ui/debug_hud.tscn" id="5_hud"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="BaseCore" parent="." instance=ExtResource("2_base")]
+position = Vector2(640, 360)
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(640, 340)
+
+[node name="SlimeGreenA" parent="." instance=ExtResource("4_slime")]
+position = Vector2(590, 390)
+
+[node name="SlimeGreenB" parent="." instance=ExtResource("4_slime")]
+position = Vector2(690, 410)
+
+[node name="DebugHUD" parent="." instance=ExtResource("5_hud")]
