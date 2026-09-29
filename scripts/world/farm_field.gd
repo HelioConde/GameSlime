@@ -265,11 +265,11 @@ func _draw() -> void:
 			if data.watered_today:
 				draw_rect(rect, Color(0.05, 0.10, 0.14, 0.28), true)
 
-		if data.fertility_bonus > 0:
-			var center := rect.get_center()
-			draw_circle(center + Vector2(-7, 6), 2.0, Color(0.64, 0.44, 0.23, 0.90))
-			draw_circle(center + Vector2(5, 8), 2.0, Color(0.64, 0.44, 0.23, 0.90))
-			draw_circle(center + Vector2(1, -7), 1.6, Color(0.72, 0.50, 0.28, 0.85))
+			if data.fertility_bonus > 0:
+				var center := rect.get_center()
+				draw_circle(center + Vector2(-7, 6), 2.0, Color(0.64, 0.44, 0.23, 0.90))
+				draw_circle(center + Vector2(5, 8), 2.0, Color(0.64, 0.44, 0.23, 0.90))
+				draw_circle(center + Vector2(1, -7), 1.6, Color(0.72, 0.50, 0.28, 0.85))
 
 			draw_rect(rect, Color(0.08, 0.12, 0.08, 0.24), false, 1.0)
 
