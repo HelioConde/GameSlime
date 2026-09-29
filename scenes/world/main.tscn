@@ -61,6 +61,25 @@ position = Vector2(250, 330)
 
 [node name="GreenSlimeA" parent="." instance=ExtResource("14_slime")]
 position = Vector2(760, 520)
+display_name = "Broto"
+biological_sex = 0
+personality = 0
+gene_size = 0.96
+gene_metabolism = 1.08
+gene_vitality = 1.02
+gene_production = 0.98
+slime_color = Color(0.30, 0.92, 0.50, 1)
+
+[node name="GreenSlimeB" parent="." instance=ExtResource("14_slime")]
+position = Vector2(825, 520)
+display_name = "Gota"
+biological_sex = 1
+personality = 1
+gene_size = 1.08
+gene_metabolism = 0.92
+gene_vitality = 1.10
+gene_production = 1.24
+slime_color = Color(0.26, 0.80, 0.58, 1)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(640, 560)
