@@ -338,6 +338,22 @@ func _interact() -> void:
 				feedback_requested.emit(upgrade_message)
 				return
 
+	for node in get_tree().get_nodes_in_group("shipping_bin"):
+		var shipping_bin := node as ShippingBin
+		if shipping_bin != null and shipping_bin.can_interact(global_position):
+			var shipping_message := shipping_bin.interact(self)
+			if not shipping_message.is_empty():
+				feedback_requested.emit(shipping_message)
+				return
+
+	for node in get_tree().get_nodes_in_group("seed_shop"):
+		var seed_shop := node as SeedShop
+		if seed_shop != null and seed_shop.can_interact(global_position):
+			var shop_message := seed_shop.interact(self)
+			if not shop_message.is_empty():
+				feedback_requested.emit(shop_message)
+				return
+
 	for node in get_tree().get_nodes_in_group("slime_breeding_nest"):
 		var nest := node as SlimeBreedingNest
 		if nest != null and nest.can_interact(global_position):
