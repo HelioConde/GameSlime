@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          godot --headless --path . --script res://tests/playability_smoke.gd 2>&1 | tee godot-playability.log
+          godot --headless --path . res://tests/playability_smoke.tscn 2>&1 | tee godot-playability.log
           if grep -E "SCRIPT ERROR|Parse Error|Compile Error|Failed loading resource|Invalid call|Invalid get index|Invalid set index|\[PLAYABILITY\] FAIL" godot-playability.log; then
             exit 1
           fi
