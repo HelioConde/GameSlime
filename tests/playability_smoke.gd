@@ -45,6 +45,19 @@ func _run() -> void:
 	_check(player != null, "player exists")
 	_check(farm != null, "farm exists")
 
+	var world_bounds := main.get_node_or_null("WorldBounds") as StaticBody2D
+	_check(world_bounds != null, "world bounds exist")
+	if world_bounds != null:
+		_check(world_bounds.get_child_count() == 4, "world bounds cover all four outer edges")
+
+	if player != null and world_bounds != null:
+		var original_position := player.global_position
+		player.global_position = Vector2(640.0, 24.0)
+		var boundary_collision := player.move_and_collide(Vector2(0.0, -80.0))
+		_check(boundary_collision != null, "north world boundary blocks the player")
+		_check(player.global_position.y >= 0.0, "player cannot leave the visible world vertically")
+		player.global_position = original_position
+
 	if player != null:
 		_check(player.inventory.slots.size() == 12, "inventory has 12 slots")
 		_check(player.inventory.get_definition(&"copper_ore") != null, "copper definition registered")
