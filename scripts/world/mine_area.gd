@@ -2,6 +2,10 @@ class_name MineArea
 extends Node2D
 
 @export var mine_size: Vector2 = Vector2(720, 620)
+@export var area_name: String = "MINA RASA"
+@export var floor_color: Color = Color(0.085, 0.09, 0.095)
+@export var wall_color: Color = Color(0.18, 0.19, 0.20)
+@export var edge_color: Color = Color(0.28, 0.29, 0.30)
 
 func _ready() -> void:
 	add_to_group("mine_area")
@@ -22,7 +26,7 @@ func _draw() -> void:
 	var half := mine_size * 0.5
 	var floor_rect := Rect2(-half, mine_size)
 
-	draw_rect(floor_rect, Color(0.085, 0.09, 0.095), true)
+	draw_rect(floor_rect, floor_color, true)
 
 	# Rocky floor patches.
 	for x in range(int(-half.x) + 36, int(half.x) - 20, 72):
@@ -34,8 +38,6 @@ func _draw() -> void:
 			draw_circle(Vector2(x, y) + offset, 2.0, Color(0.17, 0.18, 0.19, 0.72))
 
 	# Cave walls.
-	var wall_color := Color(0.18, 0.19, 0.20)
-	var edge_color := Color(0.28, 0.29, 0.30)
 	draw_rect(Rect2(-half.x, -half.y, mine_size.x, 30), wall_color, true)
 	draw_rect(Rect2(-half.x, half.y - 30, mine_size.x, 30), wall_color, true)
 	draw_rect(Rect2(-half.x, -half.y, 30, mine_size.y), wall_color, true)
@@ -47,7 +49,7 @@ func _draw() -> void:
 	draw_string(
 		ThemeDB.fallback_font,
 		Vector2(-70, -half.y + 55),
-		"MINA RASA",
+		area_name,
 		HORIZONTAL_ALIGNMENT_LEFT,
 		-1,
 		18,
