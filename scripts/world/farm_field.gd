@@ -81,6 +81,20 @@ func apply_water(cells: Array[Vector2i]) -> int:
 		queue_redraw()
 	return changed
 
+func can_fertilize(cell: Vector2i) -> bool:
+	var data := get_cell(cell)
+	return data != null and data.tilled and data.fertility_bonus <= 0
+
+func apply_fertilizer(cell: Vector2i, bonus: int) -> bool:
+	if bonus <= 0 or not can_fertilize(cell):
+		return false
+
+	var data := get_cell(cell)
+	data.fertility_bonus = bonus
+	cell_changed.emit(cell)
+	queue_redraw()
+	return true
+
 func can_plant(cell: Vector2i) -> bool:
 	var data := get_cell(cell)
 	return data != null and data.tilled and data.crop == null
@@ -112,7 +126,7 @@ func get_harvest_amount(cell: Vector2i) -> int:
 	var data := get_cell(cell)
 	if data == null or data.crop == null:
 		return 0
-	return data.crop.get_harvest_amount(GameClock.day, cell)
+	return data.crop.get_harvest_amount(GameClock.day, cell) + maxi(data.fertility_bonus, 0)
 
 func harvest_cell(cell: Vector2i) -> Dictionary:
 	if not can_harvest(cell):
@@ -159,6 +173,8 @@ func get_cell_hint(cell: Vector2i) -> String:
 	if not data.tilled:
 		return "Use a enxada primeiro."
 	if data.crop == null:
+		if data.fertility_bonus > 0:
+			return "Solo adubado · selecione uma semente."
 		return "Selecione uma semente na hotbar."
 	if data.ready_to_harvest:
 		return "Pronto para colher."
@@ -249,6 +265,12 @@ func _draw() -> void:
 			if data.watered_today:
 				draw_rect(rect, Color(0.05, 0.10, 0.14, 0.28), true)
 
+		if data.fertility_bonus > 0:
+			var center := rect.get_center()
+			draw_circle(center + Vector2(-7, 6), 2.0, Color(0.64, 0.44, 0.23, 0.90))
+			draw_circle(center + Vector2(5, 8), 2.0, Color(0.64, 0.44, 0.23, 0.90))
+			draw_circle(center + Vector2(1, -7), 1.6, Color(0.72, 0.50, 0.28, 0.85))
+
 			draw_rect(rect, Color(0.08, 0.12, 0.08, 0.24), false, 1.0)
 
 			if data.crop != null:
@@ -293,6 +315,7 @@ func get_save_data() -> Dictionary:
 			"growth_days_completed": data.growth_days_completed,
 			"crop_stage": data.crop_stage,
 			"ready_to_harvest": data.ready_to_harvest,
+			"fertility_bonus": data.fertility_bonus,
 		})
 
 	return {
@@ -323,6 +346,7 @@ func load_save_data(data: Dictionary) -> void:
 		cell_data.growth_days_completed = int(entry.get("growth_days_completed", 0))
 		cell_data.crop_stage = int(entry.get("crop_stage", 0))
 		cell_data.ready_to_harvest = bool(entry.get("ready_to_harvest", false))
+		cell_data.fertility_bonus = int(entry.get("fertility_bonus", 0))
 
 		var crop_id := StringName(str(entry.get("crop_id", "")))
 		if crop_id != &"":
