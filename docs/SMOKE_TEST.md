@@ -247,3 +247,20 @@ Execute `scenes/world/main.tscn`.
 10. Comprar 5 deve validar espaco e Ouro antes de descontar.
 11. Sem Ouro suficiente, o botao correspondente deve ficar desabilitado.
 12. Pressione Esc e confirme fechamento do painel e retorno do tempo.
+
+
+## 28. Cristalizador de Slime
+1. Tenha pelo menos 3 Gel de Slime e 1 Minerio de Cobre.
+2. Selecione Gel de Slime na hotbar.
+3. Aproxime-se do Cristalizador perto da casa.
+4. O HUD deve mostrar "Cristalizador · vazio · receita: 3 Gel + 1 Cobre".
+5. Pressione E.
+6. Confirme consumo de 3 Gel + 1 Cobre.
+7. Confirme mensagem de processamento por 4 horas.
+8. Aproxime-se durante o processo e confirme tempo restante no HUD.
+9. Salve/reabra antes de terminar e confirme que o tempo/estado continua.
+10. Avance 4 horas de jogo ou durma tempo suficiente.
+11. Confirme HUD "PRONTO PARA COLETAR".
+12. Pressione E e confirme Cristal de Slime x1 no inventario.
+13. Com inventario cheio, a coleta deve ser bloqueada sem perder o produto.
+14. Envie o Cristal pela caixa de remessa e confirme valor de 240g.
