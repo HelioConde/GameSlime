@@ -124,10 +124,38 @@ func _run() -> void:
 	var hud := main.get_node_or_null("GameHUD")
 	_check(hud != null, "game HUD exists")
 	if hud != null:
+		hud.call("_toggle_calendar")
+		_check(get_tree().paused, "calendar pauses the game")
+		hud.call("_toggle_calendar")
+		_check(not get_tree().paused, "calendar closes without leaving pause")
+
+		hud.call("_toggle_bestiary")
+		_check(get_tree().paused, "bestiary pauses the game")
+		hud.call("_toggle_bestiary")
+		_check(not get_tree().paused, "bestiary closes without leaving pause")
+
+		hud.call("_toggle_habitat")
+		_check(get_tree().paused, "habitat menu pauses the game")
+		hud.call("_toggle_habitat")
+		_check(not get_tree().paused, "habitat menu closes without leaving pause")
+
 		hud.call("_toggle_inventory")
 		_check(get_tree().paused, "inventory pauses the game")
+		var escape_event := InputEventKey.new()
+		escape_event.pressed = true
+		escape_event.physical_keycode = KEY_ESCAPE
+		hud.call("_unhandled_input", escape_event)
+		_check(not get_tree().paused, "ESC closes inventory and resumes game")
+
+		var menu_shop := main.get_node_or_null("SeedShop") as SeedShop
+		if menu_shop != null:
+			hud.call("_open_shop", menu_shop)
+			_check(get_tree().paused, "shop pauses the game")
+			hud.call("_unhandled_input", escape_event)
+			_check(not get_tree().paused, "ESC closes shop and resumes game")
+
 		hud.call("_close_all_menus")
-		_check(not get_tree().paused, "closing menus resumes the game")
+		_check(not get_tree().paused, "closing all menus resumes the game")
 
 	if player != null:
 		var entrance := main.get_node_or_null("MineEntrance") as WorldTransition
@@ -183,6 +211,36 @@ func _run() -> void:
 				_check(save_manager.load_game(), "load inside abyss mine succeeds")
 				_check(player.global_position.is_equal_approx(saved_mine_position), "mine position survives save and load")
 				_check(abyss_area.contains_position(player.global_position), "loaded player remains inside abyss mine")
+
+				# Verify the full return path: Abyss -> Deep -> Shallow -> Farm.
+				var abyss_exit := main.get_node_or_null("AbyssMineExit") as WorldTransition
+				var deep_exit := main.get_node_or_null("DeepMineExit") as WorldTransition
+				var shallow_exit := main.get_node_or_null("MineExit") as WorldTransition
+				var shallow_area := main.get_node_or_null("MineArea") as MineArea
+				_check(abyss_exit != null and deep_exit != null and shallow_exit != null, "all mine exits exist")
+				if abyss_exit != null and deep_exit != null and shallow_exit != null and shallow_area != null:
+					player.global_position = abyss_exit.global_position
+					var abyss_exit_message := abyss_exit.interact(player)
+					_check(abyss_exit_message.contains("saiu"), "abyss exit interaction succeeds")
+					_check(deep_area.contains_position(player.global_position), "abyss exit returns to deep mine")
+
+					player.global_position = deep_exit.global_position
+					var deep_exit_message := deep_exit.interact(player)
+					_check(deep_exit_message.contains("saiu"), "deep mine exit interaction succeeds")
+					_check(shallow_area.contains_position(player.global_position), "deep exit returns to shallow mine")
+
+					player.global_position = shallow_exit.global_position
+					var shallow_exit_message := shallow_exit.interact(player)
+					_check(shallow_exit_message.contains("saiu"), "shallow mine exit interaction succeeds")
+					_check(player.global_position.x < 1280.0, "shallow exit returns player to farm")
+
+					# Repeated farm save/load must preserve the same stable position.
+					var farm_save_position := player.global_position
+					for _save_cycle in range(3):
+						_check(save_manager.save_game(), "repeated farm save succeeds")
+						player.global_position += Vector2(15.0, 10.0)
+						_check(save_manager.load_game(), "repeated farm load succeeds")
+						_check(player.global_position.is_equal_approx(farm_save_position), "repeated farm load preserves position")
 
 	var old_day := int(game_clock.day)
 	game_clock.sleep_and_start_next_day()
