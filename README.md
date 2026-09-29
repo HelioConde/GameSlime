@@ -1,62 +1,77 @@
 # Slime Land Farm / GameSlime
 
-Projeto 2D top-down desenvolvido para Godot Engine 4.7.x, com o desenvolvimento atual mirando Godot 4.7.2.
+Projeto 2D top-down desenvolvido para Godot Engine 4.7.x, mirando Godot 4.7.2.
 
 ## Direcao de design
 
-A base inicial do jogo segue os principios que fazem Stardew Valley funcionar bem:
+A fundacao segue os principios que fazem Stardew Valley funcionar bem:
 
 - controle simples e preciso
-- mundo em grade
+- mundo organizado em tiles
 - usar ferramenta separado de interagir
-- dia com tempo limitado
-- energia como limite de produtividade
+- tempo limitado por dia
+- energia limitando produtividade
 - agricultura em etapas
 - inventario limitado
-- ferramentas que evoluem de trabalho manual para eficiencia
-- repeticao que futuramente pode ser automatizada
+- ferramentas melhores diminuindo trabalho repetitivo
+- recursos fisicos no mundo
+- automacao somente depois que o jogador aprendeu o trabalho manual
 
-O objetivo nao e clonar Stardew Valley. Slimes serao o diferencial principal do projeto, entrando depois que o loop basico de fazenda estiver forte.
+O objetivo nao e clonar Stardew Valley. O farming loop deve parecer familiar e forte; os slimes entram depois como o principal diferencial.
 
 ## Estado jogavel atual
 
-- movimento 8 direcoes com aceleracao/desaceleracao
-- facing cardinal
-- preview do tile/area da ferramenta
-- movimento enquanto carrega ferramenta
-- usar ferramenta separado de interagir
+### Fazenda
 - relogio 06:00 -> 02:00
-- 10 minutos de jogo a cada 7 segundos reais
+- 10 minutos de jogo / 7 segundos reais
 - energia inicial 270
 - sono e virada do dia
-- grade agricola
-- terra normal, arada e molhada
-- plantio
-- crescimento somente quando regado
-- crescimento processado na virada do dia
-- colheita
-- enxada e regador carregaveis
-- 0,45 s por estagio de carga
-- areas preparadas de 1 tile ate 5x5
-- inventario com 12 slots
-- hotbar selecionavel
+- terra normal/arado/molhado
 - sementes consumiveis
-- colheita armazenada no inventario
-- bloqueio de colheita com inventario cheio
-- regador com reservatorio limitado
-- consumo de agua por nivel de carga
-- fonte de agua para reabastecimento
-- HUD com hora, energia, item selecionado, agua e hotbar
-- validacao automatica com Godot 4.7.2 no GitHub Actions
+- crescimento somente se a planta foi regada
+- crescimento processado na virada do dia
+- colheita entrando no inventario
 
-## Inventario inicial do prototipo
+### Ferramentas
+- enxada carregavel
+- regador carregavel
+- machado de acao rapida
+- picareta de acao rapida
+- carga em estagios de 0,45 s
+- areas de 1 tile ate 5x5 preparadas
+- regador com reservatorio limitado
+- ponto de agua para reabastecer
+- machado com reducao de golpes por nivel
+- picareta com reducao de golpes por nivel
+
+### Recursos
+- arvores com colisao
+- pedras com colisao
+- arvore inicial exige 10 golpes de machado nivel 0
+- pedra inicial exige 5 golpes de picareta nivel 0
+- madeira e pedra aparecem como drops fisicos
+- aproximar do drop tenta coleta-lo
+- se nao houver espaco no inventario, o drop permanece no mundo
+
+### Inventario
+- 12 slots
+- hotbar visivel
+- teclas 1-0 para os dez primeiros slots
+- roda do mouse percorre todos os slots
+- stacks
+- limite por item
+- verificacao de espaco antes de colher
+
+## Inventario inicial
 
 1. Enxada
 2. Regador
-3. 15 Sementes de Nabo
-4-12. Vazios
+3. Machado
+4. Picareta
+5. 15 Sementes de Nabo
+6-12. Vazios
 
-A roda do mouse percorre os 12 slots. As teclas 1-0 acessam diretamente os dez primeiros.
+Madeira, pedra e nabos colhidos ocupam os slots disponiveis.
 
 ## Controles
 
@@ -64,22 +79,23 @@ A roda do mouse percorre os 12 slots. As teclas 1-0 acessam diretamente os dez p
 - 1-0: selecionar hotbar
 - roda do mouse: trocar slot
 - clique esquerdo / ESPACO:
-  - ferramenta: segurar para carregar e soltar para usar
+  - enxada/regador: segurar e soltar
+  - machado/picareta: golpe imediato
   - semente: plantar
 - E / clique direito:
   - colher
   - dormir perto da cama
   - encher regador perto da agua
-  - consultar o tile quando nenhuma dessas acoes for possivel
+  - consultar tile agricola
 
-## Prototipo de ferramenta
+## Prototipo
 
-Enxada e regador estao temporariamente no nivel 2 para que seja possivel testar imediatamente 1 tile, 3x1 e 5x1.
+Enxada e regador estao temporariamente no nivel 2 para facilitar o teste de carga. Machado e picareta permanecem nivel 0 para demonstrar a progressao por quantidade de golpes.
 
-No inicio real do jogo as ferramentas comecarao no nivel 0.
+## Validacao
 
-## Proximo marco
+O repositorio possui GitHub Actions usando Godot 4.7.2 em modo headless para importar o projeto e executar um smoke test da cena principal.
 
-Machado + picareta + arvores + pedras + drops + coleta.
+## Proximo passo
 
-Depois disso entram calendario/estacoes/clima e, com o farming loop forte, os slimes passam a ser o sistema central que diferencia o jogo.
+Completar o Marco 2 com upgrades compraveis, obstaculos que exigem nivel de ferramenta e mais feedback. Depois: calendario, estacoes, clima e save da virada do dia.
