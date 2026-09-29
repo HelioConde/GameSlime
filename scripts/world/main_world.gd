@@ -78,6 +78,11 @@ func _load_saved_game() -> void:
 		if patch != null:
 			patch.ensure_resources()
 
+	for node in get_tree().get_nodes_in_group("regrowing_resource_patch"):
+		var patch := node as RegrowingResourcePatch
+		if patch != null:
+			patch.refresh_for_day(GameClock.day, true)
+
 func _on_day_started(_day: int) -> void:
 	# Natural 02:00 rollover does not pass through SleepSpot. Schedule a save
 	# after every day-start callback has restored player/world state.
