@@ -742,7 +742,7 @@ func _refresh_shop_panel() -> void:
 	if _active_shop == null or player == null:
 		return
 
-	shop_title.text = "Banca de Sementes · %s" % GameClock.get_season_name()
+	shop_title.text = "Banca da Fazenda · %s" % GameClock.get_season_name()
 	shop_balance.text = "Seu Ouro: %dg" % Economy.gold
 
 	for child in shop_offers.get_children():
@@ -774,15 +774,17 @@ func _refresh_shop_panel() -> void:
 		name_label.add_theme_font_size_override("font_size", 16)
 		info.add_child(name_label)
 
-		var crop_text := ""
+		var offer_detail := "%dg cada" % item.buy_price
 		if item.crop_to_plant != null:
-			crop_text = "%d dias · venda %dg" % [
+			offer_detail += " · %d dias · venda base %dg" % [
 				item.crop_to_plant.growth_days,
 				item.crop_to_plant.sell_value,
 			]
+		elif item.kind == ItemDefinition.ItemKind.FERTILIZER:
+			offer_detail += " · +%d colheita · melhora qualidade" % item.fertility_bonus
 
 		var detail_label := Label.new()
-		detail_label.text = "%dg cada · %s" % [item.buy_price, crop_text]
+		detail_label.text = offer_detail
 		detail_label.add_theme_font_size_override("font_size", 12)
 		detail_label.modulate = Color(0.78, 0.80, 0.74)
 		info.add_child(detail_label)
