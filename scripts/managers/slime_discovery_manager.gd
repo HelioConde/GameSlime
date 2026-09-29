@@ -21,6 +21,7 @@ func register_slime(slime: SlimeCreature) -> void:
 		"gene_metabolism": slime.gene_metabolism,
 		"gene_vitality": slime.gene_vitality,
 		"gene_production": slime.gene_production,
+		"mutation_tag": slime.mutation_tag,
 		"color": [
 			slime.slime_color.r,
 			slime.slime_color.g,
@@ -65,6 +66,8 @@ func load_save_data(data: Dictionary) -> void:
 	discovery_updated.emit()
 
 func _register_trait_discoveries(slime: SlimeCreature) -> void:
+	if not slime.mutation_tag.is_empty():
+		_traits["Mutacao: %s" % slime.mutation_tag] = true
 	if slime.gene_size >= 1.20:
 		_traits["Tamanho grande"] = true
 	if slime.gene_size <= 0.85:
