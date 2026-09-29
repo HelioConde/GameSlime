@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/daily_resource_patch.gd" id="1_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/iron_rock.tscn" id="2_iron"]
+
+[node name="IronPatch" type="Node2D"]
+script = ExtResource("1_patch")
+resource_scene = ExtResource("2_iron")
+resource_name_prefix = "DailyIron"
+local_spawn_positions = Array[Vector2]([Vector2(-120, -80), Vector2(20, -110), Vector2(140, -55), Vector2(-70, 45), Vector2(90, 75)])
