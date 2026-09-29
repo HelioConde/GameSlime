@@ -11,6 +11,9 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	if _is_player_inside_mine():
+		return
+
 	match WeatherManager.current_weather:
 		WeatherManager.Weather.CLOUDY:
 			draw_rect(Rect2(Vector2.ZERO, size), Color(0.10, 0.13, 0.16, 0.10), true)
@@ -40,3 +43,16 @@ func _draw_snow() -> void:
 		var x := fmod(float(index * 83) + drift, size.x + 30.0) - 15.0
 		var y := fmod(float(index * 61) + _phase * 45.0, size.y + 30.0) - 15.0
 		draw_circle(Vector2(x, y), 1.5 + float(index % 2), Color(1.0, 1.0, 1.0, 0.78))
+
+
+func _is_player_inside_mine() -> bool:
+	var player := get_tree().get_first_node_in_group("player") as PlayerController
+	if player == null:
+		return false
+
+	for node in get_tree().get_nodes_in_group("mine_area"):
+		var mine := node as MineArea
+		if mine != null and mine.contains_position(player.global_position):
+			return true
+
+	return false
