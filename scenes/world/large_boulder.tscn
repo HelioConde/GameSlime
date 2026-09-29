@@ -17,6 +17,8 @@ required_tool_type = 3
 minimum_tool_level = 1
 drop_item_id = &"stone"
 drop_amount = 10
+drop_amount_min = 8
+drop_amount_max = 14
 drop_tint = Color(0.50, 0.53, 0.57, 1)
 
 [node name="Visual" type="Sprite2D" parent="."]
