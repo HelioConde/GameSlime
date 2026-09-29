@@ -198,3 +198,26 @@ Cada estacao possui duas culturas:
   - Couve de Neve: 5 dias · semente 30g · venda 52g
 
 A interface mostra saldo, tempo de crescimento e retorno, e permite comprar 1 ou 5 unidades. `Esc` fecha qualquer painel aberto.
+
+
+## Primeiro processamento artesanal
+
+O primeiro processamento manual conecta diretamente criação de slimes, mineração e economia:
+
+**Cristalizador de Slime**
+- entrada: 3 Gel de Slime + 1 Minerio de Cobre
+- tempo: 4 horas de jogo
+- saida: 1 Cristal de Slime
+- venda do Cristal: 240g
+- valor bruto dos insumos se vendidos diretamente: 192g
+- margem inicial do processamento: 48g
+
+A maquina:
+- exige Gel de Slime selecionado para iniciar
+- mostra estado e tempo restante quando o jogador se aproxima
+- continua processando com a passagem do tempo e durante o sono
+- persiste processo/tempo no save
+- exige coleta manual
+- segura o produto pronto se o inventario estiver cheio
+
+Isso inaugura a progressao `produto cru -> produto artesanal` sem automatizar a fazenda.
