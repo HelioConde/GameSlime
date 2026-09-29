@@ -59,6 +59,8 @@ func _on_day_started(_day: int) -> void:
 
 func refresh_for_current_day() -> void:
 	_prune_expired_spawns()
+	if _has_spawned_for_day(GameClock.day):
+		return
 
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _seed_for_current_day()
@@ -119,6 +121,13 @@ func _prune_expired_spawns() -> void:
 		if parent != null:
 			parent.remove_child(drop)
 		drop.queue_free()
+
+func _has_spawned_for_day(day: int) -> bool:
+	for node in get_tree().get_nodes_in_group("daily_world_spawn"):
+		var drop := node as ItemDrop
+		if drop != null and drop.natural_spawn and drop.spawned_day == day:
+			return true
+	return false
 
 func _get_natural_spawn_count() -> int:
 	var count := 0
