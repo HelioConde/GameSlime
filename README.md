@@ -31,8 +31,8 @@ Regras atuais:
 - mapa completo da base v1 em `docs/BASIC_MECHANICS.md`
 - CI executa parse, smoke da cena principal e regressao automatica de jogabilidade
 
-O save atual usa versao **6**, com:
-- migracao segura de saves v5
+O save atual usa versao **7**, com:
+- migracao segura de saves v5/v6
 - autosave tambem na virada natural das 02:00
 - respawn de jazidas concluido antes do autosave
 - gravacao via arquivo temporario
