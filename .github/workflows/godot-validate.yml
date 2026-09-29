@@ -1,0 +1,45 @@
+name: Godot 4.7.2 Validate
+
+on:
+  push:
+    branches:
+      - main
+      - feat/**
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.7.2
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Import and parse project
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --editor --path . --quit 2>&1 | tee godot-editor.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot get class" godot-editor.log; then
+            exit 1
+          fi
+
+      - name: Smoke test main scene
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --quit-after 5 2>&1 | tee godot-runtime.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Invalid call|Invalid get index|Invalid set index" godot-runtime.log; then
+            exit 1
+          fi
+
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-validation-logs
+          path: |
+            godot-editor.log
+            godot-runtime.log
