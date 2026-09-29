@@ -1,6 +1,8 @@
 class_name FarmField
 extends Node2D
 
+const CROP_ATLAS: Texture2D = preload("res://assets/sprout_lands/crops/farming_plants.png")
+
 signal cell_changed(cell: Vector2i)
 signal crop_planted(cell: Vector2i, crop: CropDefinition)
 signal crop_harvested(cell: Vector2i, crop: CropDefinition, amount: int)
@@ -178,13 +180,18 @@ func _draw_crop(center: Vector2, data: FarmCellData) -> void:
 	if crop == null:
 		return
 
-	var stage_ratio := float(data.crop_stage + 1) / float(crop.visual_stages + 1)
-	var radius := lerpf(4.0, 11.0, stage_ratio)
-	var color := crop.crop_color
+	var atlas_columns := 5
+	var stage := clampi(data.crop_stage, 0, atlas_columns - 1)
+	var source_rect := Rect2(
+		Vector2(stage * 16, crop.sprite_row * 16),
+		Vector2(16, 16)
+	)
+	var destination_rect := Rect2(
+		center - Vector2(16, 16),
+		Vector2(32, 32)
+	)
+
+	draw_texture_rect_region(CROP_ATLAS, destination_rect, source_rect)
 
 	if data.ready_to_harvest:
-		color = color.lightened(0.18)
-		radius += 2.0
-
-	draw_line(center + Vector2(0, 9), center + Vector2(0, -4), Color(0.16, 0.42, 0.18), 3.0)
-	draw_circle(center + Vector2(0, -5), radius, color)
+		draw_arc(center, 14.0, 0.0, TAU, 24, Color(1.0, 0.92, 0.42, 0.7), 1.5)
