@@ -15,6 +15,10 @@ func register_slime(slime: SlimeCreature) -> void:
 		"node_name": key,
 		"display_name": slime.display_name,
 		"slime_id": String(slime.slime_id),
+		"species": slime.get_species_name(),
+		"rarity": slime.get_rarity_name(),
+		"rarity_tier": slime.get_rarity_tier(),
+		"rarity_score": slime.get_rarity_score(),
 		"sex": slime.get_sex_name(),
 		"personality": slime.get_personality_name(),
 		"gene_size": slime.gene_size,
@@ -66,6 +70,12 @@ func load_save_data(data: Dictionary) -> void:
 	discovery_updated.emit()
 
 func _register_trait_discoveries(slime: SlimeCreature) -> void:
+	if slime.slime_id != &"green_slime":
+		_traits["Especie: %s" % slime.get_species_name()] = true
+
+	if slime.get_rarity_tier() >= SlimeCreature.RarityTier.RARE:
+		_traits["Raridade: %s" % slime.get_rarity_name()] = true
+
 	if not slime.mutation_tag.is_empty():
 		_traits["Mutacao: %s" % slime.mutation_tag] = true
 	if slime.gene_size >= 1.20:
