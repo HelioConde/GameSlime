@@ -163,3 +163,36 @@ func clear_all() -> void:
 	for slot in slots:
 		slot.clear()
 	inventory_changed.emit()
+
+func get_save_data() -> Array:
+	var data: Array = []
+	for slot in slots:
+		if slot.is_empty():
+			data.append({})
+		else:
+			data.append({
+				"item_id": String(slot.item.id),
+				"amount": slot.amount,
+			})
+	return data
+
+func load_save_data(data: Array) -> void:
+	clear_all()
+
+	var limit := mini(data.size(), slots.size())
+	for index in range(limit):
+		var entry = data[index]
+		if not (entry is Dictionary):
+			continue
+
+		var item_id := StringName(str(entry.get("item_id", "")))
+		if item_id == &"":
+			continue
+
+		var definition := get_definition(item_id)
+		if definition == null:
+			continue
+
+		seed_slot(index, definition, int(entry.get("amount", 0)))
+
+	inventory_changed.emit()
