@@ -7,3 +7,4 @@ extends Resource
 @export_range(2, 8, 1) var visual_stages: int = 4
 @export var sell_value: int = 35
 @export var crop_color: Color = Color(0.62, 0.88, 0.42)
+@export var harvest_item_id: StringName = &"starter_turnip"
