@@ -128,3 +128,31 @@ A fundacao Stardew-first agora ja suporta o primeiro ciclo de criaturas:
 - tecla B abre o bestiario
 
 O objetivo nesta etapa e tratar o slime primeiro como criatura viva da fazenda. Automacao/trabalho dos slimes continua reservada para uma fase posterior.
+
+
+## Economia manual
+
+O loop manual da fazenda agora inclui economia:
+
+- carteira iniciando em 500g
+- caixa de remessa
+- itens enviados sao pagos apenas na manha seguinte
+- remessa pendente e Ouro persistem no save
+- banca de sementes muda a oferta conforme a estacao
+- Primavera: Nabo do Vale
+- Verao: Tomate Solar
+- Outono: Abobora Ambar
+- Inverno: Raiz de Gelo
+- Minerio de Cobre coletavel com Picareta
+- pequena jazida de cobre se recompõe a cada novo dia
+- upgrades de ferramenta exigem Ouro + Cobre
+
+Precos iniciais de balanceamento:
+- Semente de Nabo: 20g / Nabo: 35g
+- Semente de Tomate Solar: 35g / Tomate: 55g
+- Semente de Abobora Ambar: 60g / Abobora: 100g
+- Semente de Raiz de Gelo: 45g / Raiz: 80g
+- Gel de Slime: 60g
+- Minerio de Cobre: 12g
+
+Esses valores ainda sao de balanceamento inicial e podem mudar conforme o loop de progressao crescer.
