@@ -106,6 +106,34 @@ func _run() -> void:
 		_check(player.inventory.get_definition(&"silver_ore") != null, "silver definition registered")
 		_check(player.inventory.get_definition(&"gold_ore") != null, "gold definition registered")
 
+	if player != null:
+		# Tool charging, water and energy are part of the core farming loop.
+		player.tools.hoe_level = 2
+		player.tools.select_tool(ToolController.ToolType.HOE)
+		player.tools.begin_charge()
+		player.tools.update_charge(0.91)
+		_check(player.tools.charge_stage == 2, "hoe charge reaches level-two area threshold")
+		var charged_result := player.tools.release_charge()
+		_check(int(charged_result.get("stage", -1)) == 2, "charged tool releases the reached stage")
+
+		player.tools.watering_can_level = 2
+		player.tools.current_water = 0
+		var water_source := main.get_node_or_null("WaterSource") as WaterSource
+		_check(water_source != null, "water source exists")
+		if water_source != null:
+			player.global_position = water_source.global_position
+			var refill_message := water_source.interact(player)
+			_check(refill_message.contains("cheio"), "water source confirms refill")
+			_check(player.tools.current_water == player.tools.get_water_capacity(), "water source refills to current capacity")
+			var water_before := player.tools.current_water
+			_check(player.tools.spend_water(2), "watering can spends water for charged area")
+			_check(player.tools.current_water == water_before - player.tools.get_water_cost(2), "watering uses exact water cost")
+
+		player.energy.set_current_energy(10.0)
+		_check(player.energy.spend(2.0), "tool energy can be spent")
+		_check(is_equal_approx(player.energy.current_energy, 8.0), "energy spends exact tool cost")
+		player.energy.restore_full()
+
 	var patches := get_tree().get_nodes_in_group("daily_resource_patch")
 	_check(patches.size() >= 4, "daily resource patches exist")
 
