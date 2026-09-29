@@ -4,6 +4,7 @@ extends CharacterBody2D
 const PLAYER_MOVE_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_premium.png")
 const PLAYER_ACTION_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_actions.png")
 const FEEDBACK_BURST_SCENE := preload("res://scenes/vfx/world_feedback_burst.tscn")
+const ITEM_DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 const WORLD_FORAGE_DEFINITIONS: Array[ItemDefinition] = [
 	preload("res://resources/items/wild_flower.tres"),
 	preload("res://resources/items/wild_berry.tres"),
@@ -156,6 +157,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				_primary_action_pressed()
 			KEY_E:
 				_interact()
+			KEY_Q:
+				_drop_selected_item(event.shift_pressed)
 	else:
 		if event.physical_keycode == KEY_SPACE:
 			_primary_action_released()
@@ -280,6 +283,40 @@ func _eat_selected_food(stack: InventorySlotData) -> void:
 	Sfx.play_cue(&"confirm")
 	var restored := roundi(energy.current_energy - before)
 	feedback_requested.emit("Comeu %s · +%d energia." % [item.display_name, restored])
+
+
+func _drop_selected_item(drop_all: bool = false) -> void:
+	var stack := inventory.get_selected_stack()
+	if stack == null or stack.is_empty() or stack.item == null:
+		feedback_requested.emit("Nenhum item selecionado para soltar.")
+		return
+	if stack.item.kind == ItemDefinition.ItemKind.TOOL:
+		feedback_requested.emit("Ferramentas essenciais nao podem ser descartadas.")
+		Sfx.play_cue(&"warning")
+		return
+	if get_parent() == null:
+		return
+
+	var item := stack.item
+	var quality := stack.quality
+	var amount := stack.amount if drop_all else 1
+	if not inventory.remove_from_slot(inventory.selected_slot, amount):
+		return
+
+	var drop := ITEM_DROP_SCENE.instantiate() as ItemDrop
+	if drop == null:
+		inventory.add_item(item, amount, quality)
+		return
+
+	get_parent().add_child(drop)
+	drop.global_position = global_position + Vector2(facing) * 28.0
+	drop.configure(item.id, amount, item.tint, quality)
+	Sfx.play_cue(&"pickup")
+
+	var quality_text := ""
+	if quality > InventorySlotData.Quality.NORMAL:
+		quality_text = " · %s" % InventorySlotData.get_quality_name(quality)
+	feedback_requested.emit("Soltou %s x%d%s." % [item.display_name, amount, quality_text])
 
 
 func _primary_action_released() -> void:
