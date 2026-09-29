@@ -186,6 +186,9 @@ func _get_world_save_data() -> Dictionary:
 			"position": [drop.global_position.x, drop.global_position.y],
 			"tint": [drop.tint.r, drop.tint.g, drop.tint.b, drop.tint.a],
 			"daily_spawn": drop.is_in_group("daily_world_spawn"),
+			"natural_spawn": drop.natural_spawn,
+			"spawned_day": drop.spawned_day,
+			"expires_after_days": drop.expires_after_days,
 		})
 
 	return {
@@ -301,7 +304,12 @@ func _load_drop_state(data: Dictionary) -> void:
 			continue
 
 		get_tree().current_scene.add_child(drop)
-		if bool(entry.get("daily_spawn", false)):
+		var is_natural := bool(entry.get("natural_spawn", entry.get("daily_spawn", false)))
+		if is_natural:
+			var spawned_day := int(entry.get("spawned_day", GameClock.day))
+			var lifetime := int(entry.get("expires_after_days", 3))
+			drop.configure_natural_spawn(spawned_day, lifetime)
+		elif bool(entry.get("daily_spawn", false)):
 			drop.add_to_group("daily_world_spawn")
 		drop.global_position = Vector2(float(position_data[0]), float(position_data[1]))
 
