@@ -53,6 +53,7 @@ func _build_content() -> void:
 	_built = true
 
 	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_theme_constant_override("margin_left", 7)
 	margin.add_theme_constant_override("margin_top", 6)
 	margin.add_theme_constant_override("margin_right", 7)
@@ -60,17 +61,20 @@ func _build_content() -> void:
 	add_child(margin)
 
 	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_theme_constant_override("separation", 2)
 	margin.add_child(column)
 
 	_key_label = Label.new()
+	_key_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_key_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_key_label.add_theme_font_size_override("font_size", 9)
 	_key_label.modulate = Color(0.72, 0.76, 0.70)
 	column.add_child(_key_label)
 
 	_icon = TextureRect.new()
+	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_icon.custom_minimum_size = Vector2(38, 38)
 	_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -78,6 +82,7 @@ func _build_content() -> void:
 	column.add_child(_icon)
 
 	_name_label = Label.new()
+	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_name_label.custom_minimum_size.x = 100
 	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -85,6 +90,7 @@ func _build_content() -> void:
 	column.add_child(_name_label)
 
 	_amount_label = Label.new()
+	_amount_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_amount_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_amount_label.add_theme_font_size_override("font_size", 10)
 	add_child(_amount_label)
