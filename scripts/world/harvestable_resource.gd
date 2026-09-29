@@ -12,6 +12,7 @@ enum ResourceKind {
 const TREE_HITS_BY_LEVEL := [10, 8, 6, 4, 2, 1]
 const ROCK_HITS_BY_LEVEL := [5, 4, 3, 2, 1, 1]
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
+const FEEDBACK_BURST_SCENE := preload("res://scenes/vfx/world_feedback_burst.tscn")
 
 @export var resource_kind: ResourceKind = ResourceKind.TREE
 @export var required_tool_type: int = ToolController.ToolType.AXE
@@ -56,6 +57,7 @@ func apply_tool_hit(tool_type: int, tool_level: int) -> Dictionary:
 
 	var remaining := maxi(_required_hits - _hits_taken, 0)
 	resource_hit.emit(self, remaining)
+	_spawn_hit_burst(remaining <= 0)
 	queue_redraw()
 
 	if _hits_taken >= _required_hits:
@@ -114,3 +116,20 @@ func _draw() -> void:
 				]),
 				color
 			)
+
+
+func _spawn_hit_burst(depleted: bool) -> void:
+	if get_parent() == null:
+		return
+
+	var burst := FEEDBACK_BURST_SCENE.instantiate() as WorldFeedbackBurst
+	if burst == null:
+		return
+
+	get_parent().add_child(burst)
+	burst.global_position = global_position + Vector2(0, -4)
+
+	var count := 14 if depleted else 6
+	var burst_speed := 72.0 if depleted else 42.0
+	var color := drop_tint.lightened(0.18)
+	burst.configure(color, count, burst_speed)
