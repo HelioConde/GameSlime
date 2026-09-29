@@ -86,6 +86,8 @@ func can_plant(cell: Vector2i) -> bool:
 func plant_crop(cell: Vector2i, crop: CropDefinition) -> bool:
 	if crop == null or not can_plant(cell):
 		return false
+	if not crop.can_grow_in_season(GameClock.season_index):
+		return false
 
 	var data := get_cell(cell)
 	data.crop = crop
@@ -119,6 +121,16 @@ func harvest_cell(cell: Vector2i) -> Dictionary:
 		"crop": harvested_crop,
 		"amount": amount,
 	}
+
+func can_plant_crop_now(crop: CropDefinition) -> bool:
+	return crop != null and crop.can_grow_in_season(GameClock.season_index)
+
+func get_crop_season_hint(crop: CropDefinition) -> String:
+	if crop == null:
+		return ""
+	if crop.can_grow_in_season(GameClock.season_index):
+		return ""
+	return "%s cresce em: %s." % [crop.display_name, crop.get_season_names()]
 
 func get_cell_hint(cell: Vector2i) -> String:
 	var data := get_cell(cell)
