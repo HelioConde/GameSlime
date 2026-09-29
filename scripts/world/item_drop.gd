@@ -5,12 +5,15 @@ extends Node2D
 @export_range(1, 999, 1) var amount: int = 1
 @export var pickup_radius: float = 30.0
 @export var tint: Color = Color.WHITE
+@export var pickup_delay: float = 0.35
 
+var quality: int = InventorySlotData.Quality.NORMAL
 var natural_spawn: bool = false
 var spawned_day: int = -1
 var expires_after_days: int = 0
 
 var _bob_time: float = 0.0
+var _age: float = 0.0
 
 func _ready() -> void:
 	add_to_group("world_drop")
@@ -18,12 +21,19 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_bob_time += delta
+	_age += delta
 	queue_redraw()
 
-func configure(new_item_id: StringName, new_amount: int, new_tint: Color) -> void:
+func configure(
+	new_item_id: StringName,
+	new_amount: int,
+	new_tint: Color,
+	new_quality: int = InventorySlotData.Quality.NORMAL
+) -> void:
 	item_id = new_item_id
 	amount = maxi(new_amount, 1)
 	tint = new_tint
+	quality = InventorySlotData.clamp_quality(new_quality)
 	queue_redraw()
 
 func configure_natural_spawn(day: int, lifetime_days: int) -> void:
@@ -38,7 +48,10 @@ func is_natural_spawn_expired(current_day: int) -> bool:
 	return current_day - spawned_day >= expires_after_days
 
 func can_pickup(player_position: Vector2) -> bool:
-	return global_position.distance_to(player_position) <= pickup_radius
+	return (
+		_age >= pickup_delay
+		and global_position.distance_to(player_position) <= pickup_radius
+	)
 
 func try_collect(inventory: InventoryComponent) -> int:
 	if inventory == null or amount <= 0:
@@ -49,7 +62,7 @@ func try_collect(inventory: InventoryComponent) -> int:
 		return 0
 
 	var before := amount
-	amount = inventory.add_item(definition, amount)
+	amount = inventory.add_item(definition, amount, quality)
 	var collected := before - amount
 
 	if amount <= 0:
