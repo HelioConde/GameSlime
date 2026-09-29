@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CropDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_definition.gd" id="1_crop"]
+
+[resource]
+script = ExtResource("1_crop")
+id = &"fall_eggplant"
+display_name = "Berinjela Roxa"
+growth_days = 6
+visual_stages = 4
+sell_value = 72
+crop_color = Color(0.60, 0.34, 0.76, 1)
+sprite_row = 9
+harvest_item_id = &"fall_eggplant"
+harvest_min = 1
+harvest_max = 2
+regrow_days = 3
+grows_in_spring = false
+grows_in_summer = false
+grows_in_fall = true
+grows_in_winter = false

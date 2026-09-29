@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CropDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_definition.gd" id="1_crop"]
+
+[resource]
+script = ExtResource("1_crop")
+id = &"summer_corn"
+display_name = "Milho Dourado"
+growth_days = 8
+visual_stages = 4
+sell_value = 90
+crop_color = Color(0.96, 0.78, 0.20, 1)
+sprite_row = 6
+harvest_item_id = &"summer_corn"
+harvest_min = 1
+harvest_max = 2
+regrow_days = 4
+grows_in_spring = false
+grows_in_summer = true
+grows_in_fall = true
+grows_in_winter = false

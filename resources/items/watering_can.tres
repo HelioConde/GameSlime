@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_definition.gd" id="1_item"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"watering_can"
+display_name = "Regador"
+kind = 0
+max_stack = 1
+tint = Color(0.30, 0.68, 0.94, 1)
+icon_sheet = 1
+icon_cell = Vector2i(0, 0)
+icon_cell_size = 16
+tool_type = 1

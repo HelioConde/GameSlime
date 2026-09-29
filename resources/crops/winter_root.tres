@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CropDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_definition.gd" id="1_crop"]
+
+[resource]
+script = ExtResource("1_crop")
+id = &"winter_root"
+display_name = "Raiz de Gelo"
+growth_days = 7
+visual_stages = 4
+sell_value = 80
+crop_color = Color(0.58, 0.82, 0.96, 1)
+sprite_row = 12
+harvest_item_id = &"winter_root"
+grows_in_spring = false
+grows_in_summer = false
+grows_in_fall = false
+grows_in_winter = true

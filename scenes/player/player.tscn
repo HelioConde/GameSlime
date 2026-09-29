@@ -1,0 +1,108 @@
+[gd_scene load_steps=35 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
+[ext_resource type="Script" path="res://scripts/components/tool_controller.gd" id="3_tools"]
+[ext_resource type="Script" path="res://scripts/components/inventory_component.gd" id="4_inventory"]
+[ext_resource type="Resource" path="res://resources/items/hoe.tres" id="5_hoe"]
+[ext_resource type="Resource" path="res://resources/items/watering_can.tres" id="6_water"]
+[ext_resource type="Resource" path="res://resources/items/starter_turnip_seed.tres" id="7_seed"]
+[ext_resource type="Resource" path="res://resources/items/starter_turnip.tres" id="8_crop"]
+[ext_resource type="Resource" path="res://resources/items/axe.tres" id="9_axe"]
+[ext_resource type="Resource" path="res://resources/items/pickaxe.tres" id="10_pickaxe"]
+[ext_resource type="Resource" path="res://resources/items/wood.tres" id="11_wood"]
+[ext_resource type="Resource" path="res://resources/items/stone.tres" id="12_stone"]
+[ext_resource type="Texture2D" path="res://assets/sprout_lands/characters/player_premium.png" id="13_player_texture"]
+[ext_resource type="Resource" path="res://resources/items/slime_gel.tres" id="14_slime_gel"]
+[ext_resource type="Resource" path="res://resources/items/copper_ore.tres" id="15_copper"]
+[ext_resource type="Resource" path="res://resources/items/summer_tomato_seed.tres" id="16_summer_seed"]
+[ext_resource type="Resource" path="res://resources/items/summer_tomato.tres" id="17_summer_crop"]
+[ext_resource type="Resource" path="res://resources/items/fall_pumpkin_seed.tres" id="18_fall_seed"]
+[ext_resource type="Resource" path="res://resources/items/fall_pumpkin.tres" id="19_fall_crop"]
+[ext_resource type="Resource" path="res://resources/items/winter_root_seed.tres" id="20_winter_seed"]
+[ext_resource type="Resource" path="res://resources/items/winter_root.tres" id="21_winter_crop"]
+[ext_resource type="Resource" path="res://resources/items/spring_berry_seed.tres" id="22_spring_berry_seed"]
+[ext_resource type="Resource" path="res://resources/items/spring_berry.tres" id="23_spring_berry_crop"]
+[ext_resource type="Resource" path="res://resources/items/summer_corn_seed.tres" id="24_summer_corn_seed"]
+[ext_resource type="Resource" path="res://resources/items/summer_corn.tres" id="25_summer_corn_crop"]
+[ext_resource type="Resource" path="res://resources/items/fall_eggplant_seed.tres" id="26_fall_eggplant_seed"]
+[ext_resource type="Resource" path="res://resources/items/fall_eggplant.tres" id="27_fall_eggplant_crop"]
+[ext_resource type="Resource" path="res://resources/items/winter_kale_seed.tres" id="28_winter_kale_seed"]
+[ext_resource type="Resource" path="res://resources/items/winter_kale.tres" id="29_winter_kale_crop"]
+[ext_resource type="Resource" path="res://resources/items/slime_crystal.tres" id="30_slime_crystal"]
+[ext_resource type="Resource" path="res://resources/items/iron_ore.tres" id="31_iron"]
+[ext_resource type="Resource" path="res://resources/items/silver_ore.tres" id="32_silver"]
+[ext_resource type="Resource" path="res://resources/items/gold_ore.tres" id="33_gold_ore"]
+
+[sub_resource type="CapsuleShape2D" id="Capsule_player"]
+radius = 8.0
+height = 26.0
+
+[node name="Player" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_player")
+starter_hoe_item = ExtResource("5_hoe")
+starter_watering_can_item = ExtResource("6_water")
+starter_axe_item = ExtResource("9_axe")
+starter_pickaxe_item = ExtResource("10_pickaxe")
+starter_seed_item = ExtResource("7_seed")
+starter_crop_item = ExtResource("8_crop")
+wood_item = ExtResource("11_wood")
+stone_item = ExtResource("12_stone")
+slime_gel_item = ExtResource("14_slime_gel")
+copper_ore_item = ExtResource("15_copper")
+summer_seed_item = ExtResource("16_summer_seed")
+summer_crop_item = ExtResource("17_summer_crop")
+fall_seed_item = ExtResource("18_fall_seed")
+fall_crop_item = ExtResource("19_fall_crop")
+winter_seed_item = ExtResource("20_winter_seed")
+winter_crop_item = ExtResource("21_winter_crop")
+spring_berry_seed_item = ExtResource("22_spring_berry_seed")
+spring_berry_crop_item = ExtResource("23_spring_berry_crop")
+summer_corn_seed_item = ExtResource("24_summer_corn_seed")
+summer_corn_crop_item = ExtResource("25_summer_corn_crop")
+fall_eggplant_seed_item = ExtResource("26_fall_eggplant_seed")
+fall_eggplant_crop_item = ExtResource("27_fall_eggplant_crop")
+winter_kale_seed_item = ExtResource("28_winter_kale_seed")
+winter_kale_crop_item = ExtResource("29_winter_kale_crop")
+slime_crystal_item = ExtResource("30_slime_crystal")
+iron_ore_item = ExtResource("31_iron")
+silver_ore_item = ExtResource("32_silver")
+gold_ore_item = ExtResource("33_gold_ore")
+
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -7)
+texture = ExtResource("13_player_texture")
+hframes = 8
+vframes = 24
+frame_coords = Vector2i(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("Capsule_player")
+
+[node name="Energy" type="Node" parent="."]
+script = ExtResource("2_energy")
+maximum_energy = 270.0
+starting_energy = 270.0
+
+[node name="ToolController" type="Node" parent="."]
+script = ExtResource("3_tools")
+hoe_level = 0
+watering_can_level = 0
+axe_level = 0
+pickaxe_level = 0
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("4_inventory")
+slot_count = 12
+
+[node name="Camera2D" type="Camera2D" parent="."]
+enabled = true
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+limit_left = 0
+limit_top = 0
+limit_right = 4160
+limit_bottom = 720

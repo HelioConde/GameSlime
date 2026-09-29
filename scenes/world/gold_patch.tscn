@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/daily_resource_patch.gd" id="1_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/gold_rock.tscn" id="2_gold"]
+
+[node name="GoldPatch" type="Node2D"]
+script = ExtResource("1_patch")
+resource_scene = ExtResource("2_gold")
+resource_name_prefix = "DailyGold"
+local_spawn_positions = Array[Vector2]([Vector2(-120, -90), Vector2(15, -120), Vector2(140, -50), Vector2(-80, 60), Vector2(90, 85)])

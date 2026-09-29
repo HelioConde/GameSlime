@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CropDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_definition.gd" id="1_crop"]
+
+[resource]
+script = ExtResource("1_crop")
+id = &"spring_berry"
+display_name = "Baga da Primavera"
+growth_days = 6
+visual_stages = 4
+sell_value = 65
+crop_color = Color(0.86, 0.34, 0.52, 1)
+sprite_row = 2
+harvest_item_id = &"spring_berry"
+harvest_min = 1
+harvest_max = 2
+regrow_days = 3
+grows_in_spring = true
+grows_in_summer = false
+grows_in_fall = false
+grows_in_winter = false

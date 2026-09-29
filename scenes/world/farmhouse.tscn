@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/farmhouse.gd" id="1_house"]
+
+[sub_resource type="RectangleShape2D" id="HouseCollision"]
+size = Vector2(176, 92)
+
+[node name="Farmhouse" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_house")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, -38)
+shape = SubResource("HouseCollision")

@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/slime_crystallizer.gd" id="1_machine"]
+[ext_resource type="Resource" path="res://resources/items/slime_crystal.tres" id="2_output"]
+
+[node name="SlimeCrystallizer" type="Node2D"]
+script = ExtResource("1_machine")
+output_item = ExtResource("2_output")

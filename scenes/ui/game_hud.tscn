@@ -1,0 +1,289 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/game_hud.gd" id="1_hud"]
+
+[node name="GameHUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="StatusPanel" type="PanelContainer" parent="."]
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 290.0
+offset_bottom = 202.0
+
+[node name="Margin" type="MarginContainer" parent="StatusPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Status" type="Label" parent="StatusPanel/Margin"]
+layout_mode = 2
+text = "Carregando..."
+
+[node name="HotbarPanel" type="PanelContainer" parent="."]
+offset_left = 170.0
+offset_top = 536.0
+offset_right = 1110.0
+offset_bottom = 632.0
+
+[node name="Margin" type="MarginContainer" parent="HotbarPanel"]
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Hotbar" type="HBoxContainer" parent="HotbarPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="HelpPanel" type="PanelContainer" parent="."]
+offset_left = 18.0
+offset_top = 650.0
+offset_right = 1262.0
+offset_bottom = 702.0
+
+[node name="Margin" type="MarginContainer" parent="HelpPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Help" type="Label" parent="HelpPanel/Margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="Feedback" type="Label" parent="."]
+offset_left = 360.0
+offset_top = 92.0
+offset_right = 920.0
+offset_bottom = 130.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="CalendarPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 360.0
+offset_top = 150.0
+offset_right = 920.0
+offset_bottom = 520.0
+
+[node name="Margin" type="MarginContainer" parent="CalendarPanel"]
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="CalendarPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="CalendarPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="CalendarPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="SlimePanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 800.0
+offset_top = 18.0
+offset_right = 1262.0
+offset_bottom = 82.0
+
+[node name="Margin" type="MarginContainer" parent="SlimePanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Status" type="Label" parent="SlimePanel/Margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="BestiaryPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 310.0
+offset_top = 110.0
+offset_right = 970.0
+offset_bottom = 570.0
+
+[node name="Margin" type="MarginContainer" parent="BestiaryPanel"]
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="BestiaryPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="BestiaryPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="BestiaryPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="HabitatPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 330.0
+offset_top = 115.0
+offset_right = 950.0
+offset_bottom = 565.0
+
+[node name="Margin" type="MarginContainer" parent="HabitatPanel"]
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="HabitatPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="HabitatPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="HabitatPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+
+[node name="InventoryPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 300.0
+offset_top = 72.0
+offset_right = 980.0
+offset_bottom = 625.0
+
+[node name="Margin" type="MarginContainer" parent="InventoryPanel"]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="InventoryPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="InventoryPanel/Margin/Content"]
+layout_mode = 2
+text = "Inventario"
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="Summary" type="Label" parent="InventoryPanel/Margin/Content"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="InventoryPanel/Margin/Content"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="Detail" type="Label" parent="InventoryPanel/Margin/Content"]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Actions" type="HBoxContainer" parent="InventoryPanel/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="OrganizeButton" type="Button" parent="InventoryPanel/Margin/Content/Actions"]
+layout_mode = 2
+text = "Organizar stacks"
+
+[node name="CloseButton" type="Button" parent="InventoryPanel/Margin/Content/Actions"]
+layout_mode = 2
+text = "Fechar"
+
+
+[node name="ShopPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 330.0
+offset_top = 115.0
+offset_right = 950.0
+offset_bottom = 560.0
+
+[node name="Margin" type="MarginContainer" parent="ShopPanel"]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="ShopPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="ShopPanel/Margin/Content"]
+layout_mode = 2
+text = "Banca de Sementes"
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="Balance" type="Label" parent="ShopPanel/Margin/Content"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Offers" type="VBoxContainer" parent="ShopPanel/Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CloseButton" type="Button" parent="ShopPanel/Margin/Content"]
+layout_mode = 2
+text = "Fechar"
+
+
+[node name="MachinePanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 790.0
+offset_top = 92.0
+offset_right = 1262.0
+offset_bottom = 140.0
+
+[node name="Margin" type="MarginContainer" parent="MachinePanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Status" type="Label" parent="MachinePanel/Margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+
+[node name="MinePanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 790.0
+offset_top = 150.0
+offset_right = 1262.0
+offset_bottom = 198.0
+
+[node name="Margin" type="MarginContainer" parent="MinePanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Status" type="Label" parent="MinePanel/Margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1

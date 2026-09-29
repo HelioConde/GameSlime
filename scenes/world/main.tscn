@@ -1,0 +1,272 @@
+[gd_scene load_steps=30 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/world/farm_field.tscn" id="3_farm"]
+[ext_resource type="PackedScene" path="res://scenes/world/sleep_spot.tscn" id="4_sleep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_hud.tscn" id="5_hud"]
+[ext_resource type="PackedScene" path="res://scenes/world/water_source.tscn" id="6_water"]
+[ext_resource type="PackedScene" path="res://scenes/world/tree_resource.tscn" id="7_tree"]
+[ext_resource type="PackedScene" path="res://scenes/world/rock_resource.tscn" id="8_rock"]
+[ext_resource type="PackedScene" path="res://scenes/ui/weather_fx.tscn" id="9_weather"]
+[ext_resource type="PackedScene" path="res://scenes/world/farmhouse.tscn" id="10_house"]
+[ext_resource type="PackedScene" path="res://scenes/world/tool_upgrade_station.tscn" id="11_upgrade"]
+[ext_resource type="PackedScene" path="res://scenes/world/large_stump.tscn" id="12_stump"]
+[ext_resource type="PackedScene" path="res://scenes/world/large_boulder.tscn" id="13_boulder"]
+[ext_resource type="PackedScene" path="res://scenes/slimes/slime_creature.tscn" id="14_slime"]
+[ext_resource type="PackedScene" path="res://scenes/slimes/slime_breeding_nest.tscn" id="15_nest"]
+[ext_resource type="PackedScene" path="res://scenes/slimes/slime_habitat.tscn" id="16_habitat"]
+[ext_resource type="PackedScene" path="res://scenes/world/shipping_bin.tscn" id="17_shipping"]
+[ext_resource type="PackedScene" path="res://scenes/world/seed_shop.tscn" id="18_shop"]
+[ext_resource type="PackedScene" path="res://scenes/world/copper_patch.tscn" id="19_copper_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/slime_crystallizer.tscn" id="20_crystallizer"]
+[ext_resource type="PackedScene" path="res://scenes/world/mine_area.tscn" id="21_mine"]
+[ext_resource type="PackedScene" path="res://scenes/world/world_transition.tscn" id="22_transition"]
+[ext_resource type="PackedScene" path="res://scenes/world/iron_patch.tscn" id="23_iron_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/silver_patch.tscn" id="24_silver_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/gold_patch.tscn" id="25_gold_patch"]
+[ext_resource type="Script" path="res://scripts/world/world_spawn_manager.gd" id="26_spawn"]
+[ext_resource type="Script" path="res://scripts/world/regrowing_resource_patch.gd" id="27_regrow"]
+
+
+[sub_resource type="RectangleShape2D" id="WorldHorizontalBoundary"]
+size = Vector2(4192, 32)
+
+[sub_resource type="RectangleShape2D" id="WorldVerticalBoundary"]
+size = Vector2(32, 752)
+
+[node name="Main" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_world")
+
+
+[node name="DayNightTint" type="CanvasModulate" parent="."]
+color = Color(1, 1, 1, 1)
+
+[node name="WorldBounds" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(2080, -16)
+shape = SubResource("WorldHorizontalBoundary")
+
+[node name="Bottom" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(2080, 736)
+shape = SubResource("WorldHorizontalBoundary")
+
+[node name="Left" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(-16, 360)
+shape = SubResource("WorldVerticalBoundary")
+
+[node name="Right" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(4176, 360)
+shape = SubResource("WorldVerticalBoundary")
+
+[node name="FarmEast" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(1280, 360)
+shape = SubResource("WorldVerticalBoundary")
+
+[node name="WorldSpawnManager" type="Node2D" parent="."]
+script = ExtResource("26_spawn")
+
+[node name="WeeklyTreePatch" type="Node2D" parent="."]
+script = ExtResource("27_regrow")
+resource_scene = ExtResource("7_tree")
+resource_name_prefix = "WildTree"
+local_spawn_positions = Array[Vector2]([Vector2(690, 145), Vector2(845, 105), Vector2(1175, 105), Vector2(1180, 650), Vector2(270, 670), Vector2(95, 610)])
+max_active_resources = 2
+respawn_interval_days = 7
+seed_salt = 11
+
+[node name="WeeklyRockPatch" type="Node2D" parent="."]
+script = ExtResource("27_regrow")
+resource_scene = ExtResource("8_rock")
+resource_name_prefix = "WildRock"
+local_spawn_positions = Array[Vector2]([Vector2(245, 585), Vector2(395, 665), Vector2(915, 665), Vector2(1160, 410), Vector2(1080, 120), Vector2(110, 365)])
+max_active_resources = 2
+respawn_interval_days = 7
+seed_salt = 29
+
+[node name="Farmhouse" parent="." instance=ExtResource("10_house")]
+position = Vector2(380, 185)
+
+[node name="ToolUpgradeStation" parent="." instance=ExtResource("11_upgrade")]
+position = Vector2(520, 180)
+
+[node name="ShippingBin" parent="." instance=ExtResource("17_shipping")]
+position = Vector2(330, 295)
+
+[node name="SeedShop" parent="." instance=ExtResource("18_shop")]
+position = Vector2(330, 360)
+
+[node name="SlimeCrystallizer" parent="." instance=ExtResource("20_crystallizer")]
+position = Vector2(610, 180)
+
+[node name="FarmField" parent="." instance=ExtResource("3_farm")]
+position = Vector2(448, 240)
+
+[node name="SleepSpot" parent="." instance=ExtResource("4_sleep")]
+visible = false
+position = Vector2(380, 235)
+
+[node name="WaterSource" parent="." instance=ExtResource("6_water")]
+position = Vector2(880, 536)
+
+[node name="TreeA" parent="." instance=ExtResource("7_tree")]
+position = Vector2(810, 176)
+
+[node name="TreeB" parent="." instance=ExtResource("7_tree")]
+position = Vector2(1010, 310)
+
+[node name="TreeC" parent="." instance=ExtResource("7_tree")]
+position = Vector2(1110, 500)
+
+[node name="RockA" parent="." instance=ExtResource("8_rock")]
+position = Vector2(330, 430)
+
+[node name="RockB" parent="." instance=ExtResource("8_rock")]
+position = Vector2(355, 505)
+
+[node name="RockC" parent="." instance=ExtResource("8_rock")]
+position = Vector2(945, 450)
+
+[node name="CopperPatch" parent="." instance=ExtResource("19_copper_patch")]
+position = Vector2(940, 245)
+
+[node name="LargeStumpGate" parent="." instance=ExtResource("12_stump")]
+position = Vector2(1080, 230)
+
+[node name="LargeBoulderGate" parent="." instance=ExtResource("13_boulder")]
+position = Vector2(250, 330)
+
+[node name="SlimeHabitat" parent="." instance=ExtResource("16_habitat")]
+position = Vector2(1040, 550)
+habitat_name = "Bosque dos Slimes"
+habitat_size = Vector2(260, 170)
+biome_type = 1
+
+[node name="SlimeBreedingNest" parent="." instance=ExtResource("15_nest")]
+position = Vector2(1040, 515)
+
+[node name="GreenSlimeA" parent="." instance=ExtResource("14_slime")]
+position = Vector2(990, 555)
+display_name = "Broto"
+biological_sex = 0
+personality = 0
+gene_size = 0.96
+gene_metabolism = 1.08
+gene_vitality = 1.02
+gene_production = 0.98
+slime_color = Color(0.30, 0.92, 0.50, 1)
+
+[node name="GreenSlimeB" parent="." instance=ExtResource("14_slime")]
+position = Vector2(1070, 555)
+display_name = "Gota"
+biological_sex = 1
+personality = 1
+gene_size = 1.08
+gene_metabolism = 0.92
+gene_vitality = 1.10
+gene_production = 1.24
+slime_color = Color(0.26, 0.80, 0.58, 1)
+
+[node name="MineArea" parent="." instance=ExtResource("21_mine")]
+position = Vector2(1900, 360)
+
+[node name="MineEntrance" parent="." instance=ExtResource("22_transition")]
+position = Vector2(1200, 175)
+target_position = Vector2(1640, 560)
+minimum_pickaxe_level = 1
+transition_name = "Mina Rasa"
+entrance_style = true
+
+[node name="MineExit" parent="." instance=ExtResource("22_transition")]
+position = Vector2(1615, 610)
+target_position = Vector2(1160, 220)
+minimum_pickaxe_level = 0
+transition_name = "Mina Rasa"
+entrance_style = false
+
+[node name="IronPatch" parent="." instance=ExtResource("23_iron_patch")]
+position = Vector2(1940, 350)
+
+[node name="MineRockA" parent="." instance=ExtResource("8_rock")]
+position = Vector2(1780, 455)
+
+[node name="MineRockB" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2080, 470)
+
+[node name="MineRockC" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2160, 250)
+
+[node name="DeepMineArea" parent="." instance=ExtResource("21_mine")]
+position = Vector2(2800, 360)
+area_name = "MINA PROFUNDA"
+floor_color = Color(0.055, 0.065, 0.08, 1)
+wall_color = Color(0.13, 0.15, 0.18, 1)
+edge_color = Color(0.27, 0.31, 0.38, 1)
+
+[node name="DeepMineEntrance" parent="." instance=ExtResource("22_transition")]
+position = Vector2(2200, 355)
+target_position = Vector2(2540, 560)
+minimum_pickaxe_level = 2
+transition_name = "Mina Profunda"
+entrance_style = true
+
+[node name="DeepMineExit" parent="." instance=ExtResource("22_transition")]
+position = Vector2(2515, 610)
+target_position = Vector2(2150, 430)
+minimum_pickaxe_level = 0
+transition_name = "Mina Profunda"
+entrance_style = false
+
+[node name="SilverPatch" parent="." instance=ExtResource("24_silver_patch")]
+position = Vector2(2840, 350)
+
+[node name="DeepRockA" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2680, 455)
+
+[node name="DeepRockB" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2980, 470)
+
+[node name="DeepRockC" parent="." instance=ExtResource("8_rock")]
+position = Vector2(3060, 250)
+
+[node name="AbyssMineArea" parent="." instance=ExtResource("21_mine")]
+position = Vector2(3700, 360)
+area_name = "MINA ABISSAL"
+floor_color = Color(0.055, 0.045, 0.045, 1)
+wall_color = Color(0.16, 0.11, 0.10, 1)
+edge_color = Color(0.36, 0.23, 0.16, 1)
+
+[node name="AbyssMineEntrance" parent="." instance=ExtResource("22_transition")]
+position = Vector2(3100, 355)
+target_position = Vector2(3440, 560)
+minimum_pickaxe_level = 3
+transition_name = "Mina Abissal"
+entrance_style = true
+
+[node name="AbyssMineExit" parent="." instance=ExtResource("22_transition")]
+position = Vector2(3415, 610)
+target_position = Vector2(3050, 430)
+minimum_pickaxe_level = 0
+transition_name = "Mina Abissal"
+entrance_style = false
+
+[node name="GoldPatch" parent="." instance=ExtResource("25_gold_patch")]
+position = Vector2(3740, 350)
+
+[node name="AbyssRockA" parent="." instance=ExtResource("8_rock")]
+position = Vector2(3580, 455)
+
+[node name="AbyssRockB" parent="." instance=ExtResource("8_rock")]
+position = Vector2(3880, 470)
+
+[node name="AbyssRockC" parent="." instance=ExtResource("8_rock")]
+position = Vector2(3960, 250)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(640, 560)
+
+[node name="GameHUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="WeatherFX" parent="." instance=ExtResource("9_weather")]

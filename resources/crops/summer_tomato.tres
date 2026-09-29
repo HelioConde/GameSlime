@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CropDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_definition.gd" id="1_crop"]
+
+[resource]
+script = ExtResource("1_crop")
+id = &"summer_tomato"
+display_name = "Tomate Solar"
+growth_days = 6
+visual_stages = 4
+sell_value = 55
+crop_color = Color(0.90, 0.34, 0.24, 1)
+sprite_row = 3
+harvest_item_id = &"summer_tomato"
+harvest_min = 1
+harvest_max = 2
+regrow_days = 3
+grows_in_spring = false
+grows_in_summer = true
+grows_in_fall = false
+grows_in_winter = false
