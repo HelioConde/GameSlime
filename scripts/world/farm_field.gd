@@ -10,6 +10,7 @@ const SOIL_SOURCE := Rect2(0, 64, 16, 16)
 signal cell_changed(cell: Vector2i)
 signal crop_planted(cell: Vector2i, crop: CropDefinition)
 signal crop_harvested(cell: Vector2i, crop: CropDefinition, amount: int)
+signal crops_withered(count: int)
 
 @export var grid_size: Vector2i = Vector2i(12, 8)
 @export var cell_size: int = 32
@@ -21,6 +22,7 @@ func _ready() -> void:
 	add_to_group("farm_field")
 	GameClock.day_ended.connect(_on_day_ended)
 	GameClock.day_started.connect(_on_day_started)
+	GameClock.season_changed.connect(_on_season_changed)
 	call_deferred("_apply_current_weather")
 	queue_redraw()
 
@@ -145,6 +147,26 @@ func get_cell_hint(cell: Vector2i) -> String:
 	if not data.watered_today:
 		return "A planta precisa de agua hoje."
 	return "%s esta crescendo." % data.crop.display_name
+
+func _on_season_changed(_year: int, new_season: int) -> void:
+	var withered := 0
+
+	for key in _cells.keys():
+		var cell: Vector2i = key
+		var data := _cells[key] as FarmCellData
+		if data == null or data.crop == null:
+			continue
+
+		if data.crop.can_grow_in_season(new_season):
+			continue
+
+		data.clear_crop()
+		withered += 1
+		cell_changed.emit(cell)
+
+	if withered > 0:
+		crops_withered.emit(withered)
+		queue_redraw()
 
 func _on_day_started(_day: int) -> void:
 	_apply_current_weather()
