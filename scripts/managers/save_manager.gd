@@ -185,6 +185,7 @@ func _get_world_save_data() -> Dictionary:
 			"amount": drop.amount,
 			"position": [drop.global_position.x, drop.global_position.y],
 			"tint": [drop.tint.r, drop.tint.g, drop.tint.b, drop.tint.a],
+			"daily_spawn": drop.is_in_group("daily_world_spawn"),
 		})
 
 	return {
@@ -295,6 +296,8 @@ func _load_drop_state(data: Dictionary) -> void:
 			continue
 
 		get_tree().current_scene.add_child(drop)
+		if bool(entry.get("daily_spawn", false)):
+			drop.add_to_group("daily_world_spawn")
 		drop.global_position = Vector2(float(position_data[0]), float(position_data[1]))
 
 		var tint := Color.WHITE
