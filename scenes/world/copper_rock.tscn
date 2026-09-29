@@ -16,7 +16,7 @@ resource_kind = 1
 required_tool_type = 3
 minimum_tool_level = 0
 drop_item_id = &"copper_ore"
-drop_amount = 3
+drop_amount = 5
 drop_tint = Color(0.82, 0.46, 0.22, 1)
 
 [node name="Visual" type="Sprite2D" parent="."]
