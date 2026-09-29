@@ -6,14 +6,19 @@ extends Node2D
 @export var local_spawn_positions: Array[Vector2] = []
 
 func _ready() -> void:
+	add_to_group("daily_resource_patch")
 	GameClock.day_started.connect(_on_day_started)
-	call_deferred("_ensure_resources")
+
+	# New game: populate immediately. Existing save: SaveManager reconstructs
+	# before applying the saved destroyed/alive resource state.
+	if not SaveManager.has_save():
+		call_deferred("ensure_resources")
 
 func _on_day_started(_day: int) -> void:
-	call_deferred("_ensure_resources")
+	call_deferred("ensure_resources")
 
-func _ensure_resources() -> void:
-	if resource_scene == null:
+func ensure_resources() -> void:
+	if resource_scene == null or get_parent() == null:
 		return
 
 	for index in range(local_spawn_positions.size()):
