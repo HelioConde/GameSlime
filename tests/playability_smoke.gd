@@ -729,6 +729,28 @@ func _run() -> void:
 				await get_tree().process_frame
 			_check(farm.can_harvest(growth_cell), "watered crop reaches harvest naturally")
 
+	# Rain must replace manual watering for crop growth.
+	if player != null and farm != null:
+		var rain_crop := player.starter_seed_item.crop_to_plant
+		var rain_cell := Vector2i(1, 3)
+		if rain_crop != null and rain_crop.can_grow_in_season(game_clock.season_index):
+			farm.apply_hoe([rain_cell])
+			_check(farm.plant_crop(rain_cell, rain_crop), "rain test crop can be planted")
+			var rain_data := farm.get_cell(rain_cell)
+			var weather_before_rain_test := int(WeatherManager.current_weather)
+			WeatherManager.current_weather = WeatherManager.Weather.RAIN
+			farm.call("_apply_current_weather")
+			_check(rain_data.watered_today, "rain waters planted tilled soil")
+			var rain_growth_before := rain_data.growth_days_completed
+			game_clock.sleep_and_start_next_day()
+			await get_tree().process_frame
+			await get_tree().process_frame
+			_check(
+				rain_data.growth_days_completed == rain_growth_before + 1,
+				"rain-watered crop advances growth at day end"
+			)
+			WeatherManager.current_weather = weather_before_rain_test
+
 	# Seven consecutive day rollovers must remain playable and autosaved.
 	var seven_day_start := int(game_clock.day)
 	for _index in range(7):
