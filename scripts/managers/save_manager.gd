@@ -205,6 +205,11 @@ func _load_world_save_data(data: Dictionary, save_version: int = SAVE_VERSION) -
 		if patch != null:
 			patch.ensure_resources()
 
+	for node in get_tree().get_nodes_in_group("regrowing_resource_patch"):
+		var patch := node as RegrowingResourcePatch
+		if patch != null:
+			patch.prepare_for_save_load()
+
 	# Saves v5 were created before the complete mine/resource catalog existed.
 # Saves v6 remain compatible with v7: fertilizer, soil age and natural-spawn
 # lifetime fields are additive and load with safe defaults when absent.
