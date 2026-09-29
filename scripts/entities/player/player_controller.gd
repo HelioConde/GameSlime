@@ -23,6 +23,7 @@ signal feedback_requested(text: String)
 @export var starter_crop_item: ItemDefinition
 @export var wood_item: ItemDefinition
 @export var stone_item: ItemDefinition
+@export var slime_gel_item: ItemDefinition
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
@@ -337,6 +338,13 @@ func _interact() -> void:
 				feedback_requested.emit(upgrade_message)
 				return
 
+	var slime := _find_interactable_slime()
+	if slime != null:
+		var slime_message := slime.interact(self)
+		if not slime_message.is_empty():
+			feedback_requested.emit(slime_message)
+			return
+
 	if farm_field == null:
 		return
 
@@ -370,6 +378,22 @@ func _interact() -> void:
 
 	feedback_requested.emit(farm_field.get_cell_hint(target))
 
+func _find_interactable_slime() -> SlimeCreature:
+	var nearest: SlimeCreature = null
+	var nearest_distance := INF
+
+	for node in get_tree().get_nodes_in_group("slime_creature"):
+		var slime := node as SlimeCreature
+		if slime == null or not slime.can_interact(global_position):
+			continue
+
+		var distance := global_position.distance_to(slime.global_position)
+		if distance < nearest_distance:
+			nearest = slime
+			nearest_distance = distance
+
+	return nearest
+
 func _seed_starting_inventory() -> void:
 	var definitions: Array[ItemDefinition] = [
 		starter_hoe_item,
@@ -380,6 +404,7 @@ func _seed_starting_inventory() -> void:
 		starter_crop_item,
 		wood_item,
 		stone_item,
+		slime_gel_item,
 	]
 
 	for definition in definitions:
