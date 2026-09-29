@@ -11,3 +11,4 @@ max_stack = 99
 tint = Color(0.82, 0.30, 0.46, 1)
 buy_price = 0
 sell_price = 24
+energy_restore = 18
