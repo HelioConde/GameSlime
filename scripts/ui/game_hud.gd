@@ -7,6 +7,9 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/sprout_lands/items/all_items
 @onready var hotbar_container: HBoxContainer = $HotbarPanel/Margin/Hotbar
 @onready var help_label: Label = $HelpPanel/Margin/Help
 @onready var feedback_label: Label = $Feedback
+@onready var calendar_panel: PanelContainer = $CalendarPanel
+@onready var calendar_title: Label = $CalendarPanel/Margin/Content/Title
+@onready var calendar_body: Label = $CalendarPanel/Margin/Content/Body
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -18,7 +21,14 @@ var _slot_amounts: Array[Label] = []
 
 func _ready() -> void:
 	call_deferred("_bind_player")
-	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E/clique direito interagir"
+	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario"
+	calendar_panel.visible = false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_C:
+			_toggle_calendar()
+			get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
 	if player == null:
@@ -116,6 +126,11 @@ func _refresh_status() -> void:
 	if player.tools.is_charging:
 		charge_text = " | Carga %d" % player.tools.charge_stage
 
+	var event_text := ""
+	var current_event := CalendarEvents.get_current_event_name()
+	if not current_event.is_empty():
+		event_text = "\nEvento: %s" % current_event
+
 	var water_text := ""
 	var selected := player.inventory.get_selected_stack()
 	if selected != null and not selected.is_empty():
@@ -125,11 +140,12 @@ func _refresh_status() -> void:
 				player.tools.get_water_capacity(),
 			]
 
-	status_label.text = "%s  %s\nClima: %s · Amanha: %s\nEnergia: %.0f / %.0f\nSelecionado: %s%s%s" % [
+	status_label.text = "%s  %s\nClima: %s · Amanha: %s%s\nEnergia: %.0f / %.0f\nSelecionado: %s%s%s" % [
 		GameClock.get_date_text(),
 		GameClock.get_time_text(),
 		WeatherManager.get_weather_name(),
 		WeatherManager.get_tomorrow_weather_name(),
+		event_text,
 		player.energy.current_energy,
 		player.energy.maximum_energy,
 		player.get_selected_item_name(),
@@ -200,3 +216,40 @@ func _slot_key_text(index: int) -> String:
 func _show_feedback(text: String) -> void:
 	feedback_label.text = text
 	_feedback_time_left = 2.2
+
+func _toggle_calendar() -> void:
+	calendar_panel.visible = not calendar_panel.visible
+	if calendar_panel.visible:
+		_refresh_calendar_panel()
+
+func _refresh_calendar_panel() -> void:
+	calendar_title.text = "%s · Ano %d" % [
+		GameClock.get_season_name(),
+		GameClock.year,
+	]
+
+	var lines: Array[String] = []
+	lines.append("SEG  TER  QUA  QUI  SEX  SAB  DOM")
+
+	for week in range(4):
+		var cells: Array[String] = []
+		for weekday in range(7):
+			var day := week * 7 + weekday + 1
+			var marker := "*" if day == GameClock.day_of_season else " "
+			var event := CalendarEvents.get_event(GameClock.season_index, day)
+			var event_marker := "!" if not event.is_empty() else " "
+			cells.append("%s%02d%s" % [marker, day, event_marker])
+		lines.append("  ".join(cells))
+
+	lines.append("")
+	lines.append("* hoje   ! evento")
+	lines.append("")
+
+	var events := CalendarEvents.get_events_for_season(GameClock.season_index)
+	for event in events:
+		lines.append("Dia %02d · %s" % [
+			int(event.get("day", 0)),
+			str(event.get("name", "")),
+		])
+
+	calendar_body.text = "\n".join(lines)
