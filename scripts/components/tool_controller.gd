@@ -21,6 +21,8 @@ const UPGRADE_GOLD_COST := [0, 200, 450, 900, 1800, 3500]
 const UPGRADE_COPPER_COST := [0, 5, 10, 15, 25, 40]
 const UPGRADE_IRON_COST := [0, 0, 5, 10, 15, 25]
 const UPGRADE_SILVER_COST := [0, 0, 0, 5, 10, 20]
+const UPGRADE_GOLD_ORE_COST := [0, 0, 0, 0, 5, 10]
+const UPGRADE_SLIME_CRYSTAL_COST := [0, 0, 0, 0, 0, 2]
 
 @export_range(0, 5, 1) var hoe_level: int = 0
 @export_range(0, 5, 1) var watering_can_level: int = 0
@@ -197,6 +199,8 @@ func get_upgrade_cost(tool: int = selected_tool) -> Dictionary:
 		"copper": UPGRADE_COPPER_COST[next_level],
 		"iron": UPGRADE_IRON_COST[next_level],
 		"silver": UPGRADE_SILVER_COST[next_level],
+		"gold_ore": UPGRADE_GOLD_ORE_COST[next_level],
+		"slime_crystal": UPGRADE_SLIME_CRYSTAL_COST[next_level],
 	}
 
 func upgrade_tool(tool: int = selected_tool) -> bool:
