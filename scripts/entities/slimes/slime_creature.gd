@@ -47,6 +47,7 @@ var affection: float
 var age_days: int = 0
 var last_petted_day: int = -1
 var last_bred_day: int = -1
+var habitat: SlimeHabitat
 
 var _home_position: Vector2
 var _wander_target: Vector2
@@ -61,6 +62,7 @@ func _ready() -> void:
 	happiness = starting_happiness
 	affection = starting_affection
 	_home_position = global_position
+	call_deferred("_find_habitat")
 
 	_rng.seed = hash(String(name))
 	_choose_wander_target()
@@ -303,9 +305,33 @@ func _tick_wander(delta: float) -> void:
 	velocity = direction * move_speed * personality_speed
 
 func _choose_wander_target() -> void:
+	if habitat != null and is_instance_valid(habitat):
+		_wander_target = habitat.get_random_point(_rng)
+		return
+
 	var angle := _rng.randf_range(0.0, TAU)
 	var distance := _rng.randf_range(16.0, wander_radius)
 	_wander_target = _home_position + Vector2.from_angle(angle) * distance
+
+func _find_habitat() -> void:
+	if habitat != null:
+		return
+
+	var nearest: SlimeHabitat = null
+	var nearest_distance := INF
+
+	for node in get_tree().get_nodes_in_group("slime_habitat"):
+		var candidate := node as SlimeHabitat
+		if candidate == null or not candidate.contains_position(global_position):
+			continue
+
+		var distance := global_position.distance_to(candidate.global_position)
+		if distance < nearest_distance:
+			nearest = candidate
+			nearest_distance = distance
+
+	if nearest != null:
+		nearest.register_slime(self)
 
 func _feed() -> void:
 	satiety = minf(satiety + 30.0, 100.0)
