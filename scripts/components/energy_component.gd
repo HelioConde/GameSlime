@@ -44,3 +44,7 @@ func get_ratio() -> float:
 	if maximum_energy <= 0.0:
 		return 0.0
 	return current_energy / maximum_energy
+
+func set_current_energy(value: float) -> void:
+	current_energy = clampf(value, 0.0, maximum_energy)
+	energy_changed.emit(current_energy, maximum_energy)
