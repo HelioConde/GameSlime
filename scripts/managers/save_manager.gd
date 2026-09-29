@@ -5,7 +5,7 @@ signal game_saved(path: String)
 signal game_loaded(path: String)
 signal save_failed(message: String)
 
-const SAVE_VERSION := 6
+const SAVE_VERSION := 7
 const SAVE_PATH := "user://savegame.json"
 const TEMP_SAVE_PATH := "user://savegame.tmp"
 const BACKUP_SAVE_PATH := "user://savegame.bak"
@@ -205,6 +205,8 @@ func _load_world_save_data(data: Dictionary, save_version: int = SAVE_VERSION) -
 			patch.ensure_resources()
 
 	# Saves v5 were created before the complete mine/resource catalog existed.
+# Saves v6 remain compatible with v7: fertilizer, soil age and natural-spawn
+# lifetime fields are additive and load with safe defaults when absent.
 	# Applying their old alive-resource whitelist would delete every resource
 	# added later. For the one-time v5 -> v6 migration, keep scene resources
 	# intact; the next autosave writes a complete v6 snapshot.
