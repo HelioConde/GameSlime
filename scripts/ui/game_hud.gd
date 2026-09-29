@@ -31,6 +31,8 @@ const INVENTORY_SLOT_WIDGET := preload("res://scripts/ui/inventory_slot_widget.g
 @onready var shop_balance: Label = $ShopPanel/Margin/Content/Balance
 @onready var shop_offers: VBoxContainer = $ShopPanel/Margin/Content/Offers
 @onready var shop_close_button: Button = $ShopPanel/Margin/Content/CloseButton
+@onready var machine_panel: PanelContainer = $MachinePanel
+@onready var machine_status: Label = $MachinePanel/Margin/Status
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -53,6 +55,7 @@ func _ready() -> void:
 	habitat_panel.visible = false
 	inventory_panel.visible = false
 	shop_panel.visible = false
+	machine_panel.visible = false
 
 	inventory_organize_button.pressed.connect(_on_inventory_organize_pressed)
 	inventory_close_button.pressed.connect(_close_inventory)
@@ -90,6 +93,7 @@ func _process(delta: float) -> void:
 	_refresh_status()
 	_refresh_hotbar()
 	_refresh_nearby_slime()
+	_refresh_nearby_machine()
 
 func _bind_player() -> void:
 	player = get_tree().get_first_node_in_group("player") as PlayerController
@@ -792,3 +796,29 @@ func _on_shop_buy(item_id: StringName, amount: int) -> void:
 	_show_feedback(message)
 	_refresh_shop_panel()
 	_refresh_inventory_panel()
+
+
+func _refresh_nearby_machine() -> void:
+	if player == null:
+		machine_panel.visible = false
+		return
+
+	var nearest: SlimeCrystallizer = null
+	var nearest_distance := 115.0
+
+	for node in get_tree().get_nodes_in_group("slime_crystallizer"):
+		var machine := node as SlimeCrystallizer
+		if machine == null:
+			continue
+
+		var distance := player.global_position.distance_to(machine.global_position)
+		if distance < nearest_distance:
+			nearest = machine
+			nearest_distance = distance
+
+	if nearest == null:
+		machine_panel.visible = false
+		return
+
+	machine_panel.visible = true
+	machine_status.text = nearest.get_status_text()
