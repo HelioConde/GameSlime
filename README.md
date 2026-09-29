@@ -12,44 +12,74 @@ A base inicial do jogo segue os principios que fazem Stardew Valley funcionar be
 - dia com tempo limitado
 - energia como limite de produtividade
 - agricultura em etapas
+- inventario limitado
 - ferramentas que evoluem de trabalho manual para eficiencia
 - repeticao que futuramente pode ser automatizada
 
 O objetivo nao e clonar Stardew Valley. Slimes serao o diferencial principal do projeto, entrando depois que o loop basico de fazenda estiver forte.
 
-## Primeira fundacao jogavel
+## Estado jogavel atual
 
-A branch atual implementa:
-
-- movimento 8 direcoes com aceleracao e desaceleracao
-- direcao/facing cardinal
-- preview permanente do tile atingido pela ferramenta
-- movimento permitido enquanto a ferramenta carrega
-- entrada separada para ferramenta e interacao
-- relogio: 06:00 ate 02:00
+- movimento 8 direcoes com aceleracao/desaceleracao
+- facing cardinal
+- preview do tile/area da ferramenta
+- movimento enquanto carrega ferramenta
+- usar ferramenta separado de interagir
+- relogio 06:00 -> 02:00
 - 10 minutos de jogo a cada 7 segundos reais
-- energia inicial de 270
-- enxada
-- regador
-- carga por estagios em intervalos de 0,45 s
-- padroes 1 tile, 3x1, 5x1, 3x3, 3x5 e 5x5 preparados
-- solo normal, arado e molhado
-- plantio de cultura de teste
-- crescimento na virada do dia somente quando regada
+- energia inicial 270
+- sono e virada do dia
+- grade agricola
+- terra normal, arada e molhada
+- plantio
+- crescimento somente quando regado
+- crescimento processado na virada do dia
 - colheita
-- cama/sono para avancar o dia
-- HUD de tempo, energia, ferramenta e carga
+- enxada e regador carregaveis
+- 0,45 s por estagio de carga
+- areas preparadas de 1 tile ate 5x5
+- inventario com 12 slots
+- hotbar selecionavel
+- sementes consumiveis
+- colheita armazenada no inventario
+- bloqueio de colheita com inventario cheio
+- regador com reservatorio limitado
+- consumo de agua por nivel de carga
+- fonte de agua para reabastecimento
+- HUD com hora, energia, item selecionado, agua e hotbar
+- validacao automatica com Godot 4.7.2 no GitHub Actions
 
-## Controles do prototipo
+## Inventario inicial do prototipo
 
-- WASD ou setas: mover
-- 1: Enxada
-- 2: Regador
-- Clique esquerdo ou ESPACO: segurar para carregar, soltar para usar
-- E ou clique direito: interagir / plantar / colher / dormir
+1. Enxada
+2. Regador
+3. 15 Sementes de Nabo
+4-12. Vazios
 
-## Observacao de prototipo
+A roda do mouse percorre os 12 slots. As teclas 1-0 acessam diretamente os dez primeiros.
 
-Na cena de teste, enxada e regador estao temporariamente configurados no nivel 2 para permitir testar imediatamente a mecanica de carga. No jogo final, ferramentas iniciais comecarao no nivel 0 e atingirao apenas 1 tile ate receberem upgrades.
+## Controles
 
-A semente da cultura inicial tambem e infinita por enquanto; inventario, sementes consumiveis e economia entram em marcos posteriores.
+- WASD / setas: mover
+- 1-0: selecionar hotbar
+- roda do mouse: trocar slot
+- clique esquerdo / ESPACO:
+  - ferramenta: segurar para carregar e soltar para usar
+  - semente: plantar
+- E / clique direito:
+  - colher
+  - dormir perto da cama
+  - encher regador perto da agua
+  - consultar o tile quando nenhuma dessas acoes for possivel
+
+## Prototipo de ferramenta
+
+Enxada e regador estao temporariamente no nivel 2 para que seja possivel testar imediatamente 1 tile, 3x1 e 5x1.
+
+No inicio real do jogo as ferramentas comecarao no nivel 0.
+
+## Proximo marco
+
+Machado + picareta + arvores + pedras + drops + coleta.
+
+Depois disso entram calendario/estacoes/clima e, com o farming loop forte, os slimes passam a ser o sistema central que diferencia o jogo.
