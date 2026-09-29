@@ -131,6 +131,28 @@ func get_harvest_amount(cell: Vector2i) -> int:
 		return 0
 	return data.crop.get_harvest_amount(GameClock.day, cell) + maxi(data.fertility_bonus, 0)
 
+func get_harvest_quality(cell: Vector2i) -> int:
+	if not can_harvest(cell):
+		return InventorySlotData.Quality.NORMAL
+
+	var data := get_cell(cell)
+	if data == null or data.crop == null or data.fertility_bonus <= 0:
+		return InventorySlotData.Quality.NORMAL
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(
+		GameClock.day * 161803
+		+ cell.x * 31337
+		+ cell.y * 7919
+		+ String(data.crop.id).hash()
+	)
+	var gold_chance := clampf(0.18 * float(data.fertility_bonus), 0.0, 0.55)
+	return (
+		InventorySlotData.Quality.GOLD
+		if rng.randf() < gold_chance
+		else InventorySlotData.Quality.SILVER
+	)
+
 func harvest_cell(cell: Vector2i) -> Dictionary:
 	if not can_harvest(cell):
 		return {}
@@ -138,6 +160,7 @@ func harvest_cell(cell: Vector2i) -> Dictionary:
 	var data := get_cell(cell)
 	var harvested_crop := data.crop
 	var amount := get_harvest_amount(cell)
+	var quality := get_harvest_quality(cell)
 	if amount <= 0:
 		return {}
 
@@ -156,6 +179,7 @@ func harvest_cell(cell: Vector2i) -> Dictionary:
 	return {
 		"crop": harvested_crop,
 		"amount": amount,
+		"quality": quality,
 		"regrowing": harvested_crop.regrows_after_harvest(),
 	}
 
