@@ -25,7 +25,8 @@ func configure(
 	item: ItemDefinition,
 	amount: int,
 	icon_texture: Texture2D,
-	selected: bool
+	selected: bool,
+	quality: int = InventorySlotData.Quality.NORMAL
 ) -> void:
 	if not _built:
 		_build_content()
@@ -41,7 +42,8 @@ func configure(
 		_name_label.text = "Vazio"
 		_amount_label.text = ""
 	else:
-		_name_label.text = item.display_name
+		var marker := InventorySlotData.get_quality_marker(quality)
+		_name_label.text = "%s%s" % [item.display_name, marker]
 		_amount_label.text = "x%d" % amount if item.max_stack > 1 else ""
 
 	_apply_style(selected)
