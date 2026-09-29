@@ -335,6 +335,29 @@ func _run() -> void:
 			_check(player.inventory.count_item(&"stone") == total_stone_before, "inventory operations conserve stone")
 			_check(player.inventory.count_item(&"wood") == total_wood_before, "inventory operations conserve wood")
 
+	# Crop growth must advance only after watered days.
+	if player != null and farm != null:
+		var natural_crop := player.starter_seed_item.crop_to_plant
+		if natural_crop != null and natural_crop.can_grow_in_season(game_clock.season_index):
+			var growth_cell := Vector2i(2, 2)
+			farm.apply_hoe([growth_cell])
+			_check(farm.plant_crop(growth_cell, natural_crop), "natural growth crop can be planted")
+			var growth_data := farm.get_cell(growth_cell)
+			var growth_before_dry_day := growth_data.growth_days_completed
+			game_clock.sleep_and_start_next_day()
+			await get_tree().process_frame
+			await get_tree().process_frame
+			_check(
+				growth_data.growth_days_completed == growth_before_dry_day,
+				"unwatered crop does not advance growth"
+			)
+			for _growth_day in range(natural_crop.growth_days):
+				farm.apply_water([growth_cell])
+				game_clock.sleep_and_start_next_day()
+				await get_tree().process_frame
+				await get_tree().process_frame
+			_check(farm.can_harvest(growth_cell), "watered crop reaches harvest naturally")
+
 	# Seven consecutive day rollovers must remain playable and autosaved.
 	var seven_day_start := int(game_clock.day)
 	for _index in range(7):
