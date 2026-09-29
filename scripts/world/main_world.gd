@@ -6,10 +6,31 @@ const WORLD_TILE_SIZE := 32
 
 func _ready() -> void:
 	queue_redraw()
+
+	if not GameClock.day_started.is_connected(_on_day_started):
+		GameClock.day_started.connect(_on_day_started)
+
 	call_deferred("_load_saved_game")
 
 func _load_saved_game() -> void:
-	SaveManager.load_game()
+	var loaded := SaveManager.load_game()
+	if loaded:
+		return
+
+	# A missing/corrupt/incompatible save must still produce a playable world.
+	# Daily patches normally wait for SaveManager when a save file exists.
+	for node in get_tree().get_nodes_in_group("daily_resource_patch"):
+		var patch := node as DailyResourcePatch
+		if patch != null:
+			patch.ensure_resources()
+
+func _on_day_started(_day: int) -> void:
+	# Natural 02:00 rollover does not pass through SleepSpot. Schedule a save
+	# after every day-start callback has restored player/world state.
+	call_deferred("_autosave_new_day")
+
+func _autosave_new_day() -> void:
+	SaveManager.save_game()
 
 func _draw() -> void:
 	_draw_grass_background()
