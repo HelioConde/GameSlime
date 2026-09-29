@@ -9,3 +9,34 @@ extends Resource
 @export var crop_color: Color = Color(0.62, 0.88, 0.42)
 @export_range(0, 14, 1) var sprite_row: int = 0
 @export var harvest_item_id: StringName = &"starter_turnip"
+
+@export_group("Season")
+@export var grows_in_spring: bool = true
+@export var grows_in_summer: bool = false
+@export var grows_in_fall: bool = false
+@export var grows_in_winter: bool = false
+
+func can_grow_in_season(season: int) -> bool:
+	match season:
+		GameClockManager.Season.SPRING:
+			return grows_in_spring
+		GameClockManager.Season.SUMMER:
+			return grows_in_summer
+		GameClockManager.Season.FALL:
+			return grows_in_fall
+		GameClockManager.Season.WINTER:
+			return grows_in_winter
+		_:
+			return false
+
+func get_season_names() -> String:
+	var names: Array[String] = []
+	if grows_in_spring:
+		names.append("Primavera")
+	if grows_in_summer:
+		names.append("Verao")
+	if grows_in_fall:
+		names.append("Outono")
+	if grows_in_winter:
+		names.append("Inverno")
+	return ", ".join(names)
