@@ -142,7 +142,7 @@ func interact(player: PlayerController) -> String:
 
 func get_status_text() -> String:
 	var mutation_text := "" if mutation_tag.is_empty() else " · Mutacao %s" % mutation_tag
-	return "%s · %s · %s\n%s · %s%s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
+	return "%s · %s · %s\n%s · %s%s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias\nAcao: %s" % [
 		display_name,
 		get_sex_name(),
 		get_personality_name(),
@@ -154,6 +154,7 @@ func get_status_text() -> String:
 		happiness,
 		affection,
 		age_days,
+		get_priority_need_text(),
 	]
 
 func get_personality_name() -> String:
@@ -273,13 +274,49 @@ func get_genetics_text() -> String:
 	]
 
 func can_breed() -> bool:
-	return (
-		age_days >= 3
-		and last_bred_day != GameClock.day
-		and satiety >= 60.0
-		and energy >= 50.0
-		and happiness >= 60.0
-		and affection >= 8.0
+	return get_breeding_blockers().is_empty()
+
+func get_breeding_blockers() -> Array[String]:
+	var blockers: Array[String] = []
+
+	if age_days < 3:
+		blockers.append("crescer ate 3 dias")
+	if last_bred_day == GameClock.day:
+		blockers.append("descansar depois da reproducao")
+	if satiety < 60.0:
+		blockers.append("saciedade 60%+")
+	if energy < 50.0:
+		blockers.append("energia 50%+")
+	if happiness < 60.0:
+		blockers.append("humor 60%+")
+	if affection < 8.0:
+		blockers.append("afeto 8%+")
+
+	return blockers
+
+func get_priority_need_text() -> String:
+	if satiety < 35.0:
+		return "ALIMENTAR"
+	if energy < 25.0:
+		return "DESCANSAR"
+	if happiness < 45.0:
+		return "MELHORAR HUMOR"
+	if last_petted_day != GameClock.day:
+		return "CARINHO DISPONIVEL"
+	if age_days < 3:
+		return "CRESCENDO"
+	if can_breed():
+		return "PRONTO PARA REPRODUCAO"
+	return "BEM CUIDADO"
+
+func get_care_score() -> float:
+	return clampf(
+		satiety * 0.30
+		+ energy * 0.20
+		+ happiness * 0.30
+		+ minf(affection * 4.0, 100.0) * 0.20,
+		0.0,
+		100.0
 	)
 
 func mark_bred() -> void:
