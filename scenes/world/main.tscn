@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/silver_patch.tscn" id="24_silver_patch"]
 [ext_resource type="PackedScene" path="res://scenes/world/gold_patch.tscn" id="25_gold_patch"]
 [ext_resource type="Script" path="res://scripts/world/world_spawn_manager.gd" id="26_spawn"]
+[ext_resource type="Script" path="res://scripts/world/regrowing_resource_patch.gd" id="27_regrow"]
 
 
 [sub_resource type="RectangleShape2D" id="WorldHorizontalBoundary"]
@@ -66,6 +67,24 @@ shape = SubResource("WorldVerticalBoundary")
 
 [node name="WorldSpawnManager" type="Node2D" parent="."]
 script = ExtResource("26_spawn")
+
+[node name="WeeklyTreePatch" type="Node2D" parent="."]
+script = ExtResource("27_regrow")
+resource_scene = ExtResource("7_tree")
+resource_name_prefix = "WildTree"
+local_spawn_positions = Array[Vector2]([Vector2(690, 145), Vector2(845, 105), Vector2(1175, 105), Vector2(1180, 650), Vector2(270, 670), Vector2(95, 610)])
+max_active_resources = 2
+respawn_interval_days = 7
+seed_salt = 11
+
+[node name="WeeklyRockPatch" type="Node2D" parent="."]
+script = ExtResource("27_regrow")
+resource_scene = ExtResource("8_rock")
+resource_name_prefix = "WildRock"
+local_spawn_positions = Array[Vector2]([Vector2(245, 585), Vector2(395, 665), Vector2(915, 665), Vector2(1160, 410), Vector2(1080, 120), Vector2(110, 365)])
+max_active_resources = 2
+respawn_interval_days = 7
+seed_salt = 29
 
 [node name="Farmhouse" parent="." instance=ExtResource("10_house")]
 position = Vector2(380, 185)
