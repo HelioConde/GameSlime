@@ -14,6 +14,7 @@ func interact(player: PlayerController) -> String:
 	if player == null or not can_interact(player.global_position):
 		return ""
 
+	Sfx.play_cue(&"sleep")
 	GameClock.sleep_and_start_next_day()
 	player.restore_after_sleep()
 
