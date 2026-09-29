@@ -189,7 +189,7 @@ func get_target_cells() -> Array[Vector2i]:
 
 	var origin := farm_field.world_to_cell(global_position)
 
-	if stack.item.kind == ItemDefinition.ItemKind.SEED:
+	if stack.item.kind in [ItemDefinition.ItemKind.SEED, ItemDefinition.ItemKind.FERTILIZER]:
 		return farm_field.filter_valid_cells(
 			GridTargeting.get_tool_cells(origin, facing, 0)
 		)
@@ -244,6 +244,8 @@ func _apply_selected_fertilizer(stack: InventorySlotData) -> void:
 		var data := farm_field.get_cell(target)
 		if data == null or not data.tilled:
 			feedback_requested.emit("Are o solo antes de aplicar adubo.")
+		elif data.crop != null:
+			feedback_requested.emit("Aplique o adubo antes de plantar.")
 		else:
 			feedback_requested.emit("Este solo ja esta adubado.")
 		return
@@ -863,6 +865,8 @@ func _draw_target_preview() -> void:
 
 	if stack.item.kind == ItemDefinition.ItemKind.SEED:
 		preview_color = Color(0.55, 0.86, 0.32, 0.30)
+	elif stack.item.kind == ItemDefinition.ItemKind.FERTILIZER:
+		preview_color = Color(0.68, 0.48, 0.24, 0.34)
 	elif stack.item.kind == ItemDefinition.ItemKind.TOOL:
 		match stack.item.tool_type:
 			ToolController.ToolType.WATERING_CAN:
