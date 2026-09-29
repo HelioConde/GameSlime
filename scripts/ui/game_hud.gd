@@ -12,6 +12,9 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/sprout_lands/items/all_items
 @onready var calendar_body: Label = $CalendarPanel/Margin/Content/Body
 @onready var slime_panel: PanelContainer = $SlimePanel
 @onready var slime_status: Label = $SlimePanel/Margin/Status
+@onready var bestiary_panel: PanelContainer = $BestiaryPanel
+@onready var bestiary_title: Label = $BestiaryPanel/Margin/Content/Title
+@onready var bestiary_body: Label = $BestiaryPanel/Margin/Content/Body
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -24,14 +27,19 @@ var _slot_amounts: Array[Label] = []
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	call_deferred("_bind_player")
-	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario"
+	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario | B bestiario"
 	calendar_panel.visible = false
+	bestiary_panel.visible = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode == KEY_C:
-			_toggle_calendar()
-			get_viewport().set_input_as_handled()
+		match event.physical_keycode:
+			KEY_C:
+				_toggle_calendar()
+				get_viewport().set_input_as_handled()
+			KEY_B:
+				_toggle_bestiary()
+				get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
 	if player == null:
@@ -227,11 +235,25 @@ func _show_feedback(text: String) -> void:
 	_feedback_time_left = 2.2
 
 func _toggle_calendar() -> void:
-	calendar_panel.visible = not calendar_panel.visible
-	get_tree().paused = calendar_panel.visible
+	var next_visible := not calendar_panel.visible
+	bestiary_panel.visible = false
+	calendar_panel.visible = next_visible
+	_update_menu_pause()
 
 	if calendar_panel.visible:
 		_refresh_calendar_panel()
+
+func _toggle_bestiary() -> void:
+	var next_visible := not bestiary_panel.visible
+	calendar_panel.visible = false
+	bestiary_panel.visible = next_visible
+	_update_menu_pause()
+
+	if bestiary_panel.visible:
+		_refresh_bestiary_panel()
+
+func _update_menu_pause() -> void:
+	get_tree().paused = calendar_panel.visible or bestiary_panel.visible
 
 func _refresh_calendar_panel() -> void:
 	calendar_title.text = "%s · Ano %d" % [
@@ -289,3 +311,36 @@ func _refresh_nearby_slime() -> void:
 
 	slime_panel.visible = true
 	slime_status.text = nearest.get_status_text()
+
+func _refresh_bestiary_panel() -> void:
+	var individuals := SlimeDiscovery.get_all_individuals()
+	var traits := SlimeDiscovery.get_discovered_traits()
+
+	bestiary_title.text = "Bestiario Genetico · %d slimes" % individuals.size()
+
+	var lines: Array[String] = []
+	if individuals.is_empty():
+		lines.append("Nenhum slime registrado.")
+	else:
+		for record in individuals:
+			lines.append("%s · %s · %s" % [
+				str(record.get("display_name", "Slime")),
+				str(record.get("sex", "")),
+				str(record.get("personality", "")),
+			])
+			lines.append("  Tam %.2f · Met %.2f · Vit %.2f · Prod %.2f" % [
+				float(record.get("gene_size", 1.0)),
+				float(record.get("gene_metabolism", 1.0)),
+				float(record.get("gene_vitality", 1.0)),
+				float(record.get("gene_production", 1.0)),
+			])
+
+	lines.append("")
+	lines.append("Descobertas geneticas:")
+	if traits.is_empty():
+		lines.append("  Nenhuma descoberta rara ainda.")
+	else:
+		for trait_name in traits:
+			lines.append("  • %s" % trait_name)
+
+	bestiary_body.text = "\n".join(lines)
