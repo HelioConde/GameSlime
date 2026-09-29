@@ -7,7 +7,7 @@
 - [x] corrigir respawn de jazidas antes do autosave
 - [x] autosave tambem na virada natural das 02:00
 - [x] fallback jogavel quando save esta ausente/invalido
-- [x] migracao segura de saves v5 para v6
+- [x] migracao segura de saves v5/v6 para v7
 - [x] limites fisicos externos impedem o player de sair da area jogavel
 - [x] banca, caixa de remessa, ferreiro e fonte de agua bloqueiam passagem
 - [ ] campanha de testes manuais sem slimes
