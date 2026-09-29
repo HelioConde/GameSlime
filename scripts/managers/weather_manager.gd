@@ -11,7 +11,6 @@ enum Weather {
 }
 
 var current_weather: int = Weather.CLEAR
-var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -24,8 +23,8 @@ func is_raining() -> bool:
 func is_snowing() -> bool:
 	return current_weather == Weather.SNOW
 
-func get_weather_name() -> String:
-	match current_weather:
+func get_weather_name(weather: int = current_weather) -> String:
+	match weather:
 		Weather.CLEAR:
 			return "Ensolarado"
 		Weather.CLOUDY:
@@ -37,54 +36,75 @@ func get_weather_name() -> String:
 		_:
 			return "Clima"
 
-func _on_day_started(_day: int) -> void:
-	_roll_weather_for_current_day()
+func get_tomorrow_weather() -> int:
+	var next_year := GameClock.year
+	var next_season := GameClock.season_index
+	var next_day := GameClock.day_of_season + 1
+
+	if next_day > GameClock.DAYS_PER_SEASON:
+		next_day = 1
+		next_season += 1
+
+		if next_season > GameClock.Season.WINTER:
+			next_season = GameClock.Season.SPRING
+			next_year += 1
+
+	return _weather_for_date(next_year, next_season, next_day, GameClock.day + 1)
+
+func get_tomorrow_weather_name() -> String:
+	return get_weather_name(get_tomorrow_weather())
 
 func refresh_for_current_day() -> void:
 	_roll_weather_for_current_day()
 
+func _on_day_started(_day: int) -> void:
+	_roll_weather_for_current_day()
+
 func _roll_weather_for_current_day() -> void:
-	if GameClock.day == 1:
-		_set_weather(Weather.CLEAR)
-		return
-
-	var seed_value := int(
-		GameClock.year * 100000
-		+ GameClock.season_index * 1000
-		+ GameClock.day_of_season * 37
+	_set_weather(
+		_weather_for_date(
+			GameClock.year,
+			GameClock.season_index,
+			GameClock.day_of_season,
+			GameClock.day
+		)
 	)
-	_rng.seed = seed_value
-	var roll := _rng.randf()
 
-	match GameClock.season_index:
+func _weather_for_date(year: int, season: int, season_day: int, absolute_day: int) -> int:
+	if absolute_day == 1:
+		return Weather.CLEAR
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(year * 100000 + season * 1000 + season_day * 37)
+	var roll := rng.randf()
+
+	match season:
 		GameClock.Season.SPRING:
 			if roll < 0.30:
-				_set_weather(Weather.RAIN)
-			elif roll < 0.45:
-				_set_weather(Weather.CLOUDY)
-			else:
-				_set_weather(Weather.CLEAR)
+				return Weather.RAIN
+			if roll < 0.45:
+				return Weather.CLOUDY
+			return Weather.CLEAR
 		GameClock.Season.SUMMER:
 			if roll < 0.15:
-				_set_weather(Weather.RAIN)
-			elif roll < 0.25:
-				_set_weather(Weather.CLOUDY)
-			else:
-				_set_weather(Weather.CLEAR)
+				return Weather.RAIN
+			if roll < 0.25:
+				return Weather.CLOUDY
+			return Weather.CLEAR
 		GameClock.Season.FALL:
 			if roll < 0.25:
-				_set_weather(Weather.RAIN)
-			elif roll < 0.45:
-				_set_weather(Weather.CLOUDY)
-			else:
-				_set_weather(Weather.CLEAR)
+				return Weather.RAIN
+			if roll < 0.45:
+				return Weather.CLOUDY
+			return Weather.CLEAR
 		GameClock.Season.WINTER:
 			if roll < 0.35:
-				_set_weather(Weather.SNOW)
-			elif roll < 0.55:
-				_set_weather(Weather.CLOUDY)
-			else:
-				_set_weather(Weather.CLEAR)
+				return Weather.SNOW
+			if roll < 0.55:
+				return Weather.CLOUDY
+			return Weather.CLEAR
+		_:
+			return Weather.CLEAR
 
 func _set_weather(value: int) -> void:
 	current_weather = value
