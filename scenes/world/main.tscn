@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/large_stump.tscn" id="12_stump"]
 [ext_resource type="PackedScene" path="res://scenes/world/large_boulder.tscn" id="13_boulder"]
 [ext_resource type="PackedScene" path="res://scenes/slimes/slime_creature.tscn" id="14_slime"]
+[ext_resource type="PackedScene" path="res://scenes/slimes/slime_breeding_nest.tscn" id="15_nest"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -58,6 +59,9 @@ position = Vector2(1080, 230)
 
 [node name="LargeBoulderGate" parent="." instance=ExtResource("13_boulder")]
 position = Vector2(250, 330)
+
+[node name="SlimeBreedingNest" parent="." instance=ExtResource("15_nest")]
+position = Vector2(800, 455)
 
 [node name="GreenSlimeA" parent="." instance=ExtResource("14_slime")]
 position = Vector2(760, 520)
