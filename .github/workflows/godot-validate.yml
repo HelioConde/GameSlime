@@ -17,12 +17,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: First import assets
+        shell: bash
+        run: |
+          set -o pipefail
+          # On a clean checkout Godot discovers/imports PNGs during this first
+          # editor pass. Scripts that preload those PNGs may report transient
+          # parse errors before the imports exist, so this pass is intentionally
+          # permissive. The next pass is the real validation.
+          godot --headless --editor --path . --quit 2>&1 | tee godot-first-import.log || true
+
       - name: Import and parse project
         shell: bash
         run: |
           set -o pipefail
           godot --headless --editor --path . --quit 2>&1 | tee godot-editor.log
-          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot get class" godot-editor.log; then
+          if grep -E "SCRIPT ERROR|Parse Error|Compile Error|Failed loading resource|Cannot get class" godot-editor.log; then
             exit 1
           fi
 
@@ -31,7 +41,7 @@ jobs:
         run: |
           set -o pipefail
           godot --headless --path . --quit-after 5 2>&1 | tee godot-runtime.log
-          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Invalid call|Invalid get index|Invalid set index" godot-runtime.log; then
+          if grep -E "SCRIPT ERROR|Parse Error|Compile Error|Failed loading resource|Invalid call|Invalid get index|Invalid set index" godot-runtime.log; then
             exit 1
           fi
 
@@ -41,5 +51,6 @@ jobs:
         with:
           name: godot-validation-logs
           path: |
+            godot-first-import.log
             godot-editor.log
             godot-runtime.log
