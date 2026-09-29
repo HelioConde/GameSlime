@@ -229,11 +229,12 @@ func _apply_selected_fertilizer(stack: InventorySlotData) -> void:
 			feedback_requested.emit("Este solo ja esta adubado.")
 		return
 
-	if not farm_field.apply_fertilizer(target, stack.item.fertility_bonus):
+	var fertilizer_item := stack.item
+	if not farm_field.apply_fertilizer(target, fertilizer_item.fertility_bonus):
 		return
 
-	inventory.remove_item(stack.item.id, 1)
-	feedback_requested.emit("Solo adubado · +%d na colheita." % stack.item.fertility_bonus)
+	inventory.remove_item(fertilizer_item.id, 1)
+	feedback_requested.emit("Solo adubado · +%d na colheita." % fertilizer_item.fertility_bonus)
 	_flash_cells([target])
 	_spawn_feedback_burst(
 		farm_field.cell_to_world(target),
