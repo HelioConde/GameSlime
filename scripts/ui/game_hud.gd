@@ -243,7 +243,8 @@ func _refresh_hotbar() -> void:
 			continue
 
 		_slot_icons[index].texture = _get_item_icon(slot.item)
-		_slot_names[index].text = slot.item.display_name
+		var quality_marker := InventorySlotData.get_quality_marker(slot.quality)
+		_slot_names[index].text = "%s%s" % [slot.item.display_name, quality_marker]
 		_slot_amounts[index].text = str(slot.amount) if slot.item.max_stack > 1 else ""
 
 func _get_item_icon(item: ItemDefinition) -> Texture2D:
@@ -594,7 +595,8 @@ func _refresh_inventory_panel() -> void:
 			item,
 			amount,
 			texture,
-			index == player.inventory.selected_slot
+			index == player.inventory.selected_slot,
+			slot.quality if slot != null and not slot.is_empty() else InventorySlotData.Quality.NORMAL
 		)
 
 	_refresh_inventory_detail()
@@ -612,14 +614,17 @@ func _refresh_inventory_detail() -> void:
 	var item := stack.item
 	var details: Array[String] = []
 	details.append("%s · x%d" % [item.display_name, stack.amount])
+	if stack.quality > InventorySlotData.Quality.NORMAL:
+		details.append("Qualidade: %s" % InventorySlotData.get_quality_name(stack.quality))
 	details.append("Tipo: %s" % _item_kind_name(item.kind))
 
 	if item.buy_price > 0:
 		details.append("Compra: %dg" % item.buy_price)
 	if item.sell_price > 0:
+		var adjusted_sell_price := InventorySlotData.get_adjusted_sell_price(item.sell_price, stack.quality)
 		details.append("Venda: %dg cada · Stack: %dg" % [
-			item.sell_price,
-			item.sell_price * stack.amount,
+			adjusted_sell_price,
+			adjusted_sell_price * stack.amount,
 		])
 
 	if item.kind == ItemDefinition.ItemKind.TOOL:
@@ -648,6 +653,8 @@ func _item_kind_name(kind: int) -> String:
 			return "Material"
 		ItemDefinition.ItemKind.FOOD:
 			return "Alimento"
+		ItemDefinition.ItemKind.FERTILIZER:
+			return "Fertilizante"
 		_:
 			return "Item"
 
