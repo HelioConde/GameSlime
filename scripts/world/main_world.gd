@@ -6,6 +6,10 @@ const WORLD_TILE_SIZE := 32
 
 func _ready() -> void:
 	queue_redraw()
+	call_deferred("_load_saved_game")
+
+func _load_saved_game() -> void:
+	SaveManager.load_game()
 
 func _draw() -> void:
 	_draw_grass_background()
