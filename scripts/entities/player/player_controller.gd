@@ -329,6 +329,14 @@ func _interact() -> void:
 				feedback_requested.emit(water_message)
 				return
 
+	for node in get_tree().get_nodes_in_group("tool_upgrade_station"):
+		var station := node as ToolUpgradeStation
+		if station != null and station.can_interact(global_position):
+			var upgrade_message := station.interact(self)
+			if not upgrade_message.is_empty():
+				feedback_requested.emit(upgrade_message)
+				return
+
 	if farm_field == null:
 		return
 
