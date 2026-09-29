@@ -5,7 +5,7 @@ signal game_saved(path: String)
 signal game_loaded(path: String)
 signal save_failed(message: String)
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const SAVE_PATH := "user://savegame.json"
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 const SLIME_SCENE := preload("res://scenes/slimes/slime_creature.tscn")
@@ -27,6 +27,7 @@ func save_game() -> bool:
 		"player": player.get_save_data(),
 		"farm": farm.get_save_data(),
 		"world": _get_world_save_data(),
+		"discoveries": SlimeDiscovery.get_save_data(),
 	}
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -66,9 +67,12 @@ func load_game() -> bool:
 	var player_data: Dictionary = data.get("player", {})
 	var farm_data: Dictionary = data.get("farm", {})
 	var world_data: Dictionary = data.get("world", {})
+	var discovery_data: Dictionary = data.get("discoveries", {})
 
 	GameClock.load_save_data(clock_data)
 	WeatherManager.refresh_for_current_day()
+	if not discovery_data.is_empty():
+		SlimeDiscovery.load_save_data(discovery_data)
 
 	var player := get_tree().get_first_node_in_group("player") as PlayerController
 	var farm := get_tree().get_first_node_in_group("farm_field") as FarmField
