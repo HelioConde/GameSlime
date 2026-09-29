@@ -28,7 +28,7 @@
 - [x] animacao direcional do player
 - [x] animacoes de uso das ferramentas
 - [ ] feedback sonoro
-- [ ] particulas finais
+- [x] particulas de farming/colheita
 - [x] agua animada com Sprout Lands
 - [x] plantacoes usando atlas real
 - [x] arvore e pedra usando sprites reais
@@ -49,7 +49,7 @@
 - [x] obstaculos que exigem nivel de ferramenta
 - [x] primeiro minerio: Cobre com jazida diaria
 - [ ] feedback sonoro por material
-- [ ] particulas de impacto
+- [x] particulas de impacto
 
 ## Marco 3 - calendario vivo
 - [x] 28 dias por estacao
