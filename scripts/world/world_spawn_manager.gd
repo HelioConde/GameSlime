@@ -16,6 +16,10 @@ const WINTER_SEED: ItemDefinition = preload("res://resources/items/winter_root_s
 
 const MIN_DAILY_SPAWNS := 4
 const MAX_DAILY_SPAWNS := 7
+const MAX_NATURAL_SPAWNS := 12
+const FORAGE_LIFETIME_DAYS := 3
+const MATERIAL_LIFETIME_DAYS := 5
+const SEED_LIFETIME_DAYS := 3
 
 const SPAWN_POINTS: Array[Vector2] = [
 	Vector2(110, 110),
@@ -54,7 +58,7 @@ func _on_day_started(_day: int) -> void:
 	refresh_for_current_day()
 
 func refresh_for_current_day() -> void:
-	_clear_daily_spawns()
+	_prune_expired_spawns()
 
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _seed_for_current_day()
@@ -67,7 +71,15 @@ func refresh_for_current_day() -> void:
 		points.size()
 	)
 
-	for index in range(spawn_count):
+	var created := 0
+	for point in points:
+		if created >= spawn_count:
+			break
+		if _get_natural_spawn_count() >= MAX_NATURAL_SPAWNS:
+			break
+		if _has_spawn_at(point):
+			continue
+
 		var item := _pick_item_for_season(rng)
 		if item == null:
 			continue
@@ -76,7 +88,8 @@ func refresh_for_current_day() -> void:
 		if item.id in [&"wood", &"stone"]:
 			amount = rng.randi_range(1, 3)
 
-		_spawn_drop(points[index], item, amount, index)
+		_spawn_drop(point, item, amount, created)
+		created += 1
 
 func get_daily_spawn_snapshot() -> Array[String]:
 	var snapshot: Array[String] = []
@@ -85,24 +98,41 @@ func get_daily_spawn_snapshot() -> Array[String]:
 		if drop == null:
 			continue
 		snapshot.append(
-			"%s:%d:%d:%d" % [
+			"%s:%d:%d:%d:%d:%d" % [
 				String(drop.item_id),
 				drop.amount,
 				roundi(drop.global_position.x),
 				roundi(drop.global_position.y),
+				drop.spawned_day,
+				drop.expires_after_days,
 			]
 		)
 	snapshot.sort()
 	return snapshot
 
-func _clear_daily_spawns() -> void:
+func _prune_expired_spawns() -> void:
 	for node in get_tree().get_nodes_in_group("daily_world_spawn"):
-		if not is_instance_valid(node):
+		var drop := node as ItemDrop
+		if drop == null or not drop.is_natural_spawn_expired(GameClock.day):
 			continue
-		var parent := node.get_parent()
+		var parent := drop.get_parent()
 		if parent != null:
-			parent.remove_child(node)
-		node.queue_free()
+			parent.remove_child(drop)
+		drop.queue_free()
+
+func _get_natural_spawn_count() -> int:
+	var count := 0
+	for node in get_tree().get_nodes_in_group("daily_world_spawn"):
+		if node is ItemDrop:
+			count += 1
+	return count
+
+func _has_spawn_at(point: Vector2) -> bool:
+	for node in get_tree().get_nodes_in_group("daily_world_spawn"):
+		var drop := node as ItemDrop
+		if drop != null and drop.global_position.distance_squared_to(point) < 4.0:
+			return true
+	return false
 
 func _spawn_drop(position_value: Vector2, item: ItemDefinition, amount: int, index: int) -> void:
 	if get_parent() == null or item == null:
@@ -112,11 +142,20 @@ func _spawn_drop(position_value: Vector2, item: ItemDefinition, amount: int, ind
 	if drop == null:
 		return
 
-	drop.name = "DailySpawn_%02d" % (index + 1)
+	drop.name = "DailySpawn_%d_%02d" % [GameClock.day, index + 1]
 	get_parent().add_child(drop)
-	drop.add_to_group("daily_world_spawn")
 	drop.global_position = position_value
 	drop.configure(item.id, amount, item.tint)
+	drop.configure_natural_spawn(GameClock.day, _get_lifetime_for_item(item))
+
+func _get_lifetime_for_item(item: ItemDefinition) -> int:
+	if item == null:
+		return FORAGE_LIFETIME_DAYS
+	if item.kind == ItemDefinition.ItemKind.SEED:
+		return SEED_LIFETIME_DAYS
+	if item.id in [&"wood", &"stone"]:
+		return MATERIAL_LIFETIME_DAYS
+	return FORAGE_LIFETIME_DAYS
 
 func _pick_item_for_season(rng: RandomNumberGenerator) -> ItemDefinition:
 	var pool: Array[ItemDefinition] = []
