@@ -45,6 +45,15 @@ jobs:
             exit 1
           fi
 
+      - name: Playability regression smoke
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/playability_smoke.gd 2>&1 | tee godot-playability.log
+          if grep -E "SCRIPT ERROR|Parse Error|Compile Error|Failed loading resource|Invalid call|Invalid get index|Invalid set index|\[PLAYABILITY\] FAIL" godot-playability.log; then
+            exit 1
+          fi
+
       - name: Upload validation logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -54,3 +63,4 @@ jobs:
             godot-first-import.log
             godot-editor.log
             godot-runtime.log
+            godot-playability.log
