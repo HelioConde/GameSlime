@@ -292,6 +292,46 @@ func _run() -> void:
 		_check(not recovery_data.tilled, "abandoned tilled soil returns to grass")
 		_check(recovery_data.fertility_bonus == 0, "soil recovery removes abandoned fertilizer")
 
+	var regrowing_patches := get_tree().get_nodes_in_group("regrowing_resource_patch")
+	_check(regrowing_patches.size() >= 2, "weekly tree and rock regrowth patches exist")
+	for node in regrowing_patches:
+		var regrow_patch := node as RegrowingResourcePatch
+		if regrow_patch == null:
+			continue
+		regrow_patch.refresh_for_day(game_clock.day, true)
+		var expected_names := regrow_patch.get_expected_names_for_day(game_clock.day)
+		_check(expected_names.size() == regrow_patch.max_active_resources, "weekly patch selects bounded active resources")
+		_check(
+			expected_names == regrow_patch.get_expected_names_for_day(game_clock.day),
+			"weekly resource layout is deterministic for same day"
+		)
+		_check(
+			regrow_patch.get_cycle_for_day(game_clock.day + regrow_patch.respawn_interval_days)
+				== regrow_patch.get_cycle_for_day(game_clock.day) + 1,
+			"weekly patch advances exactly one cycle after interval"
+		)
+		for resource_name in expected_names:
+			_check(main.has_node(NodePath(resource_name)), "weekly natural resource spawned: %s" % resource_name)
+
+	if not regrowing_patches.is_empty():
+		var persistence_patch := regrowing_patches[0] as RegrowingResourcePatch
+		if persistence_patch != null:
+			var persistence_names := persistence_patch.get_expected_names_for_day(game_clock.day)
+			if not persistence_names.is_empty():
+				var removed_name := persistence_names[0]
+				var removed_resource := main.get_node_or_null(NodePath(removed_name))
+				_check(removed_resource != null, "weekly resource exists before destruction persistence test")
+				if removed_resource != null:
+					main.remove_child(removed_resource)
+					removed_resource.queue_free()
+					_check(save_manager.save_game(), "save after destroying weekly resource succeeds")
+					_check(save_manager.load_game(), "load after destroying weekly resource succeeds")
+					await get_tree().process_frame
+					_check(
+						not main.has_node(NodePath(removed_name)),
+						"destroyed weekly resource stays destroyed after same-cycle save/load"
+					)
+
 	var patches := get_tree().get_nodes_in_group("daily_resource_patch")
 	_check(patches.size() >= 4, "daily resource patches exist")
 
