@@ -15,11 +15,20 @@
 - [x] colheita
 - [x] ferramenta com toque/segurar/soltar
 - [x] padroes de area para upgrades
+- [x] agua limitada no regador
+- [x] ponto de recarga de agua
+- [x] inventario com 12 slots
+- [x] hotbar
+- [x] sementes consumiveis
+- [x] colheita entrando no inventario
+- [x] bloqueio de colheita quando inventario esta cheio
+- [x] feedback visual simples de acao
+- [x] CI Godot 4.7.2
 - [ ] sprites e animacoes reais do player
-- [ ] feedback sonoro e particulas
-- [ ] agua limitada no regador
-- [ ] inventario e hotbar
-- [ ] sementes consumiveis
+- [ ] feedback sonoro
+- [ ] particulas finais
+- [ ] painel completo de inventario
+- [ ] drag-and-drop de slots
 
 ## Marco 2 - ferramentas e recursos do mapa
 - [ ] machado
