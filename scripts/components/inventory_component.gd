@@ -158,3 +158,8 @@ func get_used_slot_count() -> int:
 		if not slot.is_empty():
 			used += 1
 	return used
+
+func clear_all() -> void:
+	for slot in slots:
+		slot.clear()
+	inventory_changed.emit()
