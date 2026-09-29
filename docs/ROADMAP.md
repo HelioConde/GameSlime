@@ -77,7 +77,7 @@
 - [x] Minerio de Cobre
 - [x] jazida de Cobre se recompõe no novo dia
 - [x] ferreiro consome Ouro + Cobre
-- [ ] menu de loja com multiplos produtos por estacao
+- [x] menu de loja com multiplos produtos por estacao
 - [ ] processamento de produtos
 - [ ] produtos artesanais
 
