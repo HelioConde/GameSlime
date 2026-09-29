@@ -118,3 +118,43 @@ Execute `scenes/world/main.tscn`.
 4. O dia atual deve ter marcador *.
 5. Dias com eventos devem ter marcador !.
 6. Pressione C novamente e confirme retorno ao jogo.
+
+
+## 16. Slime basico
+1. Aproxime-se de Broto ou Gota.
+2. Confirme painel com nome, sexo, personalidade, fome, energia, humor, afeto e idade.
+3. Sem alimento selecionado, pressione E e confirme carinho.
+4. Tente fazer carinho novamente no mesmo dia e confirme limite diario.
+5. Selecione um Nabo do Vale e pressione E perto do slime.
+6. Confirme consumo de 1 alimento e aumento de saciedade/humor.
+
+## 17. Habitat
+1. Confirme que Broto e Gota passeiam dentro da area cercada do habitat.
+2. Confirme capacidade exibida pela logica do habitat.
+3. Os slimes nao devem escolher destinos de passeio fora da zona.
+
+## 18. Producao de Gel
+1. Mantenha um slime com Saciedade >= 55% e Humor >= 55%.
+2. Durma.
+3. No novo dia, confirme um drop de Gel de Slime perto dele.
+4. Aproxime-se e confirme coleta para o inventario.
+5. Feche/reabra antes de coletar e confirme que o drop persiste no save.
+
+## 19. Genetica / Breeding
+1. Broto e Gota precisam ter pelo menos 3 dias de idade.
+2. Cuide deles ate ambos terem Saciedade >= 60%, Energia >= 50%, Humor >= 60% e Afeto >= 8%.
+3. Aproxime-se do ninho e pressione E.
+4. Confirme nascimento do filhote.
+5. Confirme cor intermediaria/variada.
+6. Abra B e compare os genes do filhote com os pais.
+7. Durma para salvar, feche e abra.
+8. Confirme que o filhote continua existindo com os mesmos genes.
+
+## 20. Bestiario genetico
+1. Pressione B.
+2. Confirme que o mundo pausa.
+3. Confirme Broto e Gota na lista.
+4. Confirme sexo, personalidade e os quatro genes.
+5. Gere filhotes e verifique novos individuos.
+6. Genes extremos devem registrar descobertas como Producao alta, Vitalidade alta ou Metabolismo eficiente.
+7. Pressione B novamente para voltar ao jogo.
