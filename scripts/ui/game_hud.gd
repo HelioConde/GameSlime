@@ -125,10 +125,11 @@ func _refresh_status() -> void:
 				player.tools.get_water_capacity(),
 			]
 
-	status_label.text = "%s  %s\nClima: %s\nEnergia: %.0f / %.0f\nSelecionado: %s%s%s" % [
+	status_label.text = "%s  %s\nClima: %s · Amanha: %s\nEnergia: %.0f / %.0f\nSelecionado: %s%s%s" % [
 		GameClock.get_date_text(),
 		GameClock.get_time_text(),
 		WeatherManager.get_weather_name(),
+		WeatherManager.get_tomorrow_weather_name(),
 		player.energy.current_energy,
 		player.energy.maximum_energy,
 		player.get_selected_item_name(),
