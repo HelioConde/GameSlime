@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3]
+[gd_scene load_steps=25 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/mine_area.tscn" id="21_mine"]
 [ext_resource type="PackedScene" path="res://scenes/world/world_transition.tscn" id="22_transition"]
 [ext_resource type="PackedScene" path="res://scenes/world/iron_patch.tscn" id="23_iron_patch"]
+[ext_resource type="PackedScene" path="res://scenes/world/silver_patch.tscn" id="24_silver_patch"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -139,6 +140,39 @@ position = Vector2(2080, 470)
 
 [node name="MineRockC" parent="." instance=ExtResource("8_rock")]
 position = Vector2(2160, 250)
+
+[node name="DeepMineArea" parent="." instance=ExtResource("21_mine")]
+position = Vector2(2800, 360)
+area_name = "MINA PROFUNDA"
+floor_color = Color(0.055, 0.065, 0.08, 1)
+wall_color = Color(0.13, 0.15, 0.18, 1)
+edge_color = Color(0.27, 0.31, 0.38, 1)
+
+[node name="DeepMineEntrance" parent="." instance=ExtResource("22_transition")]
+position = Vector2(2200, 355)
+target_position = Vector2(2540, 560)
+minimum_pickaxe_level = 2
+transition_name = "Mina Profunda"
+entrance_style = true
+
+[node name="DeepMineExit" parent="." instance=ExtResource("22_transition")]
+position = Vector2(2515, 610)
+target_position = Vector2(2150, 430)
+minimum_pickaxe_level = 0
+transition_name = "Mina Profunda"
+entrance_style = false
+
+[node name="SilverPatch" parent="." instance=ExtResource("24_silver_patch")]
+position = Vector2(2840, 350)
+
+[node name="DeepRockA" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2680, 455)
+
+[node name="DeepRockB" parent="." instance=ExtResource("8_rock")]
+position = Vector2(2980, 470)
+
+[node name="DeepRockC" parent="." instance=ExtResource("8_rock")]
+position = Vector2(3060, 250)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(640, 560)
