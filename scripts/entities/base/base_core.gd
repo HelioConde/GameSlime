@@ -37,8 +37,10 @@ func register_slime(slime: SlimeWorker) -> bool:
 	return true
 
 func unregister_slime(slime: SlimeWorker) -> void:
-	if not registered_slimes.erase(slime):
+	if slime not in registered_slimes:
 		return
+
+	registered_slimes.erase(slime)
 	if slime.base_core == self:
 		slime.base_core = null
 	slime_unregistered.emit(slime)
