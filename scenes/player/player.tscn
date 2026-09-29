@@ -49,8 +49,8 @@ starting_energy = 270.0
 
 [node name="ToolController" type="Node" parent="."]
 script = ExtResource("3_tools")
-hoe_level = 2
-watering_can_level = 2
+hoe_level = 0
+watering_can_level = 0
 axe_level = 0
 pickaxe_level = 0
 
