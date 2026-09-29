@@ -264,3 +264,14 @@ Execute `scenes/world/main.tscn`.
 12. Pressione E e confirme Cristal de Slime x1 no inventario.
 13. Com inventario cheio, a coleta deve ser bloqueada sem perder o produto.
 14. Envie o Cristal pela caixa de remessa e confirme valor de 240g.
+
+
+## 29. Particulas / game feel
+1. Use a Enxada em solo valido e confirme burst marrom no tile.
+2. Use o Regador e confirme burst azul.
+3. Plante uma semente e confirme burst verde.
+4. Colha uma cultura madura e confirme burst usando a cor do item.
+5. Acerte uma arvore com Machado e confirme pequenas particulas de impacto.
+6. Acerte pedra/cobre com Picareta e confirme particulas na cor do recurso.
+7. No golpe que destrui o recurso, confirme burst maior.
+8. Confirme que os efeitos somem sozinhos e nao deixam nodes permanentes.
