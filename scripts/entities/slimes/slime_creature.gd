@@ -237,6 +237,33 @@ func get_rarity_score() -> int:
 
 	return score
 
+func get_rarity_reasons() -> Array[String]:
+	var reasons: Array[String] = []
+
+	if gene_size <= 0.85:
+		reasons.append("tamanho muito pequeno")
+	elif gene_size >= 1.20:
+		reasons.append("tamanho muito grande")
+
+	if gene_metabolism <= 0.85:
+		reasons.append("metabolismo eficiente")
+	elif gene_metabolism >= 1.20:
+		reasons.append("metabolismo acelerado")
+
+	if gene_vitality >= 1.20:
+		reasons.append("vitalidade alta")
+
+	if gene_production >= 1.20:
+		reasons.append("producao alta")
+
+	if not mutation_tag.is_empty():
+		reasons.append("mutacao %s" % mutation_tag)
+
+	if slime_id != &"green_slime":
+		reasons.append("especie especial")
+
+	return reasons
+
 func get_genetics_text() -> String:
 	return "Tam %.2f · Met %.2f · Vit %.2f · Prod %.2f" % [
 		gene_size,
@@ -563,3 +590,26 @@ func _draw() -> void:
 
 	if happiness < 30.0:
 		draw_arc(Vector2(0, 9 + squash), 4.0, PI, TAU, 12, Color(0.08, 0.10, 0.08), 1.0)
+
+	_draw_rarity_marker(squash)
+
+func _draw_rarity_marker(squash: float) -> void:
+	var rarity := get_rarity_tier()
+	if rarity < RarityTier.RARE:
+		return
+
+	var pulse := 0.72 + sin(_bounce_time * 2.2) * 0.12
+	var marker_color := Color(0.70, 0.84, 1.0, pulse)
+
+	match rarity:
+		RarityTier.EPIC:
+			marker_color = Color(0.78, 0.55, 1.0, pulse)
+		RarityTier.LEGENDARY:
+			marker_color = Color(1.0, 0.82, 0.30, pulse)
+
+	draw_arc(Vector2(0, 1 + squash), 20.0 * gene_size, 0.0, TAU, 28, marker_color, 1.4)
+
+	for index in range(3):
+		var angle := _bounce_time * 0.7 + float(index) * TAU / 3.0
+		var spark_position := Vector2.from_angle(angle) * (23.0 * gene_size)
+		draw_circle(spark_position, 1.5, marker_color)
