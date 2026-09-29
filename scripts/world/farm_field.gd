@@ -48,7 +48,7 @@ func apply_hoe(cells: Array[Vector2i]) -> int:
 	var changed := 0
 	for cell in filter_valid_cells(cells):
 		var data := get_cell(cell)
-		if data.tilled:
+		if data == null or data.tilled:
 			continue
 		data.tilled = true
 		changed += 1
@@ -62,7 +62,7 @@ func apply_water(cells: Array[Vector2i]) -> int:
 	var changed := 0
 	for cell in filter_valid_cells(cells):
 		var data := get_cell(cell)
-		if not data.tilled or data.watered_today:
+		if data == null or not data.tilled or data.watered_today:
 			continue
 		data.watered_today = true
 		changed += 1
@@ -77,6 +77,8 @@ func interact_cell(cell: Vector2i) -> String:
 		return ""
 
 	var data := get_cell(cell)
+	if data == null:
+		return ""
 
 	if data.ready_to_harvest and data.crop != null:
 		var harvested_crop := data.crop
@@ -104,8 +106,10 @@ func interact_cell(cell: Vector2i) -> String:
 
 func _on_day_ended(_day: int) -> void:
 	for key in _cells.keys():
-		var cell := key as Vector2i
+		var cell: Vector2i = key
 		var data := _cells[key] as FarmCellData
+		if data == null:
+			continue
 
 		if data.crop != null and data.watered_today and not data.ready_to_harvest:
 			data.growth_days_completed += 1
@@ -132,6 +136,8 @@ func _draw() -> void:
 				Vector2(cell_size, cell_size)
 			)
 			var data := get_cell(cell)
+			if data == null:
+				continue
 
 			var ground := Color(0.25, 0.47, 0.22, 1.0)
 			if data.tilled:
@@ -147,6 +153,9 @@ func _draw() -> void:
 
 func _draw_crop(center: Vector2, data: FarmCellData) -> void:
 	var crop := data.crop
+	if crop == null:
+		return
+
 	var stage_ratio := float(data.crop_stage + 1) / float(crop.visual_stages + 1)
 	var radius := lerpf(4.0, 11.0, stage_ratio)
 	var color := crop.crop_color
