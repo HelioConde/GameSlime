@@ -31,6 +31,7 @@ func interact(player: PlayerController) -> String:
 		return ""
 
 	player.refill_watering_can()
+	Sfx.play_cue(&"water")
 	return "Regador cheio."
 
 func _update_frame() -> void:
