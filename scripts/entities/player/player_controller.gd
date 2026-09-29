@@ -1,6 +1,9 @@
 class_name PlayerController
 extends CharacterBody2D
 
+const PLAYER_MOVE_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_premium.png")
+const PLAYER_ACTION_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_actions.png")
+
 signal feedback_requested(text: String)
 
 @export var move_speed: float = 165.0
@@ -9,6 +12,7 @@ signal feedback_requested(text: String)
 @export_range(0.25, 1.0, 0.05) var charge_move_multiplier: float = 0.80
 @export var starting_seed_amount: int = 15
 @export var movement_animation_fps: float = 8.0
+@export var tool_action_animation_fps: float = 10.0
 
 @export_group("Starting Items")
 @export var starter_hoe_item: ItemDefinition
@@ -30,6 +34,9 @@ var farm_field: FarmField
 var _action_flash_cells: Array[Vector2i] = []
 var _action_flash_time: float = 0.0
 var _movement_anim_time: float = 0.0
+var _tool_action_active: bool = false
+var _tool_action_elapsed: float = 0.0
+var _tool_action_type: int = -1
 
 func _ready() -> void:
 	add_to_group("player")
@@ -47,17 +54,25 @@ func _physics_process(delta: float) -> void:
 	if farm_field == null:
 		_find_world_systems()
 
-	var input_direction := _read_movement_input()
-	if input_direction != Vector2.ZERO:
-		_update_facing(input_direction)
+	var input_direction := Vector2.ZERO
+	if not _tool_action_active:
+		input_direction = _read_movement_input()
+		if input_direction != Vector2.ZERO:
+			_update_facing(input_direction)
 
-	var speed_multiplier := charge_move_multiplier if tools.is_charging else 1.0
-	var target_velocity := input_direction.normalized() * move_speed * speed_multiplier
-	var rate := acceleration if input_direction != Vector2.ZERO else deceleration
-	velocity = velocity.move_toward(target_velocity, rate * delta)
+		var speed_multiplier := charge_move_multiplier if tools.is_charging else 1.0
+		var target_velocity := input_direction.normalized() * move_speed * speed_multiplier
+		var rate := acceleration if input_direction != Vector2.ZERO else deceleration
+		velocity = velocity.move_toward(target_velocity, rate * delta)
+	else:
+		velocity = velocity.move_toward(Vector2.ZERO, deceleration * delta)
 
 	tools.update_charge(delta)
-	_update_visual_animation(delta, input_direction)
+
+	if _tool_action_active:
+		_update_tool_action_animation(delta)
+	else:
+		_update_visual_animation(delta, input_direction)
 
 	if _action_flash_time > 0.0:
 		_action_flash_time -= delta
@@ -67,6 +82,8 @@ func _physics_process(delta: float) -> void:
 	queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _tool_action_active:
+		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			inventory.set_selected_slot(inventory.selected_slot - 1)
@@ -209,6 +226,7 @@ func _release_tool() -> void:
 		tools.spend_water(stage)
 
 	_flash_cells(cells)
+	_start_tool_action(tool)
 
 func _use_instant_tool(tool_type: int) -> void:
 	var target := _find_resource_target()
@@ -235,6 +253,8 @@ func _use_instant_tool(tool_type: int) -> void:
 		feedback_requested.emit("Recurso quebrado!")
 	else:
 		feedback_requested.emit("Golpe acertou. Faltam %d." % remaining)
+
+	_start_tool_action(tool_type)
 
 func _find_resource_target() -> HarvestableResource:
 	var target_point := global_position + Vector2(facing) * 34.0
@@ -430,6 +450,72 @@ func _update_facing(direction: Vector2) -> void:
 	elif not is_zero_approx(direction.y):
 		facing = Vector2i.DOWN if direction.y > 0.0 else Vector2i.UP
 
+func _start_tool_action(tool_type: int) -> void:
+	var row := _get_tool_action_row(tool_type)
+	if row < 0:
+		return
+
+	_tool_action_active = true
+	_tool_action_elapsed = 0.0
+	_tool_action_type = tool_type
+	velocity = Vector2.ZERO
+
+	visual.texture = PLAYER_ACTION_TEXTURE
+	visual.hframes = 3
+	visual.vframes = 12
+	visual.frame_coords = Vector2i(0, row)
+
+func _update_tool_action_animation(delta: float) -> void:
+	if not _tool_action_active or visual == null:
+		return
+
+	_tool_action_elapsed += delta
+	var row := _get_tool_action_row(_tool_action_type)
+	var frame := mini(int(floor(_tool_action_elapsed * tool_action_animation_fps)), 2)
+	visual.frame_coords = Vector2i(frame, row)
+
+	var duration := 3.0 / maxf(tool_action_animation_fps, 1.0)
+	if _tool_action_elapsed >= duration:
+		_finish_tool_action()
+
+func _finish_tool_action() -> void:
+	_tool_action_active = false
+	_tool_action_elapsed = 0.0
+	_tool_action_type = -1
+
+	visual.texture = PLAYER_MOVE_TEXTURE
+	visual.hframes = 8
+	visual.vframes = 24
+	visual.frame_coords = Vector2i(0, _get_facing_animation_row())
+
+func _get_tool_action_row(tool_type: int) -> int:
+	var base_row := -1
+
+	match tool_type:
+		ToolController.ToolType.AXE:
+			base_row = 0
+		ToolController.ToolType.HOE, ToolController.ToolType.PICKAXE:
+			base_row = 4
+		ToolController.ToolType.WATERING_CAN:
+			base_row = 8
+		_:
+			return -1
+
+	return base_row + _get_facing_direction_offset()
+
+func _get_facing_direction_offset() -> int:
+	match facing:
+		Vector2i.DOWN:
+			return 0
+		Vector2i.UP:
+			return 1
+		Vector2i.LEFT:
+			return 2
+		Vector2i.RIGHT:
+			return 3
+		_:
+			return 0
+
 func _update_visual_animation(delta: float, input_direction: Vector2) -> void:
 	if visual == null:
 		return
@@ -469,6 +555,8 @@ func _draw() -> void:
 	_draw_action_flash()
 
 func _draw_target_preview() -> void:
+	if _tool_action_active:
+		return
 	if farm_field == null:
 		return
 
