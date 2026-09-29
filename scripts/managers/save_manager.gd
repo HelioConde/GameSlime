@@ -183,6 +183,7 @@ func _get_world_save_data() -> Dictionary:
 		drops.append({
 			"item_id": String(drop.item_id),
 			"amount": drop.amount,
+			"quality": drop.quality,
 			"position": [drop.global_position.x, drop.global_position.y],
 			"tint": [drop.tint.r, drop.tint.g, drop.tint.b, drop.tint.a],
 			"daily_spawn": drop.is_in_group("daily_world_spawn"),
@@ -324,7 +325,12 @@ func _load_drop_state(data: Dictionary) -> void:
 				float(tint_data[3])
 			)
 
-		drop.configure(item_id, amount, tint)
+		drop.configure(
+			item_id,
+			amount,
+			tint,
+			int(entry.get("quality", InventorySlotData.Quality.NORMAL))
+		)
 
 
 func _load_processor_state(data: Dictionary) -> void:
