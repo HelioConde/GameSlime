@@ -26,7 +26,7 @@
 - [x] CI Godot 4.7.2
 - [x] sprite real do player
 - [x] animacao direcional do player
-- [ ] animacoes de uso das ferramentas
+- [x] animacoes de uso das ferramentas
 - [ ] feedback sonoro
 - [ ] particulas finais
 - [x] agua animada com Sprout Lands
@@ -52,14 +52,14 @@
 - [ ] particulas de impacto
 
 ## Marco 3 - calendario vivo
-- [ ] 28 dias por estacao
-- [ ] primavera/verao/outono/inverno
-- [ ] culturas por estacao
-- [ ] clima
+- [x] 28 dias por estacao
+- [x] primavera/verao/outono/inverno
+- [x] culturas por estacao
+- [x] clima
 - [ ] previsao do tempo
-- [ ] calendario
+- [x] calendario
 - [ ] eventos por dia
-- [ ] salvamento na virada do dia
+- [x] salvamento na virada do dia
 
 ## Marco 4 - slimes como identidade central
 - [ ] slime base
