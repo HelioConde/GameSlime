@@ -40,6 +40,7 @@ signal shop_requested(shop: SeedShop)
 @export var fall_eggplant_crop_item: ItemDefinition
 @export var winter_kale_seed_item: ItemDefinition
 @export var winter_kale_crop_item: ItemDefinition
+@export var slime_crystal_item: ItemDefinition
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
@@ -368,6 +369,14 @@ func _interact() -> void:
 			shop_requested.emit(seed_shop)
 			return
 
+	for node in get_tree().get_nodes_in_group("slime_crystallizer"):
+		var crystallizer := node as SlimeCrystallizer
+		if crystallizer != null and crystallizer.can_interact(global_position):
+			var machine_message := crystallizer.interact(self)
+			if not machine_message.is_empty():
+				feedback_requested.emit(machine_message)
+				return
+
 	for node in get_tree().get_nodes_in_group("slime_breeding_nest"):
 		var nest := node as SlimeBreedingNest
 		if nest != null and nest.can_interact(global_position):
@@ -458,6 +467,7 @@ func _seed_starting_inventory() -> void:
 		fall_eggplant_crop_item,
 		winter_kale_seed_item,
 		winter_kale_crop_item,
+		slime_crystal_item,
 	]
 
 	for definition in definitions:
