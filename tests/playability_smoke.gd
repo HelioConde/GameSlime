@@ -161,7 +161,13 @@ func _run() -> void:
 		player.energy.set_current_energy(10.0)
 		_check(player.energy.spend(2.0), "tool energy can be spent")
 		_check(is_equal_approx(player.energy.current_energy, 8.0), "energy spends exact tool cost")
+		player.energy.set_current_energy(0.0)
+		_check(
+			is_equal_approx(player.get_movement_speed_multiplier(), player.exhausted_move_multiplier),
+			"zero energy applies exhausted movement multiplier"
+		)
 		player.energy.restore_full()
+		_check(is_equal_approx(player.get_movement_speed_multiplier(), 1.0), "restored energy returns normal movement speed")
 
 	if player != null and farm != null:
 		var fertilizer := player.inventory.get_definition(&"basic_fertilizer")
