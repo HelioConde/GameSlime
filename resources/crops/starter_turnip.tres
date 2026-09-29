@@ -10,3 +10,4 @@ growth_days = 4
 visual_stages = 4
 sell_value = 35
 crop_color = Color(0.62, 0.88, 0.42, 1)
+harvest_item_id = &"starter_turnip"
