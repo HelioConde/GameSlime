@@ -13,8 +13,8 @@ enum ToolType {
 
 const CHARGE_THRESHOLDS := [0.0, 0.45, 0.90, 1.35, 1.80, 2.25]
 
-@export_range(0, 5, 1) var hoe_level: int = 2
-@export_range(0, 5, 1) var watering_can_level: int = 2
+@export_range(0, 5, 1) var hoe_level: int = 0
+@export_range(0, 5, 1) var watering_can_level: int = 0
 
 var selected_tool: int = ToolType.HOE
 var is_charging: bool = false
@@ -63,7 +63,7 @@ func release_charge() -> Dictionary:
 	is_charging = false
 	charge_elapsed = 0.0
 	charge_stage = 0
-	charge_released.emit(result.tool, result.stage)
+	charge_released.emit(int(result["tool"]), int(result["stage"]))
 	return result
 
 func cancel_charge() -> void:
