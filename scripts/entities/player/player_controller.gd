@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 const PLAYER_MOVE_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_premium.png")
 const PLAYER_ACTION_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_actions.png")
+const FEEDBACK_BURST_SCENE := preload("res://scenes/vfx/world_feedback_burst.tscn")
 
 signal feedback_requested(text: String)
 signal shop_requested(shop: SeedShop)
@@ -244,6 +245,14 @@ func _release_tool() -> void:
 		tools.spend_water(stage)
 
 	_flash_cells(cells)
+
+	var burst_color := Color(0.64, 0.42, 0.22)
+	if tool == ToolController.ToolType.WATERING_CAN:
+		burst_color = Color(0.36, 0.72, 1.0)
+
+	for cell in cells:
+		_spawn_feedback_burst(farm_field.cell_to_world(cell), burst_color, 5, 34.0)
+
 	_start_tool_action(tool)
 
 func _use_instant_tool(tool_type: int) -> void:
@@ -329,6 +338,12 @@ func _plant_selected_seed(stack: InventorySlotData) -> void:
 	inventory.remove_item(seed_id, 1)
 	feedback_requested.emit("Plantou %s." % crop.display_name)
 	_flash_cells([target])
+	_spawn_feedback_burst(
+		farm_field.cell_to_world(target),
+		Color(0.52, 0.86, 0.36),
+		7,
+		38.0
+	)
 
 func _interact() -> void:
 	for node in get_tree().get_nodes_in_group("sleep_spot"):
@@ -421,6 +436,12 @@ func _interact() -> void:
 		inventory.add_item(harvest_item, amount)
 		feedback_requested.emit("Colheu %s x%d." % [harvest_item.display_name, amount])
 		_flash_cells([target])
+		_spawn_feedback_burst(
+			farm_field.cell_to_world(target),
+			harvest_item.tint.lightened(0.12),
+			10,
+			56.0
+		)
 		return
 
 	feedback_requested.emit(farm_field.get_cell_hint(target))
@@ -499,6 +520,23 @@ func _get_front_cell() -> Vector2i:
 	var origin := farm_field.world_to_cell(global_position)
 	var cells := GridTargeting.get_tool_cells(origin, facing, 0)
 	return cells[0] if not cells.is_empty() else origin
+
+func _spawn_feedback_burst(
+	world_position: Vector2,
+	color: Color,
+	count: int = 8,
+	burst_speed: float = 48.0
+) -> void:
+	if get_parent() == null:
+		return
+
+	var burst := FEEDBACK_BURST_SCENE.instantiate() as WorldFeedbackBurst
+	if burst == null:
+		return
+
+	get_parent().add_child(burst)
+	burst.global_position = world_position
+	burst.configure(color, count, burst_speed)
 
 func _flash_cells(cells: Array[Vector2i]) -> void:
 	_action_flash_cells = cells.duplicate()
