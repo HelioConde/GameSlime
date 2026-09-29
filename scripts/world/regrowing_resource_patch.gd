@@ -43,6 +43,7 @@ func refresh_for_day(day: int, replace_cycle: bool = true) -> void:
 		return
 
 	var cycle := get_cycle_for_day(day)
+	var cycle_changed := _active_cycle >= 0 and cycle != _active_cycle
 	var selected_indices := _get_selected_indices(day)
 	var expected_lookup: Dictionary = {}
 	for index in selected_indices:
@@ -53,7 +54,7 @@ func refresh_for_day(day: int, replace_cycle: bool = true) -> void:
 			var child_name := String(child.name)
 			if not child_name.begins_with(resource_name_prefix):
 				continue
-			if expected_lookup.has(child_name):
+			if not cycle_changed and expected_lookup.has(child_name):
 				continue
 			get_parent().remove_child(child)
 			child.queue_free()
