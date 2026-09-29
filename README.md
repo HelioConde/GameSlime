@@ -99,3 +99,32 @@ O repositorio possui GitHub Actions usando Godot 4.7.2 em modo headless para imp
 ## Proximo passo
 
 Completar o Marco 2 com upgrades compraveis, obstaculos que exigem nivel de ferramenta e mais feedback. Depois: calendario, estacoes, clima e save da virada do dia.
+
+
+## Primeiro sistema de Slimes
+
+A fundacao Stardew-first agora ja suporta o primeiro ciclo de criaturas:
+
+- dois slimes iniciais: Broto e Gota
+- passeio autonomo dentro do habitat
+- saciedade
+- energia propria
+- humor
+- afeto
+- idade em dias
+- personalidade
+- sexo biologico
+- genes de tamanho, metabolismo, vitalidade e producao
+- alimentar com colheitas/alimentos selecionados
+- carinho uma vez por dia
+- producao de Gel de Slime quando bem cuidado
+- painel contextual ao aproximar
+- habitat com capacidade
+- ninho de reproducao controlada
+- requisitos de idade, cuidado, afeto e sexo oposto para breeding
+- filhote com heranca dos genes e cor dos pais + pequena variacao
+- filhotes persistem no save
+- Bestiario Genetico com registro de individuos e descobertas
+- tecla B abre o bestiario
+
+O objetivo nesta etapa e tratar o slime primeiro como criatura viva da fazenda. Automacao/trabalho dos slimes continua reservada para uma fase posterior.
