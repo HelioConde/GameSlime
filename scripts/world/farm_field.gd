@@ -2,6 +2,10 @@ class_name FarmField
 extends Node2D
 
 const CROP_ATLAS: Texture2D = preload("res://assets/sprout_lands/crops/farming_plants.png")
+const GRASS_ATLAS: Texture2D = preload("res://assets/sprout_lands/tiles/grass_tiles.png")
+const SOIL_ATLAS: Texture2D = preload("res://assets/sprout_lands/tiles/tilled_dirt.png")
+const GRASS_SOURCE := Rect2(0, 64, 16, 16)
+const SOIL_SOURCE := Rect2(0, 64, 16, 16)
 
 signal cell_changed(cell: Vector2i)
 signal crop_planted(cell: Vector2i, crop: CropDefinition)
@@ -163,13 +167,13 @@ func _draw() -> void:
 			if data == null:
 				continue
 
-			var ground := Color(0.25, 0.47, 0.22, 1.0)
-			if data.tilled:
-				ground = Color(0.39, 0.25, 0.15, 1.0)
-			if data.watered_today:
-				ground = Color(0.25, 0.19, 0.16, 1.0)
+			var source_texture := SOIL_ATLAS if data.tilled else GRASS_ATLAS
+			var source_rect := SOIL_SOURCE if data.tilled else GRASS_SOURCE
+			draw_texture_rect_region(source_texture, rect, source_rect)
 
-			draw_rect(rect, ground)
+			if data.watered_today:
+				draw_rect(rect, Color(0.05, 0.10, 0.14, 0.28), true)
+
 			draw_rect(rect, Color(0.08, 0.12, 0.08, 0.24), false, 1.0)
 
 			if data.crop != null:
