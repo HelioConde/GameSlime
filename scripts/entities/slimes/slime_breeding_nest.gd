@@ -27,9 +27,14 @@ func interact(player: PlayerController) -> String:
 			habitat.capacity,
 		]
 
+	var nearby := _get_nearby_slimes()
 	var candidates := _get_nearby_eligible_slimes()
+
+	if nearby.size() < 2:
+		return "Ninho: aproxime 2 slimes do habitat."
+
 	if candidates.size() < 2:
-		return "Ninho: precisa de 2 slimes adultos e bem cuidados por perto."
+		return _build_readiness_message(nearby)
 
 	var pair := _find_pair(candidates)
 	if pair.is_empty():
@@ -59,6 +64,33 @@ func _find_habitat() -> SlimeHabitat:
 		if habitat != null and habitat.contains_position(global_position):
 			return habitat
 	return null
+
+func _get_nearby_slimes() -> Array[SlimeCreature]:
+	var result: Array[SlimeCreature] = []
+
+	for node in get_tree().get_nodes_in_group("slime_creature"):
+		var slime := node as SlimeCreature
+		if slime == null:
+			continue
+		if slime.global_position.distance_to(global_position) <= breeding_radius:
+			result.append(slime)
+
+	return result
+
+func _build_readiness_message(slimes: Array[SlimeCreature]) -> String:
+	var details: Array[String] = []
+
+	for slime in slimes:
+		var blockers := slime.get_breeding_blockers()
+		if blockers.is_empty():
+			details.append("%s: pronto" % slime.display_name)
+		else:
+			details.append("%s: %s" % [
+				slime.display_name,
+				", ".join(blockers),
+			])
+
+	return "Ninho · " + " | ".join(details)
 
 func _get_nearby_eligible_slimes() -> Array[SlimeCreature]:
 	var result: Array[SlimeCreature] = []
