@@ -4,6 +4,12 @@ extends CharacterBody2D
 const PLAYER_MOVE_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_premium.png")
 const PLAYER_ACTION_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_actions.png")
 const FEEDBACK_BURST_SCENE := preload("res://scenes/vfx/world_feedback_burst.tscn")
+const WORLD_FORAGE_DEFINITIONS: Array[ItemDefinition] = [
+	preload("res://resources/items/wild_flower.tres"),
+	preload("res://resources/items/wild_berry.tres"),
+	preload("res://resources/items/wild_mushroom.tres"),
+	preload("res://resources/items/wild_root.tres"),
+]
 
 signal feedback_requested(text: String)
 signal shop_requested(shop: SeedShop)
@@ -435,7 +441,11 @@ func _interact() -> void:
 			feedback_requested.emit("Item de colheita nao registrado.")
 			return
 
-		if not inventory.can_add_item(harvest_item, 1):
+		var expected_amount := farm_field.get_harvest_amount(target)
+		if expected_amount <= 0:
+			return
+
+		if not inventory.can_add_item(harvest_item, expected_amount):
 			feedback_requested.emit("Inventario cheio.")
 			return
 
@@ -504,6 +514,9 @@ func _seed_starting_inventory() -> void:
 		silver_ore_item,
 		gold_ore_item,
 	]
+
+	for definition in WORLD_FORAGE_DEFINITIONS:
+		definitions.append(definition)
 
 	for definition in definitions:
 		inventory.register_definition(definition)
