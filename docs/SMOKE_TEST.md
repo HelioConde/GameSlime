@@ -208,3 +208,19 @@ Execute `scenes/world/main.tscn`.
 6. Nivel 0 -> 1 deve exigir 200g + 5 Cobre.
 7. Confirme consumo de Ouro/Cobre e nivel atualizado no HUD.
 8. Confirme custos crescentes nos niveis seguintes.
+
+
+## 26. Inventario completo
+1. Pressione I.
+2. Confirme que o mundo pausa.
+3. Confirme grade 4x3 com os mesmos 12 slots da hotbar.
+4. Clique em um slot e confirme que ele vira o slot selecionado da hotbar.
+5. Arraste um stack para um slot vazio e confirme a movimentacao completa.
+6. Arraste dois stacks do mesmo item um sobre o outro e confirme mesclagem ate o max_stack.
+7. Arraste itens diferentes entre si e confirme troca de posicao.
+8. Clique direito em um stack com quantidade > 1.
+9. Clique direito em um slot vazio e confirme divisao aproximada pela metade.
+10. Use Organizar stacks e confirme stacks iguais mesclados e espacos vazios compactados.
+11. Confirme que a selecao da ferramenta/item continua coerente apos organizar.
+12. Feche com o botao Fechar ou pressione I novamente.
+13. Salve/reabra e confirme que a nova ordem dos slots persiste.
