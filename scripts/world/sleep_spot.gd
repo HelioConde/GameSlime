@@ -17,10 +17,21 @@ func interact(player: PlayerController) -> String:
 	GameClock.sleep_and_start_next_day()
 	player.restore_after_sleep()
 
+	var income := Economy.last_day_income
 	var saved := SaveManager.save_game()
+	var income_text := ""
+	if income > 0:
+		income_text = " Vendas: +%dg." % income
+
 	if saved:
-		return "Voce dormiu. %s comecou. Jogo salvo." % GameClock.get_date_text()
-	return "Voce dormiu. %s comecou." % GameClock.get_date_text()
+		return "Voce dormiu. %s comecou.%s Jogo salvo." % [
+			GameClock.get_date_text(),
+			income_text,
+		]
+	return "Voce dormiu. %s comecou.%s" % [
+		GameClock.get_date_text(),
+		income_text,
+	]
 
 func _draw() -> void:
 	draw_rect(Rect2(-26, -16, 52, 32), Color(0.40, 0.25, 0.16), true)
