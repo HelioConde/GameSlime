@@ -63,6 +63,7 @@ func purchase(player: PlayerController, item_id: StringName, amount: int = 1) ->
 		Economy.add_gold(total_price)
 		return "Nao foi possivel guardar a compra."
 
+	Sfx.play_cue(&"confirm")
 	return "Comprou %s x%d por %dg. Saldo: %dg." % [
 		seed_item.display_name,
 		amount,
