@@ -50,7 +50,7 @@ Regra deste marco:
 - [x] sprite real do player
 - [x] animacao direcional do player
 - [x] animacoes de uso das ferramentas
-- [ ] feedback sonoro
+- [x] feedback sonoro procedural basico
 - [x] particulas de farming/colheita
 - [x] agua animada com Sprout Lands
 - [x] plantacoes usando atlas real
@@ -69,6 +69,10 @@ Regra deste marco:
 - [x] qualidade Normal/Prata/Ouro por stack
 - [x] qualidade afeta valor de venda
 - [x] cultura multiestacao (Milho Dourado)
+- [x] chuva validada como irrigacao de cultivo
+- [x] ciclo visual dia/noite
+- [x] sono tardio reduz recuperacao de energia
+- [x] descarte/recoleta de itens com qualidade preservada
 
 ## Marco 2 - ferramentas e recursos do mapa
 - [x] machado
@@ -84,12 +88,14 @@ Regra deste marco:
 - [x] Ferro com jazida diaria
 - [x] Prata com jazida diaria
 - [x] Ouro com jazida diaria
-- [ ] feedback sonoro por material
+- [x] feedback sonoro distinto para madeira/pedra/ferramentas
 - [x] particulas de impacto
 - [x] rendimento variavel deterministico de madeira/pedra
 - [x] spawns diarios de forrageaveis, materiais e sementes sazonais
 - [x] spawns diarios persistidos no save/load
 - [x] recursos naturais nao coletados persistem, expiram e respeitam limite global
+- [x] clima influencia forrageio diario
+- [x] arvores/pedras naturais regeneram semanalmente em pontos deterministicos
 
 
 ## Marco 2B - exploracao e progressao da mina
