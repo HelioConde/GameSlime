@@ -393,6 +393,14 @@ func _interact() -> void:
 				feedback_requested.emit(machine_message)
 				return
 
+	for node in get_tree().get_nodes_in_group("world_transition"):
+		var transition := node as WorldTransition
+		if transition != null and transition.can_interact(global_position):
+			var transition_message := transition.interact(self)
+			if not transition_message.is_empty():
+				feedback_requested.emit(transition_message)
+				return
+
 	for node in get_tree().get_nodes_in_group("slime_breeding_nest"):
 		var nest := node as SlimeBreedingNest
 		if nest != null and nest.can_interact(global_position):
