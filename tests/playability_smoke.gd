@@ -59,6 +59,34 @@ func _run() -> void:
 		_check(save_manager.load_game(), "world spawn snapshot reload succeeds")
 		_check(world_spawner.get_daily_spawn_snapshot() == first_snapshot, "world spawns survive save and load")
 
+		var initial_spawn_day := int(game_clock.day)
+		game_clock.sleep_and_start_next_day()
+		await get_tree().process_frame
+		await get_tree().process_frame
+		var next_day_spawns := get_tree().get_nodes_in_group("daily_world_spawn")
+		_check(next_day_spawns.size() >= first_snapshot.size(), "uncollected natural spawns persist into next day")
+		_check(next_day_spawns.size() <= WorldSpawnManager.MAX_NATURAL_SPAWNS, "natural spawn accumulation respects world cap")
+		var found_previous_day_spawn := false
+		for node in next_day_spawns:
+			var drop := node as ItemDrop
+			if drop != null and drop.spawned_day == initial_spawn_day:
+				found_previous_day_spawn = true
+				break
+		_check(found_previous_day_spawn, "previous-day natural spawn remains before expiry")
+
+		for _expiry_day in range(WorldSpawnManager.MATERIAL_LIFETIME_DAYS):
+			game_clock.sleep_and_start_next_day()
+			await get_tree().process_frame
+			await get_tree().process_frame
+		var stale_spawn_found := false
+		for node in get_tree().get_nodes_in_group("daily_world_spawn"):
+			var drop := node as ItemDrop
+			if drop != null and drop.spawned_day == initial_spawn_day:
+				stale_spawn_found = true
+				break
+		_check(not stale_spawn_found, "expired natural spawns are pruned automatically")
+		_check(get_tree().get_nodes_in_group("daily_world_spawn").size() <= WorldSpawnManager.MAX_NATURAL_SPAWNS, "world spawn cap remains stable across multiple days")
+
 	var world_bounds := main.get_node_or_null("WorldBounds") as StaticBody2D
 	_check(world_bounds != null, "world bounds exist")
 	if world_bounds != null:
