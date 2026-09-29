@@ -58,6 +58,16 @@ func _run() -> void:
 		_check(player.global_position.y >= 0.0, "player cannot leave the visible world vertically")
 		player.global_position = original_position
 
+	var solid_interactables := ["ShippingBin", "SeedShop", "ToolUpgradeStation", "WaterSource"]
+	for node_name in solid_interactables:
+		var interactable := main.get_node_or_null(NodePath(node_name))
+		_check(interactable != null, "%s exists" % node_name)
+		if interactable != null:
+			_check(
+				interactable.get_node_or_null("StaticBody2D/CollisionShape2D") != null,
+				"%s blocks player movement" % node_name
+			)
+
 	if player != null:
 		_check(player.inventory.slots.size() == 12, "inventory has 12 slots")
 		_check(player.inventory.get_definition(&"copper_ore") != null, "copper definition registered")
