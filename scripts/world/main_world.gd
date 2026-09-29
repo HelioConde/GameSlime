@@ -4,13 +4,64 @@ const GRASS_ATLAS: Texture2D = preload("res://assets/sprout_lands/tiles/grass_ti
 const GRASS_SOURCE := Rect2(0, 64, 16, 16)
 const WORLD_TILE_SIZE := 32
 
+@onready var day_night_tint: CanvasModulate = $DayNightTint
+
 func _ready() -> void:
 	queue_redraw()
 
 	if not GameClock.day_started.is_connected(_on_day_started):
 		GameClock.day_started.connect(_on_day_started)
+	if not GameClock.time_changed.is_connected(_on_time_changed):
+		GameClock.time_changed.connect(_on_time_changed)
 
+	_update_day_night_tint()
 	call_deferred("_load_saved_game")
+
+func _process(_delta: float) -> void:
+	if day_night_tint == null:
+		return
+	var player := get_tree().get_first_node_in_group("player") as PlayerController
+	day_night_tint.visible = player == null or not _is_player_in_mine(player)
+
+func _on_time_changed(_day: int, _hour: int, _minute: int) -> void:
+	_update_day_night_tint()
+
+func _update_day_night_tint() -> void:
+	if day_night_tint == null:
+		return
+	day_night_tint.color = get_daylight_color(GameClock.minute_of_day)
+
+func get_daylight_color(game_minute: int) -> Color:
+	var minute := clampi(game_minute, GameClock.START_MINUTE, GameClock.END_MINUTE)
+	var keyframes := [
+		{"minute": 360, "color": Color(0.76, 0.82, 0.96, 1.0)},
+		{"minute": 450, "color": Color(0.94, 0.94, 0.98, 1.0)},
+		{"minute": 510, "color": Color.WHITE},
+		{"minute": 1020, "color": Color.WHITE},
+		{"minute": 1140, "color": Color(0.92, 0.82, 0.72, 1.0)},
+		{"minute": 1260, "color": Color(0.66, 0.70, 0.82, 1.0)},
+		{"minute": 1380, "color": Color(0.48, 0.54, 0.70, 1.0)},
+		{"minute": 1560, "color": Color(0.36, 0.42, 0.60, 1.0)},
+	]
+
+	for index in range(keyframes.size() - 1):
+		var left := keyframes[index] as Dictionary
+		var right := keyframes[index + 1] as Dictionary
+		var left_minute := int(left["minute"])
+		var right_minute := int(right["minute"])
+		if minute < left_minute or minute > right_minute:
+			continue
+		var ratio := inverse_lerp(float(left_minute), float(right_minute), float(minute))
+		return (left["color"] as Color).lerp(right["color"] as Color, ratio)
+
+	return keyframes[keyframes.size() - 1]["color"] as Color
+
+func _is_player_in_mine(player: PlayerController) -> bool:
+	for node in get_tree().get_nodes_in_group("mine_area"):
+		var mine := node as MineArea
+		if mine != null and mine.contains_position(player.global_position):
+			return true
+	return false
 
 func _load_saved_game() -> void:
 	var loaded := SaveManager.load_game()
