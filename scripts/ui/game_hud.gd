@@ -26,6 +26,11 @@ const INVENTORY_SLOT_WIDGET := preload("res://scripts/ui/inventory_slot_widget.g
 @onready var inventory_detail: Label = $InventoryPanel/Margin/Content/Detail
 @onready var inventory_organize_button: Button = $InventoryPanel/Margin/Content/Actions/OrganizeButton
 @onready var inventory_close_button: Button = $InventoryPanel/Margin/Content/Actions/CloseButton
+@onready var shop_panel: PanelContainer = $ShopPanel
+@onready var shop_title: Label = $ShopPanel/Margin/Content/Title
+@onready var shop_balance: Label = $ShopPanel/Margin/Content/Balance
+@onready var shop_offers: VBoxContainer = $ShopPanel/Margin/Content/Offers
+@onready var shop_close_button: Button = $ShopPanel/Margin/Content/CloseButton
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -37,6 +42,7 @@ var _slot_amounts: Array[Label] = []
 var _inventory_built: bool = false
 var _inventory_slot_widgets: Array[InventorySlotWidget] = []
 var _pending_split_source: int = -1
+var _active_shop: SeedShop
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -46,9 +52,11 @@ func _ready() -> void:
 	bestiary_panel.visible = false
 	habitat_panel.visible = false
 	inventory_panel.visible = false
+	shop_panel.visible = false
 
 	inventory_organize_button.pressed.connect(_on_inventory_organize_pressed)
 	inventory_close_button.pressed.connect(_close_inventory)
+	shop_close_button.pressed.connect(_close_shop)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -65,6 +73,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_I:
 				_toggle_inventory()
 				get_viewport().set_input_as_handled()
+			KEY_ESCAPE:
+				if _any_menu_open():
+					_close_all_menus()
+					get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
 	if player == null:
@@ -86,6 +98,9 @@ func _bind_player() -> void:
 
 	if not player.feedback_requested.is_connected(_show_feedback):
 		player.feedback_requested.connect(_show_feedback)
+
+	if not player.shop_requested.is_connected(_open_shop):
+		player.shop_requested.connect(_open_shop)
 
 	if not player.inventory.inventory_changed.is_connected(_on_inventory_changed):
 		player.inventory.inventory_changed.connect(_on_inventory_changed)
@@ -273,6 +288,8 @@ func _toggle_calendar() -> void:
 	bestiary_panel.visible = false
 	habitat_panel.visible = false
 	inventory_panel.visible = false
+	shop_panel.visible = false
+	_active_shop = null
 	calendar_panel.visible = next_visible
 	_update_menu_pause()
 
@@ -284,6 +301,8 @@ func _toggle_bestiary() -> void:
 	calendar_panel.visible = false
 	habitat_panel.visible = false
 	inventory_panel.visible = false
+	shop_panel.visible = false
+	_active_shop = null
 	bestiary_panel.visible = next_visible
 	_update_menu_pause()
 
@@ -295,6 +314,8 @@ func _toggle_habitat() -> void:
 	calendar_panel.visible = false
 	bestiary_panel.visible = false
 	inventory_panel.visible = false
+	shop_panel.visible = false
+	_active_shop = null
 	habitat_panel.visible = next_visible
 	_update_menu_pause()
 
@@ -306,6 +327,8 @@ func _toggle_inventory() -> void:
 	calendar_panel.visible = false
 	bestiary_panel.visible = false
 	habitat_panel.visible = false
+	shop_panel.visible = false
+	_active_shop = null
 	inventory_panel.visible = next_visible
 	_pending_split_source = -1
 	_update_menu_pause()
@@ -324,7 +347,27 @@ func _update_menu_pause() -> void:
 		or bestiary_panel.visible
 		or habitat_panel.visible
 		or inventory_panel.visible
+		or shop_panel.visible
 	)
+
+func _any_menu_open() -> bool:
+	return (
+		calendar_panel.visible
+		or bestiary_panel.visible
+		or habitat_panel.visible
+		or inventory_panel.visible
+		or shop_panel.visible
+	)
+
+func _close_all_menus() -> void:
+	calendar_panel.visible = false
+	bestiary_panel.visible = false
+	habitat_panel.visible = false
+	inventory_panel.visible = false
+	shop_panel.visible = false
+	_active_shop = null
+	_pending_split_source = -1
+	_update_menu_pause()
 
 func _refresh_calendar_panel() -> void:
 	calendar_title.text = "%s · Ano %d" % [
@@ -658,4 +701,94 @@ func _on_inventory_organize_pressed() -> void:
 	_refresh_inventory_panel()
 
 func _on_inventory_changed() -> void:
+	_refresh_inventory_panel()
+
+
+func _open_shop(shop: SeedShop) -> void:
+	if shop == null or player == null:
+		return
+
+	calendar_panel.visible = false
+	bestiary_panel.visible = false
+	habitat_panel.visible = false
+	inventory_panel.visible = false
+
+	_active_shop = shop
+	shop_panel.visible = true
+	_update_menu_pause()
+	_refresh_shop_panel()
+
+func _close_shop() -> void:
+	shop_panel.visible = false
+	_active_shop = null
+	_update_menu_pause()
+
+func _refresh_shop_panel() -> void:
+	if _active_shop == null or player == null:
+		return
+
+	shop_title.text = "Banca de Sementes · %s" % GameClock.get_season_name()
+	shop_balance.text = "Seu Ouro: %dg" % Economy.gold
+
+	for child in shop_offers.get_children():
+		child.queue_free()
+
+	var offers := _active_shop.get_current_offers()
+	if offers.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "Nenhuma oferta nesta estacao."
+		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		shop_offers.add_child(empty_label)
+		return
+
+	for item in offers:
+		if item == null:
+			continue
+
+		var row := HBoxContainer.new()
+		row.custom_minimum_size = Vector2(0, 74)
+		row.add_theme_constant_override("separation", 10)
+		shop_offers.add_child(row)
+
+		var info := VBoxContainer.new()
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(info)
+
+		var name_label := Label.new()
+		name_label.text = item.display_name
+		name_label.add_theme_font_size_override("font_size", 16)
+		info.add_child(name_label)
+
+		var crop_text := ""
+		if item.crop_to_plant != null:
+			crop_text = "%d dias · venda %dg" % [
+				item.crop_to_plant.growth_days,
+				item.crop_to_plant.sell_value,
+			]
+
+		var detail_label := Label.new()
+		detail_label.text = "%dg cada · %s" % [item.buy_price, crop_text]
+		detail_label.add_theme_font_size_override("font_size", 12)
+		detail_label.modulate = Color(0.78, 0.80, 0.74)
+		info.add_child(detail_label)
+
+		var buy_one := Button.new()
+		buy_one.text = "Comprar 1"
+		buy_one.disabled = not Economy.can_afford(item.buy_price)
+		buy_one.pressed.connect(_on_shop_buy.bind(item.id, 1))
+		row.add_child(buy_one)
+
+		var buy_five := Button.new()
+		buy_five.text = "Comprar 5"
+		buy_five.disabled = not Economy.can_afford(item.buy_price * 5)
+		buy_five.pressed.connect(_on_shop_buy.bind(item.id, 5))
+		row.add_child(buy_five)
+
+func _on_shop_buy(item_id: StringName, amount: int) -> void:
+	if _active_shop == null or player == null:
+		return
+
+	var message := _active_shop.purchase(player, item_id, amount)
+	_show_feedback(message)
+	_refresh_shop_panel()
 	_refresh_inventory_panel()
