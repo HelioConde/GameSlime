@@ -9,4 +9,7 @@ display_name = "Regador"
 kind = 0
 max_stack = 1
 tint = Color(0.30, 0.68, 0.94, 1)
+icon_sheet = 1
+icon_cell = Vector2i(0, 0)
+icon_cell_size = 16
 tool_type = 1
