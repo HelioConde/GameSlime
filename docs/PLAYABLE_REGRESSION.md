@@ -15,6 +15,8 @@ Regra:
 5. Abrir I e fechar por I, botao e Esc.
 6. Abrir calendario por C e fechar por C/Esc.
 7. Confirmar que nenhum menu deixa o jogo pausado depois de fechar.
+8. Caminhar contra os quatro limites externos e confirmar que o player nao sai da area visivel.
+9. Tentar atravessar banca, caixa de remessa, ferreiro e fonte de agua; todos devem bloquear movimento sem impedir E/interacao.
 
 ## Sessao B - agricultura
 1. Arar pelo menos 8 tiles.
@@ -95,6 +97,8 @@ Sem:
 - duplicacao de item
 - perda indevida de Ouro
 - mundo permanentemente pausado
+- player perdido fora dos limites do mapa
+- objetos principais atravessaveis
 - save corrompido sem recuperacao
 
 Somente depois desse criterio voltamos a criar features grandes.
