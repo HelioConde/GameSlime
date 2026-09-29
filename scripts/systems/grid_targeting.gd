@@ -33,6 +33,8 @@ static func get_tool_cells(origin: Vector2i, facing: Vector2i, stage: int) -> Ar
 static func _sanitize_facing(facing: Vector2i) -> Vector2i:
 	if facing == Vector2i.ZERO:
 		return Vector2i.DOWN
+
 	if abs(facing.x) > abs(facing.y):
-		return Vector2i(signi(facing.x), 0)
-	return Vector2i(0, signi(facing.y))
+		return Vector2i(1 if facing.x > 0 else -1, 0)
+
+	return Vector2i(0, 1 if facing.y > 0 else -1)
