@@ -12,8 +12,12 @@ signal feedback_requested(text: String)
 @export_group("Starting Items")
 @export var starter_hoe_item: ItemDefinition
 @export var starter_watering_can_item: ItemDefinition
+@export var starter_axe_item: ItemDefinition
+@export var starter_pickaxe_item: ItemDefinition
 @export var starter_seed_item: ItemDefinition
 @export var starter_crop_item: ItemDefinition
+@export var wood_item: ItemDefinition
+@export var stone_item: ItemDefinition
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
@@ -55,6 +59,7 @@ func _physics_process(delta: float) -> void:
 		_action_flash_time -= delta
 
 	move_and_slide()
+	_collect_nearby_drops()
 	queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -144,7 +149,10 @@ func _primary_action_pressed() -> void:
 	match stack.item.kind:
 		ItemDefinition.ItemKind.TOOL:
 			tools.select_tool(stack.item.tool_type)
-			tools.begin_charge()
+			if tools.is_chargeable_tool(stack.item.tool_type):
+				tools.begin_charge()
+			else:
+				_use_instant_tool(stack.item.tool_type)
 		ItemDefinition.ItemKind.SEED:
 			_plant_selected_seed(stack)
 		_:
@@ -170,7 +178,7 @@ func _release_tool() -> void:
 		feedback_requested.emit("Nenhum tile valido.")
 		return
 
-	var energy_cost := tools.get_energy_cost(stage)
+	var energy_cost := tools.get_energy_cost(stage, tool)
 	if not energy.can_spend(energy_cost):
 		feedback_requested.emit("Energia insuficiente.")
 		return
@@ -197,6 +205,61 @@ func _release_tool() -> void:
 		tools.spend_water(stage)
 
 	_flash_cells(cells)
+
+func _use_instant_tool(tool_type: int) -> void:
+	var target := _find_resource_target()
+	if target == null:
+		feedback_requested.emit("Nenhum recurso ao alcance.")
+		return
+
+	var energy_cost := tools.get_energy_cost(0, tool_type)
+	if not energy.can_spend(energy_cost):
+		feedback_requested.emit("Energia insuficiente.")
+		return
+
+	var level := tools.get_tool_level(tool_type)
+	var result := target.apply_tool_hit(tool_type, level)
+
+	if not bool(result.get("success", false)):
+		feedback_requested.emit(str(result.get("reason", "Nao foi possivel usar a ferramenta.")))
+		return
+
+	energy.spend(energy_cost)
+
+	var remaining := int(result.get("remaining_hits", 0))
+	if bool(result.get("depleted", false)):
+		feedback_requested.emit("Recurso quebrado!")
+	else:
+		feedback_requested.emit("Golpe acertou. Faltam %d." % remaining)
+
+func _find_resource_target() -> HarvestableResource:
+	var target_point := global_position + Vector2(facing) * 34.0
+	var best: HarvestableResource = null
+	var best_distance := 38.0
+
+	for node in get_tree().get_nodes_in_group("harvestable_resource"):
+		var resource := node as HarvestableResource
+		if resource == null:
+			continue
+
+		var distance := resource.global_position.distance_to(target_point)
+		if distance <= best_distance:
+			best = resource
+			best_distance = distance
+
+	return best
+
+func _collect_nearby_drops() -> void:
+	for node in get_tree().get_nodes_in_group("world_drop"):
+		var drop := node as ItemDrop
+		if drop == null or not drop.can_pickup(global_position):
+			continue
+
+		var collected := drop.try_collect(inventory)
+		if collected > 0:
+			var definition := inventory.get_definition(drop.item_id)
+			var item_name := definition.display_name if definition != null else str(drop.item_id)
+			feedback_requested.emit("Coletou %s x%d." % [item_name, collected])
 
 func _plant_selected_seed(stack: InventorySlotData) -> void:
 	if farm_field == null or stack.item.crop_to_plant == null:
@@ -275,8 +338,12 @@ func _seed_starting_inventory() -> void:
 	var definitions: Array[ItemDefinition] = [
 		starter_hoe_item,
 		starter_watering_can_item,
+		starter_axe_item,
+		starter_pickaxe_item,
 		starter_seed_item,
 		starter_crop_item,
+		wood_item,
+		stone_item,
 	]
 
 	for definition in definitions:
@@ -286,8 +353,12 @@ func _seed_starting_inventory() -> void:
 		inventory.seed_slot(0, starter_hoe_item, 1)
 	if starter_watering_can_item != null:
 		inventory.seed_slot(1, starter_watering_can_item, 1)
+	if starter_axe_item != null:
+		inventory.seed_slot(2, starter_axe_item, 1)
+	if starter_pickaxe_item != null:
+		inventory.seed_slot(3, starter_pickaxe_item, 1)
 	if starter_seed_item != null:
-		inventory.seed_slot(2, starter_seed_item, starting_seed_amount)
+		inventory.seed_slot(4, starter_seed_item, starting_seed_amount)
 
 func _sync_selected_item() -> void:
 	var stack := inventory.get_selected_stack()
@@ -387,9 +458,13 @@ func _draw_target_preview() -> void:
 
 	if stack.item.kind == ItemDefinition.ItemKind.SEED:
 		preview_color = Color(0.55, 0.86, 0.32, 0.30)
-	elif stack.item.kind == ItemDefinition.ItemKind.TOOL and stack.item.tool_type == ToolController.ToolType.WATERING_CAN:
-		preview_color = Color(0.29, 0.69, 1.0, 0.30)
-	elif stack.item.kind != ItemDefinition.ItemKind.TOOL:
+	elif stack.item.kind == ItemDefinition.ItemKind.TOOL:
+		match stack.item.tool_type:
+			ToolController.ToolType.WATERING_CAN:
+				preview_color = Color(0.29, 0.69, 1.0, 0.30)
+			ToolController.ToolType.AXE, ToolController.ToolType.PICKAXE:
+				preview_color = Color(0.95, 0.72, 0.28, 0.24)
+	else:
 		return
 
 	for cell in get_target_cells():
