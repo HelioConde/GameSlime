@@ -189,17 +189,24 @@ func _run() -> void:
 			fertilized_data.growth_days_completed = starter_crop.growth_days
 			fertilized_data.crop_stage = starter_crop.visual_stages
 			var base_fertilized_yield := starter_crop.get_harvest_amount(game_clock.day, fertilizer_cell)
+			var fertilized_quality := farm.get_harvest_quality(fertilizer_cell)
 			_check(
 				farm.get_harvest_amount(fertilizer_cell) == base_fertilized_yield + fertilizer.fertility_bonus,
 				"fertilizer increases harvest by exact configured bonus"
+			)
+			_check(
+				fertilized_quality in [InventorySlotData.Quality.SILVER, InventorySlotData.Quality.GOLD],
+				"fertilizer upgrades crop quality above normal"
 			)
 			_check(save_manager.save_game(), "fertilized soil save succeeds")
 			fertilized_data.fertility_bonus = 0
 			_check(save_manager.load_game(), "fertilized soil reload succeeds")
 			fertilized_data = farm.get_cell(fertilizer_cell)
 			_check(fertilized_data.fertility_bonus == fertilizer.fertility_bonus, "fertilizer survives save and load")
+			_check(farm.get_harvest_quality(fertilizer_cell) == fertilized_quality, "fertilized crop quality is deterministic across save and load")
 			var fertilizer_harvest := farm.harvest_cell(fertilizer_cell)
 			_check(not fertilizer_harvest.is_empty(), "fertilized crop harvest succeeds")
+			_check(int(fertilizer_harvest.get("quality", -1)) == fertilized_quality, "harvest returns deterministic fertilizer quality")
 			_check(farm.get_cell(fertilizer_cell).fertility_bonus == 0, "single-cycle crop clears fertilizer after harvest")
 
 		var recovery_cell := Vector2i(9, 5)
@@ -410,6 +417,11 @@ func _run() -> void:
 					var cell_entry := cell_entry_variant as Dictionary
 					cell_entry.erase("fertility_bonus")
 					cell_entry.erase("idle_tilled_days")
+			var v6_player: Dictionary = v6_data.get("player", {})
+			var v6_inventory: Array = v6_player.get("inventory", [])
+			for inventory_entry_variant in v6_inventory:
+				if inventory_entry_variant is Dictionary:
+					(inventory_entry_variant as Dictionary).erase("quality")
 			var v6_world: Dictionary = v6_data.get("world", {})
 			var v6_drops: Array = v6_world.get("drops", [])
 			for drop_entry_variant in v6_drops:
@@ -546,6 +558,33 @@ func _run() -> void:
 								await get_tree().process_frame
 								_check(int(economy.gold) == gold_after_shipping, "shipment cannot pay twice")
 
+								player.inventory.clear_all()
+								player.inventory.seed_slot(
+									0,
+									harvest_item,
+									2,
+									InventorySlotData.Quality.GOLD
+								)
+								player.inventory.set_selected_slot(0)
+								player.global_position = shipping_bin.global_position
+								var gold_quality_message := shipping_bin.interact(player)
+								var gold_unit_price := InventorySlotData.get_adjusted_sell_price(
+									harvest_item.sell_price,
+									InventorySlotData.Quality.GOLD
+								)
+								var gold_quality_total := gold_unit_price * 2
+								_check(gold_quality_message.contains("Ouro"), "shipping message identifies gold quality")
+								_check(economy.get_pending_total() == gold_quality_total, "gold quality shipment uses adjusted price")
+								var gold_before_quality_sale := int(economy.gold)
+								game_clock.sleep_and_start_next_day()
+								await get_tree().process_frame
+								await get_tree().process_frame
+								_check(
+									int(economy.gold) == gold_before_quality_sale + gold_quality_total,
+									"gold quality shipment pays exact adjusted value"
+								)
+								_check(economy.get_pending_total() == 0, "quality shipment clears after payout")
+
 	if player != null:
 		# Inventory manipulation must conserve item totals.
 		var stone_def := player.inventory.get_definition(&"stone")
@@ -563,6 +602,36 @@ func _run() -> void:
 			player.inventory.organize_slots()
 			_check(player.inventory.count_item(&"stone") == total_stone_before, "inventory operations conserve stone")
 			_check(player.inventory.count_item(&"wood") == total_wood_before, "inventory operations conserve wood")
+
+		var quality_crop := player.inventory.get_definition(&"starter_turnip")
+		if quality_crop != null:
+			player.inventory.clear_all()
+			player.inventory.add_item(quality_crop, 3, InventorySlotData.Quality.NORMAL)
+			player.inventory.add_item(quality_crop, 2, InventorySlotData.Quality.SILVER)
+			player.inventory.add_item(quality_crop, 1, InventorySlotData.Quality.GOLD)
+			_check(player.inventory.get_used_slot_count() == 3, "different qualities occupy separate stacks")
+			_check(player.inventory.count_item(quality_crop.id) == 6, "quality stacks still count toward total item amount")
+			_check(
+				player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.SILVER) == 2,
+				"silver quality count stays separate"
+			)
+			_check(
+				player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.GOLD) == 1,
+				"gold quality count stays separate"
+			)
+			player.inventory.organize_slots()
+			_check(player.inventory.get_used_slot_count() == 3, "organize does not merge different qualities")
+			_check(save_manager.save_game(), "quality inventory save succeeds")
+			player.inventory.clear_all()
+			_check(save_manager.load_game(), "quality inventory reload succeeds")
+			_check(
+				player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.SILVER) == 2,
+				"silver quality survives save and load"
+			)
+			_check(
+				player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.GOLD) == 1,
+				"gold quality survives save and load"
+			)
 
 	if player != null:
 		# World drops must remain when inventory is full and collect after space is freed.
