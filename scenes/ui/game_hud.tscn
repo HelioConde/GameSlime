@@ -9,7 +9,7 @@ script = ExtResource("1_hud")
 offset_left = 18.0
 offset_top = 18.0
 offset_right = 290.0
-offset_bottom = 170.0
+offset_bottom = 178.0
 
 [node name="Margin" type="MarginContainer" parent="StatusPanel"]
 theme_override_constants/margin_left = 12
