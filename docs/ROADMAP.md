@@ -45,8 +45,8 @@
 - [x] drops fisicos
 - [x] coleta automatica por proximidade
 - [x] madeira e pedra integradas ao inventario
-- [ ] upgrades de ferramenta compraveis
-- [ ] obstaculos que exigem nivel de ferramenta
+- [x] upgrades de ferramenta com custo em recursos (prototipo)
+- [x] obstaculos que exigem nivel de ferramenta
 - [ ] tipos adicionais de arvore/pedra/minerio
 - [ ] feedback sonoro por material
 - [ ] particulas de impacto
@@ -56,31 +56,31 @@
 - [x] primavera/verao/outono/inverno
 - [x] culturas por estacao
 - [x] clima
-- [ ] previsao do tempo
+- [x] previsao do tempo
 - [x] calendario
-- [ ] eventos por dia
+- [x] eventos por dia
 - [x] salvamento na virada do dia
 
 ## Marco 4 - slimes como identidade central
-- [ ] slime base
-- [ ] fome
-- [ ] humor
-- [ ] afeto
-- [ ] energia propria
-- [ ] idade
-- [ ] sexo/genetica
-- [ ] cor herdavel
-- [ ] personalidade
-- [ ] habitat
-- [ ] producao de recursos
+- [x] slime base
+- [x] fome
+- [x] humor
+- [x] afeto
+- [x] energia propria
+- [x] idade
+- [x] sexo/genetica
+- [x] cor herdavel
+- [x] personalidade
+- [x] habitat
+- [x] producao de recursos
 
 ## Marco 5 - breeding e descobertas
-- [ ] reproducao no mundo
-- [ ] heranca dos pais
+- [x] reproducao controlada no ninho
+- [x] heranca dos pais
 - [ ] mutacoes por ambiente
 - [ ] raridades condicionais
-- [ ] bestiario
-- [ ] descobertas geneticas registradas
+- [x] bestiario genetico
+- [x] descobertas geneticas registradas
 - [ ] especies especiais por clima/horario/bioma
 
 ## Marco 6 - progressao e automacao
