@@ -4,18 +4,34 @@ extends Node
 signal time_changed(day: int, hour: int, minute: int)
 signal day_ended(day: int)
 signal day_started(day: int)
+signal calendar_changed(year: int, season: int, day_of_season: int)
+signal season_changed(year: int, season: int)
+signal year_changed(year: int)
+
+enum Season {
+	SPRING,
+	SUMMER,
+	FALL,
+	WINTER,
+}
 
 const START_MINUTE := 6 * 60
 const END_MINUTE := 26 * 60
 const REAL_SECONDS_PER_TEN_GAME_MINUTES := 7.0
+const DAYS_PER_SEASON := 28
 
 var day: int = 1
 var minute_of_day: int = START_MINUTE
+var year: int = 1
+var season_index: int = Season.SPRING
+var day_of_season: int = 1
+
 var _accumulator: float = 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	time_changed.emit(day, get_hour(), get_minute())
+	calendar_changed.emit(year, season_index, day_of_season)
 
 func _process(delta: float) -> void:
 	if get_tree().paused:
@@ -50,10 +66,46 @@ func get_minute() -> int:
 func get_time_text() -> String:
 	return "%02d:%02d" % [get_hour(), get_minute()]
 
+func get_season_name() -> String:
+	match season_index:
+		Season.SPRING:
+			return "Primavera"
+		Season.SUMMER:
+			return "Verao"
+		Season.FALL:
+			return "Outono"
+		Season.WINTER:
+			return "Inverno"
+		_:
+			return "Estacao"
+
+func get_date_text() -> String:
+	return "%s %d · Ano %d" % [get_season_name(), day_of_season, year]
+
 func _finish_day() -> void:
 	day_ended.emit(day)
+
 	day += 1
+	_advance_calendar()
 	minute_of_day = START_MINUTE
 	_accumulator = 0.0
+
 	day_started.emit(day)
 	time_changed.emit(day, get_hour(), get_minute())
+	calendar_changed.emit(year, season_index, day_of_season)
+
+func _advance_calendar() -> void:
+	day_of_season += 1
+
+	if day_of_season <= DAYS_PER_SEASON:
+		return
+
+	day_of_season = 1
+	season_index += 1
+
+	if season_index > Season.WINTER:
+		season_index = Season.SPRING
+		year += 1
+		year_changed.emit(year)
+
+	season_changed.emit(year, season_index)
