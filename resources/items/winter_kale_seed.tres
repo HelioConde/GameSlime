@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_definition.gd" id="1_item"]
+[ext_resource type="Resource" path="res://resources/crops/winter_kale.tres" id="2_crop"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"winter_kale_seed"
+display_name = "Semente de Couve de Neve"
+kind = 1
+max_stack = 99
+tint = Color(0.42, 0.68, 0.62, 1)
+buy_price = 30
+sell_price = 15
+crop_to_plant = ExtResource("2_crop")
