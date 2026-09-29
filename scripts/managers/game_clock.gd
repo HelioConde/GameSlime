@@ -27,6 +27,7 @@ var season_index: int = Season.SPRING
 var day_of_season: int = 1
 
 var _accumulator: float = 0.0
+var last_transition_was_passout: bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -48,13 +49,13 @@ func advance_minutes(amount: int) -> void:
 
 	minute_of_day += amount
 	if minute_of_day >= END_MINUTE:
-		_finish_day()
+		_finish_day(true)
 		return
 
 	time_changed.emit(day, get_hour(), get_minute())
 
 func sleep_and_start_next_day() -> void:
-	_finish_day()
+	_finish_day(false)
 
 func get_hour() -> int:
 	var raw_hour: int = int(floor(float(minute_of_day) / 60.0))
@@ -82,7 +83,8 @@ func get_season_name() -> String:
 func get_date_text() -> String:
 	return "%s %d · Ano %d" % [get_season_name(), day_of_season, year]
 
-func _finish_day() -> void:
+func _finish_day(was_passout: bool = false) -> void:
+	last_transition_was_passout = was_passout
 	day_ended.emit(day)
 
 	day += 1
@@ -126,6 +128,7 @@ func load_save_data(data: Dictionary) -> void:
 	season_index = clampi(int(data.get("season_index", Season.SPRING)), Season.SPRING, Season.WINTER)
 	day_of_season = clampi(int(data.get("day_of_season", 1)), 1, DAYS_PER_SEASON)
 	_accumulator = 0.0
+	last_transition_was_passout = false
 
 	time_changed.emit(day, get_hour(), get_minute())
 	calendar_changed.emit(year, season_index, day_of_season)
