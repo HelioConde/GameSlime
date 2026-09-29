@@ -31,14 +31,18 @@
 - [ ] drag-and-drop de slots
 
 ## Marco 2 - ferramentas e recursos do mapa
-- [ ] machado
-- [ ] picareta
-- [ ] arvores com quantidade de golpes por upgrade
-- [ ] pedras/minerios
-- [ ] drops fisicos
-- [ ] coleta
+- [x] machado
+- [x] picareta
+- [x] arvores com quantidade de golpes por upgrade
+- [x] pedras com quantidade de golpes por upgrade
+- [x] drops fisicos
+- [x] coleta automatica por proximidade
+- [x] madeira e pedra integradas ao inventario
 - [ ] upgrades de ferramenta compraveis
 - [ ] obstaculos que exigem nivel de ferramenta
+- [ ] tipos adicionais de arvore/pedra/minerio
+- [ ] feedback sonoro por material
+- [ ] particulas de impacto
 
 ## Marco 3 - calendario vivo
 - [ ] 28 dias por estacao
