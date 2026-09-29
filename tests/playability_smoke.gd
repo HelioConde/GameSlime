@@ -16,11 +16,16 @@ func _run() -> void:
 	var save_manager = get_tree().root.get_node_or_null("SaveManager")
 	var game_clock = get_tree().root.get_node_or_null("GameClock")
 	var economy = get_tree().root.get_node_or_null("Economy")
+	var sfx = get_tree().root.get_node_or_null("Sfx")
 
 	_check(save_manager != null, "SaveManager autoload exists")
 	_check(game_clock != null, "GameClock autoload exists")
 	_check(economy != null, "Economy autoload exists")
-	if save_manager == null or game_clock == null or economy == null:
+	_check(sfx != null, "Sfx autoload exists")
+	if sfx != null:
+		sfx.play_cue(&"pickup")
+		sfx.play_tool(ToolController.ToolType.PICKAXE, false)
+	if save_manager == null or game_clock == null or economy == null or sfx == null:
 		_finish()
 		return
 
@@ -465,6 +470,7 @@ func _run() -> void:
 					drop_entry.erase("natural_spawn")
 					drop_entry.erase("spawned_day")
 					drop_entry.erase("expires_after_days")
+					drop_entry.erase("quality")
 			var v6_write := FileAccess.open("user://savegame.json", FileAccess.WRITE)
 			_check(v6_write != null, "synthetic v6 save can be written")
 			if v6_write != null:
@@ -666,6 +672,60 @@ func _run() -> void:
 			_check(
 				player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.GOLD) == 1,
 				"gold quality survives save and load"
+			)
+
+			player.inventory.clear_all()
+			player.inventory.seed_slot(0, quality_crop, 2, InventorySlotData.Quality.GOLD)
+			player.inventory.set_selected_slot(0)
+			player.call("_drop_selected_item", false)
+			_check(
+				player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.GOLD) == 1,
+				"dropping one gold crop removes exactly one from selected stack"
+			)
+
+			var dropped_quality_item: ItemDrop = null
+			for drop_node in get_tree().get_nodes_in_group("world_drop"):
+				var candidate := drop_node as ItemDrop
+				if (
+					candidate != null
+					and not candidate.natural_spawn
+					and candidate.item_id == quality_crop.id
+					and candidate.quality == InventorySlotData.Quality.GOLD
+				):
+					dropped_quality_item = candidate
+					break
+			_check(dropped_quality_item != null, "dropped crop keeps gold quality in world")
+			if dropped_quality_item != null:
+				_check(save_manager.save_game(), "quality world drop save succeeds")
+				_check(save_manager.load_game(), "quality world drop reload succeeds")
+				dropped_quality_item = null
+				for drop_node in get_tree().get_nodes_in_group("world_drop"):
+					var candidate := drop_node as ItemDrop
+					if (
+						candidate != null
+						and not candidate.natural_spawn
+						and candidate.item_id == quality_crop.id
+						and candidate.quality == InventorySlotData.Quality.GOLD
+					):
+						dropped_quality_item = candidate
+						break
+				_check(dropped_quality_item != null, "gold quality world drop survives save and load")
+				if dropped_quality_item != null:
+					dropped_quality_item.pickup_delay = 0.0
+					_check(dropped_quality_item.try_collect(player.inventory) == 1, "dropped gold crop can be collected again")
+					_check(
+						player.inventory.count_item(quality_crop.id, InventorySlotData.Quality.GOLD) == 2,
+						"recollecting dropped crop restores original gold-quality total"
+					)
+
+			player.inventory.clear_all()
+			player.inventory.seed_slot(0, player.starter_hoe_item, 1)
+			player.inventory.set_selected_slot(0)
+			player.call("_drop_selected_item", false)
+			var tool_slot := player.inventory.get_slot(0)
+			_check(
+				tool_slot != null and not tool_slot.is_empty() and tool_slot.item == player.starter_hoe_item,
+				"essential tool cannot be dropped"
 			)
 
 	if player != null:
