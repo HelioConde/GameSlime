@@ -9,6 +9,12 @@ signal feedback_requested(text: String)
 @export_range(0.25, 1.0, 0.05) var charge_move_multiplier: float = 0.80
 @export var starting_seed_amount: int = 15
 
+@export_group("Starting Items")
+@export var starter_hoe_item: ItemDefinition
+@export var starter_watering_can_item: ItemDefinition
+@export var starter_seed_item: ItemDefinition
+@export var starter_crop_item: ItemDefinition
+
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
 @onready var inventory: InventoryComponent = $Inventory
@@ -196,7 +202,10 @@ func _plant_selected_seed(stack: InventorySlotData) -> void:
 	if farm_field == null or stack.item.crop_to_plant == null:
 		return
 
+	var seed_id := stack.item.id
+	var crop := stack.item.crop_to_plant
 	var target := _get_front_cell()
+
 	if not farm_field.is_valid_cell(target):
 		feedback_requested.emit("Nao da para plantar aqui.")
 		return
@@ -205,11 +214,11 @@ func _plant_selected_seed(stack: InventorySlotData) -> void:
 		feedback_requested.emit(farm_field.get_cell_hint(target))
 		return
 
-	if not farm_field.plant_crop(target, stack.item.crop_to_plant):
+	if not farm_field.plant_crop(target, crop):
 		return
 
-	inventory.remove_item(stack.item.id, 1)
-	feedback_requested.emit("Plantou %s." % stack.item.crop_to_plant.display_name)
+	inventory.remove_item(seed_id, 1)
+	feedback_requested.emit("Plantou %s." % crop.display_name)
 	_flash_cells([target])
 
 func _interact() -> void:
@@ -263,16 +272,22 @@ func _interact() -> void:
 	feedback_requested.emit(farm_field.get_cell_hint(target))
 
 func _seed_starting_inventory() -> void:
-	var hoe := inventory.get_definition(&"hoe")
-	var watering_can := inventory.get_definition(&"watering_can")
-	var seeds := inventory.get_definition(&"starter_turnip_seed")
+	var definitions: Array[ItemDefinition] = [
+		starter_hoe_item,
+		starter_watering_can_item,
+		starter_seed_item,
+		starter_crop_item,
+	]
 
-	if hoe != null:
-		inventory.seed_slot(0, hoe, 1)
-	if watering_can != null:
-		inventory.seed_slot(1, watering_can, 1)
-	if seeds != null:
-		inventory.seed_slot(2, seeds, starting_seed_amount)
+	for definition in definitions:
+		inventory.register_definition(definition)
+
+	if starter_hoe_item != null:
+		inventory.seed_slot(0, starter_hoe_item, 1)
+	if starter_watering_can_item != null:
+		inventory.seed_slot(1, starter_watering_can_item, 1)
+	if starter_seed_item != null:
+		inventory.seed_slot(2, starter_seed_item, starting_seed_amount)
 
 func _sync_selected_item() -> void:
 	var stack := inventory.get_selected_stack()
