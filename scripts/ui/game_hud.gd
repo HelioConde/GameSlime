@@ -15,6 +15,9 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/sprout_lands/items/all_items
 @onready var bestiary_panel: PanelContainer = $BestiaryPanel
 @onready var bestiary_title: Label = $BestiaryPanel/Margin/Content/Title
 @onready var bestiary_body: Label = $BestiaryPanel/Margin/Content/Body
+@onready var habitat_panel: PanelContainer = $HabitatPanel
+@onready var habitat_title: Label = $HabitatPanel/Margin/Content/Title
+@onready var habitat_body: Label = $HabitatPanel/Margin/Content/Body
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -27,9 +30,10 @@ var _slot_amounts: Array[Label] = []
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	call_deferred("_bind_player")
-	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario | B bestiario"
+	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario | B bestiario | H habitat"
 	calendar_panel.visible = false
 	bestiary_panel.visible = false
+	habitat_panel.visible = false
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -39,6 +43,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 			KEY_B:
 				_toggle_bestiary()
+				get_viewport().set_input_as_handled()
+			KEY_H:
+				_toggle_habitat()
 				get_viewport().set_input_as_handled()
 
 func _process(delta: float) -> void:
@@ -237,6 +244,7 @@ func _show_feedback(text: String) -> void:
 func _toggle_calendar() -> void:
 	var next_visible := not calendar_panel.visible
 	bestiary_panel.visible = false
+	habitat_panel.visible = false
 	calendar_panel.visible = next_visible
 	_update_menu_pause()
 
@@ -246,14 +254,25 @@ func _toggle_calendar() -> void:
 func _toggle_bestiary() -> void:
 	var next_visible := not bestiary_panel.visible
 	calendar_panel.visible = false
+	habitat_panel.visible = false
 	bestiary_panel.visible = next_visible
 	_update_menu_pause()
 
 	if bestiary_panel.visible:
 		_refresh_bestiary_panel()
 
+func _toggle_habitat() -> void:
+	var next_visible := not habitat_panel.visible
+	calendar_panel.visible = false
+	bestiary_panel.visible = false
+	habitat_panel.visible = next_visible
+	_update_menu_pause()
+
+	if habitat_panel.visible:
+		_refresh_habitat_panel()
+
 func _update_menu_pause() -> void:
-	get_tree().paused = calendar_panel.visible or bestiary_panel.visible
+	get_tree().paused = calendar_panel.visible or bestiary_panel.visible or habitat_panel.visible
 
 func _refresh_calendar_panel() -> void:
 	calendar_title.text = "%s · Ano %d" % [
@@ -325,6 +344,10 @@ func _refresh_bestiary_panel() -> void:
 		for record in individuals:
 			lines.append("%s · %s · %s" % [
 				str(record.get("display_name", "Slime")),
+				str(record.get("species", "Slime")),
+				str(record.get("rarity", "Comum")),
+			])
+			lines.append("  %s · %s" % [
 				str(record.get("sex", "")),
 				str(record.get("personality", "")),
 			])
@@ -344,3 +367,59 @@ func _refresh_bestiary_panel() -> void:
 			lines.append("  • %s" % trait_name)
 
 	bestiary_body.text = "\n".join(lines)
+
+func _refresh_habitat_panel() -> void:
+	var habitats := get_tree().get_nodes_in_group("slime_habitat")
+	if habitats.is_empty():
+		habitat_title.text = "Habitat"
+		habitat_body.text = "Nenhum habitat construido."
+		return
+
+	var habitat := habitats[0] as SlimeHabitat
+	if habitat == null:
+		habitat_title.text = "Habitat"
+		habitat_body.text = "Habitat indisponivel."
+		return
+
+	habitat_title.text = habitat.get_status_text()
+
+	var lines: Array[String] = []
+	lines.append("Bioma: %s" % habitat.get_biome_name())
+	lines.append("Capacidade: %d / %d" % [
+		habitat.registered_slimes.size(),
+		habitat.capacity,
+	])
+	lines.append("")
+	lines.append("Moradores:")
+
+	if habitat.registered_slimes.is_empty():
+		lines.append("  Nenhum slime registrado.")
+	else:
+		for slime in habitat.registered_slimes:
+			if slime == null or not is_instance_valid(slime):
+				continue
+			lines.append("  %s · %s · %s" % [
+				slime.display_name,
+				slime.get_species_name(),
+				slime.get_rarity_name(),
+			])
+			lines.append("    Fome %.0f%% · Humor %.0f%% · Afeto %.0f%%" % [
+				slime.satiety,
+				slime.happiness,
+				slime.affection,
+			])
+
+	lines.append("")
+	lines.append("Nascimentos especiais neste bioma:")
+	match habitat.biome_type:
+		SlimeHabitat.HabitatBiome.GROVE:
+			lines.append("  Slime Musgo: Primavera/Outono")
+		SlimeHabitat.HabitatBiome.WETLAND:
+			lines.append("  Afinidade com chuva")
+		SlimeHabitat.HabitatBiome.FROST:
+			lines.append("  Afinidade com neve")
+		_:
+			lines.append("  Nenhuma especie exclusiva do bioma")
+
+	lines.append("Outras condicoes: chuva noturna, neve, sol de Verao e noite profunda.")
+	habitat_body.text = "\n".join(lines)
