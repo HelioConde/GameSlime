@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/harvestable_resource.gd" id="1_resource"]
+
+[sub_resource type="CircleShape2D" id="Circle_rock"]
+radius = 19.0
+
+[node name="RockResource" type="Node2D"]
+script = ExtResource("1_resource")
+resource_kind = 1
+required_tool_type = 3
+drop_item_id = &"stone"
+drop_amount = 5
+drop_tint = Color(0.50, 0.53, 0.57, 1)
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("Circle_rock")
