@@ -275,6 +275,11 @@ func _load_slime_state(data: Dictionary) -> void:
 
 func _load_drop_state(data: Dictionary) -> void:
 	for node in get_tree().get_nodes_in_group("world_drop"):
+		if not is_instance_valid(node):
+			continue
+		var parent := node.get_parent()
+		if parent != null:
+			parent.remove_child(node)
 		node.queue_free()
 
 	var saved_drops: Array = data.get("drops", [])
