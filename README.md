@@ -176,3 +176,25 @@ A hotbar de 12 slots agora possui uma interface completa aberta com `I`:
 - cultura, tempo de crescimento e estacao para sementes
 
 A ordem dos slots continua sendo a propria ordem salva pelo inventario; nao existe um inventario paralelo apenas para a interface.
+
+
+## Loja sazonal expandida
+
+A banca de sementes agora abre uma interface propria ao interagir com `E`.
+
+Cada estacao possui duas culturas:
+
+- Primavera
+  - Nabo do Vale: 4 dias · semente 20g · venda 35g
+  - Baga da Primavera: 6 dias · semente 35g · venda 65g
+- Verao
+  - Tomate Solar: 6 dias · semente 35g · venda 55g
+  - Milho Dourado: 8 dias · semente 50g · venda 90g
+- Outono
+  - Abobora Ambar: 8 dias · semente 60g · venda 100g
+  - Berinjela Roxa: 6 dias · semente 40g · venda 72g
+- Inverno
+  - Raiz de Gelo: 7 dias · semente 45g · venda 80g
+  - Couve de Neve: 5 dias · semente 30g · venda 52g
+
+A interface mostra saldo, tempo de crescimento e retorno, e permite comprar 1 ou 5 unidades. `Esc` fecha qualquer painel aberto.
