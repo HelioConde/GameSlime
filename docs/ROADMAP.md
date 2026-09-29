@@ -11,11 +11,11 @@
 - [x] limites fisicos externos impedem o player de sair da area jogavel
 - [x] banca, caixa de remessa, ferreiro e fonte de agua bloqueiam passagem
 - [ ] campanha de testes manuais sem slimes
-- [ ] validar 7 dias consecutivos sem softlock
+- [x] validar 7 dias consecutivos sem softlock (smoke automatico)
 - [ ] validar save/load repetido em fazenda e minas
-- [ ] validar inventario cheio em compra/colheita/coleta
+- [x] validar inventario cheio em compra/colheita/coleta
 - [ ] validar todos os menus e ESC sem prender o jogo
-- [ ] validar economia sem duplicacao/perda de itens
+- [x] validar economia sem duplicacao/perda de itens nas transacoes cobertas
 - [ ] validar Minas Rasa/Profunda/Abissal ida e volta
 - [ ] corrigir bugs encontrados antes de qualquer feature nova
 
@@ -59,6 +59,9 @@ Regra deste marco:
 - [x] hotbar visual com icones de ferramentas
 - [x] painel completo de inventario
 - [x] drag-and-drop de slots
+- [x] culturas com rendimento variavel deterministico
+- [x] culturas de rebrota
+- [x] comida/forrageaveis restaurando energia
 
 ## Marco 2 - ferramentas e recursos do mapa
 - [x] machado
@@ -76,6 +79,9 @@ Regra deste marco:
 - [x] Ouro com jazida diaria
 - [ ] feedback sonoro por material
 - [x] particulas de impacto
+- [x] rendimento variavel deterministico de madeira/pedra
+- [x] spawns diarios de forrageaveis, materiais e sementes sazonais
+- [x] spawns diarios persistidos no save/load
 
 
 ## Marco 2B - exploracao e progressao da mina
