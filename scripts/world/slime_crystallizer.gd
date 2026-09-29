@@ -126,7 +126,7 @@ func _get_absolute_minute() -> int:
 
 func _remaining_time_text() -> String:
 	var remaining := maxi(ready_absolute_minute - _get_absolute_minute(), 0)
-	var hours := remaining / 60
+	var hours := int(floor(float(remaining) / 60.0))
 	var minutes := remaining % 60
 
 	if hours > 0:
