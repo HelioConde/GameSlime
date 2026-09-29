@@ -169,3 +169,42 @@ Execute `scenes/world/main.tscn`.
 6. Quando ocorrer uma mutacao, confirme mudanca visual de cor/genes.
 7. Abra B e confirme registro "Mutacao: <tipo>" nas descobertas geneticas.
 8. Salve/reabra e confirme persistencia da mutacao.
+
+
+## 22. Economia / Caixa de remessa
+1. Confirme HUD iniciando com 500g.
+2. Colha um Nabo do Vale.
+3. Selecione o Nabo e interaja com a caixa de remessa usando E.
+4. Confirme que o stack sai do inventario e o HUD mostra valor em Remessa.
+5. Feche e abra o jogo antes de dormir.
+6. Confirme que a remessa pendente continua salva.
+7. Durma.
+8. Confirme pagamento no novo dia e mensagem "Vendas: +Xg".
+9. Confirme Remessa voltando para 0g.
+
+## 23. Banca de sementes sazonal
+1. Na Primavera, interaja com a banca e confirme Semente de Nabo por 20g.
+2. Confirme desconto no Ouro e entrada no inventario.
+3. Avance ate o Verao e confirme oferta de Tomate Solar por 35g.
+4. No Outono, confirme Abobora Ambar por 60g.
+5. No Inverno, confirme Raiz de Gelo por 45g.
+6. Tente comprar sem Ouro suficiente e confirme bloqueio.
+7. Tente comprar com inventario cheio e confirme bloqueio sem perder Ouro.
+
+## 24. Culturas por estacao
+1. Primavera: Nabo do Vale, 4 dias, venda 35g.
+2. Verao: Tomate Solar, 6 dias, venda 55g.
+3. Outono: Abobora Ambar, 8 dias, venda 100g.
+4. Inverno: Raiz de Gelo, 7 dias, venda 80g.
+5. Em cada estacao, confirme que a cultura correta planta e cresce.
+6. Tente usar semente fora da estacao e confirme que ela nao e consumida.
+
+## 25. Cobre e ferreiro
+1. Quebre a jazida de cobre com Picareta nivel 0.
+2. Confirme drop de Minerio de Cobre e coleta.
+3. Destrua um veio, salve/reabra no mesmo dia e confirme que ele continua destruido.
+4. Durma e confirme que a jazida se recompõe no novo dia.
+5. Selecione uma ferramenta na hotbar e aproxime-se do ferreiro.
+6. Nivel 0 -> 1 deve exigir 200g + 5 Cobre.
+7. Confirme consumo de Ouro/Cobre e nivel atualizado no HUD.
+8. Confirme custos crescentes nos niveis seguintes.
