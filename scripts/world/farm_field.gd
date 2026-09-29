@@ -14,6 +14,7 @@ signal crops_withered(count: int)
 
 @export var grid_size: Vector2i = Vector2i(12, 8)
 @export var cell_size: int = 32
+@export_range(1, 14, 1) var empty_soil_recovery_days: int = 3
 
 var harvested_total: int = 0
 var _cells: Dictionary = {}
@@ -60,6 +61,7 @@ func apply_hoe(cells: Array[Vector2i]) -> int:
 		if data == null or data.tilled:
 			continue
 		data.tilled = true
+		data.idle_tilled_days = 0
 		changed += 1
 		cell_changed.emit(cell)
 
@@ -110,6 +112,7 @@ func plant_crop(cell: Vector2i, crop: CropDefinition) -> bool:
 	data.growth_days_completed = 0
 	data.crop_stage = 0
 	data.ready_to_harvest = false
+	data.idle_tilled_days = 0
 	crop_planted.emit(cell, crop)
 	cell_changed.emit(cell)
 	queue_redraw()
@@ -230,6 +233,18 @@ func _on_day_ended(_day: int) -> void:
 		if data == null:
 			continue
 
+		if data.tilled and data.crop == null:
+			data.idle_tilled_days += 1
+			if data.idle_tilled_days >= empty_soil_recovery_days:
+				data.tilled = false
+				data.watered_today = false
+				data.fertility_bonus = 0
+				data.idle_tilled_days = 0
+				cell_changed.emit(cell)
+				continue
+		else:
+			data.idle_tilled_days = 0
+
 		if data.crop != null and data.watered_today and not data.ready_to_harvest:
 			data.growth_days_completed += 1
 			var progress := float(data.growth_days_completed) / float(maxi(data.crop.growth_days, 1))
@@ -316,6 +331,7 @@ func get_save_data() -> Dictionary:
 			"crop_stage": data.crop_stage,
 			"ready_to_harvest": data.ready_to_harvest,
 			"fertility_bonus": data.fertility_bonus,
+			"idle_tilled_days": data.idle_tilled_days,
 		})
 
 	return {
@@ -347,6 +363,7 @@ func load_save_data(data: Dictionary) -> void:
 		cell_data.crop_stage = int(entry.get("crop_stage", 0))
 		cell_data.ready_to_harvest = bool(entry.get("ready_to_harvest", false))
 		cell_data.fertility_bonus = int(entry.get("fertility_bonus", 0))
+		cell_data.idle_tilled_days = int(entry.get("idle_tilled_days", 0))
 
 		var crop_id := StringName(str(entry.get("crop_id", "")))
 		if crop_id != &"":
