@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -11,6 +11,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/weather_fx.tscn" id="9_weather"]
 [ext_resource type="PackedScene" path="res://scenes/world/farmhouse.tscn" id="10_house"]
 [ext_resource type="PackedScene" path="res://scenes/world/tool_upgrade_station.tscn" id="11_upgrade"]
+[ext_resource type="PackedScene" path="res://scenes/world/large_stump.tscn" id="12_stump"]
+[ext_resource type="PackedScene" path="res://scenes/world/large_boulder.tscn" id="13_boulder"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -49,6 +51,12 @@ position = Vector2(355, 505)
 
 [node name="RockC" parent="." instance=ExtResource("8_rock")]
 position = Vector2(945, 450)
+
+[node name="LargeStumpGate" parent="." instance=ExtResource("12_stump")]
+position = Vector2(1080, 230)
+
+[node name="LargeBoulderGate" parent="." instance=ExtResource("13_boulder")]
+position = Vector2(250, 330)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(640, 560)
