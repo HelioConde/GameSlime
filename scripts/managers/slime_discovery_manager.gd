@@ -19,6 +19,7 @@ func register_slime(slime: SlimeCreature) -> void:
 		"rarity": slime.get_rarity_name(),
 		"rarity_tier": slime.get_rarity_tier(),
 		"rarity_score": slime.get_rarity_score(),
+		"rarity_reasons": ", ".join(slime.get_rarity_reasons()),
 		"sex": slime.get_sex_name(),
 		"personality": slime.get_personality_name(),
 		"gene_size": slime.gene_size,
