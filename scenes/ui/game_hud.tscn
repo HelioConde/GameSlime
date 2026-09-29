@@ -107,3 +107,29 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
+
+[node name="BestiaryPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 310.0
+offset_top = 110.0
+offset_right = 970.0
+offset_bottom = 570.0
+
+[node name="Margin" type="MarginContainer" parent="BestiaryPanel"]
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="BestiaryPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="BestiaryPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="BestiaryPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
