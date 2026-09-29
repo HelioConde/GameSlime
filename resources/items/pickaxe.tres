@@ -9,4 +9,7 @@ display_name = "Picareta"
 kind = 0
 max_stack = 1
 tint = Color(0.55, 0.58, 0.62, 1)
+icon_sheet = 1
+icon_cell = Vector2i(0, 2)
+icon_cell_size = 16
 tool_type = 3
