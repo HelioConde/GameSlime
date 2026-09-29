@@ -1,9 +1,14 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/harvestable_resource.gd" id="1_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprout_lands/world/stones_flora.png" id="2_atlas"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rock"]
+atlas = ExtResource("2_atlas")
+region = Rect2(112, 16, 32, 32)
 
 [sub_resource type="CircleShape2D" id="Circle_rock"]
-radius = 19.0
+radius = 15.0
 
 [node name="RockResource" type="Node2D"]
 script = ExtResource("1_resource")
@@ -13,7 +18,13 @@ drop_item_id = &"stone"
 drop_amount = 5
 drop_tint = Color(0.50, 0.53, 0.57, 1)
 
+[node name="Visual" type="Sprite2D" parent="."]
+position = Vector2(0, -4)
+texture = SubResource("AtlasTexture_rock")
+texture_filter = 1
+
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 2)
 shape = SubResource("Circle_rock")
