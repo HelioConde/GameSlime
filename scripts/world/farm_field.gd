@@ -105,15 +105,32 @@ func can_harvest(cell: Vector2i) -> bool:
 	var data := get_cell(cell)
 	return data != null and data.ready_to_harvest and data.crop != null
 
+func get_harvest_amount(cell: Vector2i) -> int:
+	if not can_harvest(cell):
+		return 0
+
+	var data := get_cell(cell)
+	if data == null or data.crop == null:
+		return 0
+	return data.crop.get_harvest_amount(GameClock.day, cell)
+
 func harvest_cell(cell: Vector2i) -> Dictionary:
 	if not can_harvest(cell):
 		return {}
 
 	var data := get_cell(cell)
 	var harvested_crop := data.crop
-	var amount := 1
+	var amount := get_harvest_amount(cell)
+	if amount <= 0:
+		return {}
 
-	data.clear_crop()
+	if harvested_crop.regrows_after_harvest():
+		data.ready_to_harvest = false
+		data.growth_days_completed = maxi(harvested_crop.growth_days - harvested_crop.regrow_days, 0)
+		data.crop_stage = maxi(harvested_crop.visual_stages - 1, 0)
+	else:
+		data.clear_crop()
+
 	harvested_total += amount
 	crop_harvested.emit(cell, harvested_crop, amount)
 	cell_changed.emit(cell)
@@ -122,6 +139,7 @@ func harvest_cell(cell: Vector2i) -> Dictionary:
 	return {
 		"crop": harvested_crop,
 		"amount": amount,
+		"regrowing": harvested_crop.regrows_after_harvest(),
 	}
 
 func can_plant_crop_now(crop: CropDefinition) -> bool:
