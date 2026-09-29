@@ -20,6 +20,8 @@ var _cells: Dictionary = {}
 func _ready() -> void:
 	add_to_group("farm_field")
 	GameClock.day_ended.connect(_on_day_ended)
+	GameClock.day_started.connect(_on_day_started)
+	call_deferred("_apply_current_weather")
 	queue_redraw()
 
 func world_to_cell(world_position: Vector2) -> Vector2i:
@@ -131,6 +133,27 @@ func get_cell_hint(cell: Vector2i) -> String:
 	if not data.watered_today:
 		return "A planta precisa de agua hoje."
 	return "%s esta crescendo." % data.crop.display_name
+
+func _on_day_started(_day: int) -> void:
+	_apply_current_weather()
+
+func _apply_current_weather() -> void:
+	if not WeatherManager.is_raining():
+		return
+
+	var changed := false
+	for key in _cells.keys():
+		var cell: Vector2i = key
+		var data := _cells[key] as FarmCellData
+		if data == null or not data.tilled or data.watered_today:
+			continue
+
+		data.watered_today = true
+		changed = true
+		cell_changed.emit(cell)
+
+	if changed:
+		queue_redraw()
 
 func _on_day_ended(_day: int) -> void:
 	for key in _cells.keys():
