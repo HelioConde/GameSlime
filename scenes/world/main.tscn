@@ -62,13 +62,16 @@ position = Vector2(1080, 230)
 position = Vector2(250, 330)
 
 [node name="SlimeHabitat" parent="." instance=ExtResource("16_habitat")]
-position = Vector2(800, 510)
+position = Vector2(1040, 550)
+habitat_name = "Bosque dos Slimes"
+habitat_size = Vector2(260, 170)
+biome_type = 1
 
 [node name="SlimeBreedingNest" parent="." instance=ExtResource("15_nest")]
-position = Vector2(800, 455)
+position = Vector2(1040, 515)
 
 [node name="GreenSlimeA" parent="." instance=ExtResource("14_slime")]
-position = Vector2(760, 520)
+position = Vector2(990, 555)
 display_name = "Broto"
 biological_sex = 0
 personality = 0
@@ -79,7 +82,7 @@ gene_production = 0.98
 slime_color = Color(0.30, 0.92, 0.50, 1)
 
 [node name="GreenSlimeB" parent="." instance=ExtResource("14_slime")]
-position = Vector2(825, 520)
+position = Vector2(1070, 555)
 display_name = "Gota"
 biological_sex = 1
 personality = 1
