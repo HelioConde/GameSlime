@@ -224,3 +224,26 @@ Execute `scenes/world/main.tscn`.
 11. Confirme que a selecao da ferramenta/item continua coerente apos organizar.
 12. Feche com o botao Fechar ou pressione I novamente.
 13. Salve/reabra e confirme que a nova ordem dos slots persiste.
+
+
+## 27. Loja sazonal com multiplas ofertas
+1. Aproxime-se da banca de sementes e pressione E.
+2. Confirme que o mundo pausa e o painel da loja abre.
+3. Confirme o saldo de Ouro no topo.
+4. Na Primavera devem existir:
+   - Semente de Nabo
+   - Semente de Baga da Primavera
+5. No Verao:
+   - Semente de Tomate Solar
+   - Semente de Milho Dourado
+6. No Outono:
+   - Semente de Abobora Ambar
+   - Semente de Berinjela Roxa
+7. No Inverno:
+   - Semente de Raiz de Gelo
+   - Semente de Couve de Neve
+8. Cada oferta deve mostrar dias de crescimento, custo e valor de venda.
+9. Comprar 1 deve descontar o valor correto e adicionar 1 semente.
+10. Comprar 5 deve validar espaco e Ouro antes de descontar.
+11. Sem Ouro suficiente, o botao correspondente deve ficar desabilitado.
+12. Pressione Esc e confirme fechamento do painel e retorno do tempo.
