@@ -10,6 +10,8 @@ const ITEM_ATLAS: Texture2D = preload("res://assets/sprout_lands/items/all_items
 @onready var calendar_panel: PanelContainer = $CalendarPanel
 @onready var calendar_title: Label = $CalendarPanel/Margin/Content/Title
 @onready var calendar_body: Label = $CalendarPanel/Margin/Content/Body
+@onready var slime_panel: PanelContainer = $SlimePanel
+@onready var slime_status: Label = $SlimePanel/Margin/Status
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -42,6 +44,7 @@ func _process(delta: float) -> void:
 
 	_refresh_status()
 	_refresh_hotbar()
+	_refresh_nearby_slime()
 
 func _bind_player() -> void:
 	player = get_tree().get_first_node_in_group("player") as PlayerController
@@ -261,3 +264,28 @@ func _refresh_calendar_panel() -> void:
 		])
 
 	calendar_body.text = "\n".join(lines)
+
+func _refresh_nearby_slime() -> void:
+	if player == null:
+		slime_panel.visible = false
+		return
+
+	var nearest: SlimeCreature = null
+	var nearest_distance := 120.0
+
+	for node in get_tree().get_nodes_in_group("slime_creature"):
+		var slime := node as SlimeCreature
+		if slime == null:
+			continue
+
+		var distance := player.global_position.distance_to(slime.global_position)
+		if distance < nearest_distance:
+			nearest = slime
+			nearest_distance = distance
+
+	if nearest == null:
+		slime_panel.visible = false
+		return
+
+	slime_panel.visible = true
+	slime_status.text = nearest.get_status_text()
