@@ -30,6 +30,8 @@ func _on_day_started(_day: int) -> void:
 	call_deferred("_autosave_new_day")
 
 func _autosave_new_day() -> void:
+	if SaveManager.was_saved_at_current_clock():
+		return
 	SaveManager.save_game()
 
 func _draw() -> void:
