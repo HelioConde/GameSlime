@@ -6,6 +6,7 @@ extends Node2D
 @export var summer_seed_items: Array[ItemDefinition] = []
 @export var fall_seed_items: Array[ItemDefinition] = []
 @export var winter_seed_items: Array[ItemDefinition] = []
+@export var always_available_items: Array[ItemDefinition] = []
 
 func _ready() -> void:
 	add_to_group("seed_shop")
@@ -16,17 +17,21 @@ func can_interact(player_position: Vector2) -> bool:
 	return global_position.distance_to(player_position) <= interaction_radius
 
 func get_current_offers() -> Array[ItemDefinition]:
+	var offers: Array[ItemDefinition] = []
 	match GameClock.season_index:
 		GameClock.Season.SPRING:
-			return spring_seed_items
+			offers.append_array(spring_seed_items)
 		GameClock.Season.SUMMER:
-			return summer_seed_items
+			offers.append_array(summer_seed_items)
 		GameClock.Season.FALL:
-			return fall_seed_items
+			offers.append_array(fall_seed_items)
 		GameClock.Season.WINTER:
-			return winter_seed_items
+			offers.append_array(winter_seed_items)
 		_:
-			return spring_seed_items
+			offers.append_array(spring_seed_items)
+
+	offers.append_array(always_available_items)
+	return offers
 
 func purchase(player: PlayerController, item_id: StringName, amount: int = 1) -> String:
 	if player == null or amount <= 0:
@@ -34,7 +39,7 @@ func purchase(player: PlayerController, item_id: StringName, amount: int = 1) ->
 
 	var seed_item := _find_offer(item_id)
 	if seed_item == null:
-		return "Essa semente nao esta disponivel nesta estacao."
+		return "Esse item nao esta disponivel nesta estacao."
 	if seed_item.buy_price <= 0:
 		return "%s ainda nao possui preco de compra." % seed_item.display_name
 
@@ -48,7 +53,7 @@ func purchase(player: PlayerController, item_id: StringName, amount: int = 1) ->
 		]
 
 	if not player.inventory.can_add_item(seed_item, amount):
-		return "Inventario sem espaco para %d sementes." % amount
+		return "Inventario sem espaco para %d itens." % amount
 
 	if not Economy.spend_gold(total_price):
 		return "Ouro insuficiente."
