@@ -196,6 +196,21 @@ func _run() -> void:
 			_check(not fertilizer_harvest.is_empty(), "fertilized crop harvest succeeds")
 			_check(farm.get_cell(fertilizer_cell).fertility_bonus == 0, "single-cycle crop clears fertilizer after harvest")
 
+		var recovery_cell := Vector2i(9, 5)
+		farm.apply_hoe([recovery_cell])
+		var recovery_data := farm.get_cell(recovery_cell)
+		recovery_data.fertility_bonus = 1
+		recovery_data.idle_tilled_days = 1
+		_check(save_manager.save_game(), "idle tilled soil save succeeds")
+		recovery_data.idle_tilled_days = 0
+		_check(save_manager.load_game(), "idle tilled soil reload succeeds")
+		recovery_data = farm.get_cell(recovery_cell)
+		_check(recovery_data.idle_tilled_days == 1, "idle tilled soil age survives save and load")
+		recovery_data.idle_tilled_days = farm.empty_soil_recovery_days - 1
+		farm.call("_on_day_ended", game_clock.day)
+		_check(not recovery_data.tilled, "abandoned tilled soil returns to grass")
+		_check(recovery_data.fertility_bonus == 0, "soil recovery removes abandoned fertilizer")
+
 	var patches := get_tree().get_nodes_in_group("daily_resource_patch")
 	_check(patches.size() >= 4, "daily resource patches exist")
 
