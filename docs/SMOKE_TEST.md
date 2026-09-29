@@ -158,3 +158,14 @@ Execute `scenes/world/main.tscn`.
 5. Gere filhotes e verifique novos individuos.
 6. Genes extremos devem registrar descobertas como Producao alta, Vitalidade alta ou Metabolismo eficiente.
 7. Pressione B novamente para voltar ao jogo.
+
+
+## 21. Mutacoes ambientais
+1. O breeding deve continuar funcionando normalmente em qualquer clima elegivel.
+2. Em dias de Chuva existe uma chance rara de filhote receber mutacao Chuva.
+3. No Inverno com Neve existe chance de mutacao Neve.
+4. No Verao ensolarado existe chance de mutacao Solar.
+5. No Outono existe chance rara de mutacao Outono.
+6. Quando ocorrer uma mutacao, confirme mudanca visual de cor/genes.
+7. Abra B e confirme registro "Mutacao: <tipo>" nas descobertas geneticas.
+8. Salve/reabra e confirme persistencia da mutacao.
