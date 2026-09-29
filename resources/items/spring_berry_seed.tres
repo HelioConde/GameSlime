@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_definition.gd" id="1_item"]
+[ext_resource type="Resource" path="res://resources/crops/spring_berry.tres" id="2_crop"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"spring_berry_seed"
+display_name = "Semente de Baga da Primavera"
+kind = 1
+max_stack = 99
+tint = Color(0.78, 0.38, 0.48, 1)
+buy_price = 35
+sell_price = 17
+crop_to_plant = ExtResource("2_crop")
