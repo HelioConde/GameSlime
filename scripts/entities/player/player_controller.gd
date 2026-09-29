@@ -338,6 +338,14 @@ func _interact() -> void:
 				feedback_requested.emit(upgrade_message)
 				return
 
+	for node in get_tree().get_nodes_in_group("slime_breeding_nest"):
+		var nest := node as SlimeBreedingNest
+		if nest != null and nest.can_interact(global_position):
+			var breeding_message := nest.interact(self)
+			if not breeding_message.is_empty():
+				feedback_requested.emit(breeding_message)
+				return
+
 	var slime := _find_interactable_slime()
 	if slime != null:
 		var slime_message := slime.interact(self)
