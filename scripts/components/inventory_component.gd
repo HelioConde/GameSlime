@@ -62,6 +62,23 @@ func seed_slot(index: int, item: ItemDefinition, amount: int = 1) -> void:
 
 	inventory_changed.emit()
 
+func can_add_item(item: ItemDefinition, amount: int = 1) -> bool:
+	if item == null or amount <= 0:
+		return true
+
+	var remaining := amount
+
+	for slot in slots:
+		if slot.is_empty():
+			remaining -= mini(item.max_stack, remaining)
+		elif slot.item.id == item.id:
+			remaining -= mini(item.max_stack - slot.amount, remaining)
+
+		if remaining <= 0:
+			return true
+
+	return false
+
 func add_item(item: ItemDefinition, amount: int = 1) -> int:
 	if item == null or amount <= 0:
 		return amount
@@ -134,3 +151,10 @@ func count_item(item_id: StringName) -> int:
 			total += slot.amount
 
 	return total
+
+func get_used_slot_count() -> int:
+	var used := 0
+	for slot in slots:
+		if not slot.is_empty():
+			used += 1
+	return used
