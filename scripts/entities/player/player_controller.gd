@@ -10,6 +10,7 @@ const WORLD_FORAGE_DEFINITIONS: Array[ItemDefinition] = [
 	preload("res://resources/items/wild_mushroom.tres"),
 	preload("res://resources/items/wild_root.tres"),
 ]
+const BASIC_FERTILIZER: ItemDefinition = preload("res://resources/items/basic_fertilizer.tres")
 
 signal feedback_requested(text: String)
 signal shop_requested(shop: SeedShop)
@@ -206,8 +207,41 @@ func _primary_action_pressed() -> void:
 			_plant_selected_seed(stack)
 		ItemDefinition.ItemKind.FOOD:
 			_eat_selected_food(stack)
+		ItemDefinition.ItemKind.FERTILIZER:
+			_apply_selected_fertilizer(stack)
 		_:
 			feedback_requested.emit("%s ainda nao possui uso direto." % stack.item.display_name)
+
+func _apply_selected_fertilizer(stack: InventorySlotData) -> void:
+	if farm_field == null or stack == null or stack.is_empty() or stack.item == null:
+		return
+
+	var target := _get_front_cell()
+	if not farm_field.is_valid_cell(target):
+		feedback_requested.emit("Nao da para adubar aqui.")
+		return
+
+	if not farm_field.can_fertilize(target):
+		var data := farm_field.get_cell(target)
+		if data == null or not data.tilled:
+			feedback_requested.emit("Are o solo antes de aplicar adubo.")
+		else:
+			feedback_requested.emit("Este solo ja esta adubado.")
+		return
+
+	if not farm_field.apply_fertilizer(target, stack.item.fertility_bonus):
+		return
+
+	inventory.remove_item(stack.item.id, 1)
+	feedback_requested.emit("Solo adubado · +%d na colheita." % stack.item.fertility_bonus)
+	_flash_cells([target])
+	_spawn_feedback_burst(
+		farm_field.cell_to_world(target),
+		Color(0.68, 0.48, 0.24),
+		6,
+		32.0
+	)
+
 
 func _eat_selected_food(stack: InventorySlotData) -> void:
 	if stack == null or stack.is_empty() or stack.item == null:
@@ -539,6 +573,7 @@ func _seed_starting_inventory() -> void:
 
 	for definition in WORLD_FORAGE_DEFINITIONS:
 		definitions.append(definition)
+	definitions.append(BASIC_FERTILIZER)
 
 	for definition in definitions:
 		inventory.register_definition(definition)
