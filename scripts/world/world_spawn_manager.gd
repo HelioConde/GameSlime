@@ -94,8 +94,12 @@ func get_daily_spawn_snapshot() -> Array[String]:
 
 func _clear_daily_spawns() -> void:
 	for node in get_tree().get_nodes_in_group("daily_world_spawn"):
-		if is_instance_valid(node):
-			node.queue_free()
+		if not is_instance_valid(node):
+			continue
+		var parent := node.get_parent()
+		if parent != null:
+			parent.remove_child(node)
+		node.queue_free()
 
 func _spawn_drop(position_value: Vector2, item: ItemDefinition, amount: int, index: int) -> void:
 	if get_parent() == null or item == null:
