@@ -66,6 +66,15 @@ func interact(player: PlayerController) -> String:
 
 	return "Cristalizacao iniciada · pronta em 4 horas."
 
+func get_status_text() -> String:
+	_refresh_processing_state()
+
+	if output_ready:
+		return "Cristalizador · PRONTO PARA COLETAR"
+	if processing:
+		return "Cristalizador · processando · %s restantes" % _remaining_time_text()
+	return "Cristalizador · vazio · receita: 3 Gel + 1 Cobre"
+
 func get_save_data() -> Dictionary:
 	return {
 		"node_name": String(name),
