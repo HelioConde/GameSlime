@@ -9,3 +9,5 @@ display_name = "Madeira"
 kind = 3
 max_stack = 999
 tint = Color(0.66, 0.40, 0.20, 1)
+buy_price = 0
+sell_price = 2
