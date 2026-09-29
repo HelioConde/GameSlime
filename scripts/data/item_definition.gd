@@ -30,6 +30,9 @@ enum IconSheet {
 @export var icon_cell: Vector2i = Vector2i.ZERO
 @export_range(8, 64, 1) var icon_cell_size: int = 16
 
+@export_group("Consumable")
+@export_range(0, 999, 1) var energy_restore: int = 0
+
 # Used only when kind == TOOL.
 @export var tool_type: int = -1
 
