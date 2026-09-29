@@ -8,6 +8,7 @@ signal feedback_requested(text: String)
 @export var deceleration: float = 1350.0
 @export_range(0.25, 1.0, 0.05) var charge_move_multiplier: float = 0.80
 @export var starting_seed_amount: int = 15
+@export var movement_animation_fps: float = 8.0
 
 @export_group("Starting Items")
 @export var starter_hoe_item: ItemDefinition
@@ -22,11 +23,13 @@ signal feedback_requested(text: String)
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
 @onready var inventory: InventoryComponent = $Inventory
+@onready var visual: Sprite2D = $Visual
 
 var facing: Vector2i = Vector2i.DOWN
 var farm_field: FarmField
 var _action_flash_cells: Array[Vector2i] = []
 var _action_flash_time: float = 0.0
+var _movement_anim_time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("player")
@@ -54,6 +57,7 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity.move_toward(target_velocity, rate * delta)
 
 	tools.update_charge(delta)
+	_update_visual_animation(delta, input_direction)
 
 	if _action_flash_time > 0.0:
 		_action_flash_time -= delta
@@ -425,6 +429,34 @@ func _update_facing(direction: Vector2) -> void:
 		facing = Vector2i.RIGHT if direction.x > 0.0 else Vector2i.LEFT
 	elif not is_zero_approx(direction.y):
 		facing = Vector2i.DOWN if direction.y > 0.0 else Vector2i.UP
+
+func _update_visual_animation(delta: float, input_direction: Vector2) -> void:
+	if visual == null:
+		return
+
+	var row := _get_facing_animation_row()
+
+	if input_direction == Vector2.ZERO:
+		_movement_anim_time = 0.0
+		visual.frame_coords = Vector2i(0, row)
+		return
+
+	_movement_anim_time += delta
+	var frame := int(floor(_movement_anim_time * movement_animation_fps)) % 8
+	visual.frame_coords = Vector2i(frame, row)
+
+func _get_facing_animation_row() -> int:
+	match facing:
+		Vector2i.DOWN:
+			return 0
+		Vector2i.UP:
+			return 1
+		Vector2i.LEFT:
+			return 2
+		Vector2i.RIGHT:
+			return 3
+		_:
+			return 0
 
 func _find_world_systems() -> void:
 	farm_field = get_tree().get_first_node_in_group("farm_field") as FarmField
