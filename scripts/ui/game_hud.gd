@@ -51,7 +51,7 @@ var _active_shop: SeedShop
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	call_deferred("_bind_player")
-	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | I inventario | C calendario | B bestiario | H habitat"
+	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | Q soltar | Shift+Q stack | I inventario | C calendario"
 	calendar_panel.visible = false
 	bestiary_panel.visible = false
 	habitat_panel.visible = false
