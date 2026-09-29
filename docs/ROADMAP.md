@@ -62,6 +62,13 @@ Regra deste marco:
 - [x] culturas com rendimento variavel deterministico
 - [x] culturas de rebrota
 - [x] comida/forrageaveis restaurando energia
+- [x] exaustao reduz velocidade ate recuperar energia
+- [x] desmaio automatico as 02:00 com retorno para casa
+- [x] solo arado abandonado se recupera naturalmente
+- [x] adubo basico
+- [x] qualidade Normal/Prata/Ouro por stack
+- [x] qualidade afeta valor de venda
+- [x] cultura multiestacao (Milho Dourado)
 
 ## Marco 2 - ferramentas e recursos do mapa
 - [x] machado
@@ -82,6 +89,7 @@ Regra deste marco:
 - [x] rendimento variavel deterministico de madeira/pedra
 - [x] spawns diarios de forrageaveis, materiais e sementes sazonais
 - [x] spawns diarios persistidos no save/load
+- [x] recursos naturais nao coletados persistem, expiram e respeitam limite global
 
 
 ## Marco 2B - exploracao e progressao da mina
