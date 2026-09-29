@@ -5,6 +5,7 @@ const PLAYER_MOVE_TEXTURE: Texture2D = preload("res://assets/sprout_lands/charac
 const PLAYER_ACTION_TEXTURE: Texture2D = preload("res://assets/sprout_lands/characters/player_actions.png")
 
 signal feedback_requested(text: String)
+signal shop_requested(shop: SeedShop)
 
 @export var move_speed: float = 165.0
 @export var acceleration: float = 1050.0
@@ -31,6 +32,14 @@ signal feedback_requested(text: String)
 @export var fall_crop_item: ItemDefinition
 @export var winter_seed_item: ItemDefinition
 @export var winter_crop_item: ItemDefinition
+@export var spring_berry_seed_item: ItemDefinition
+@export var spring_berry_crop_item: ItemDefinition
+@export var summer_corn_seed_item: ItemDefinition
+@export var summer_corn_crop_item: ItemDefinition
+@export var fall_eggplant_seed_item: ItemDefinition
+@export var fall_eggplant_crop_item: ItemDefinition
+@export var winter_kale_seed_item: ItemDefinition
+@export var winter_kale_crop_item: ItemDefinition
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
@@ -356,10 +365,8 @@ func _interact() -> void:
 	for node in get_tree().get_nodes_in_group("seed_shop"):
 		var seed_shop := node as SeedShop
 		if seed_shop != null and seed_shop.can_interact(global_position):
-			var shop_message := seed_shop.interact(self)
-			if not shop_message.is_empty():
-				feedback_requested.emit(shop_message)
-				return
+			shop_requested.emit(seed_shop)
+			return
 
 	for node in get_tree().get_nodes_in_group("slime_breeding_nest"):
 		var nest := node as SlimeBreedingNest
@@ -443,6 +450,14 @@ func _seed_starting_inventory() -> void:
 		fall_crop_item,
 		winter_seed_item,
 		winter_crop_item,
+		spring_berry_seed_item,
+		spring_berry_crop_item,
+		summer_corn_seed_item,
+		summer_corn_crop_item,
+		fall_eggplant_seed_item,
+		fall_eggplant_crop_item,
+		winter_kale_seed_item,
+		winter_kale_crop_item,
 	]
 
 	for definition in definitions:
