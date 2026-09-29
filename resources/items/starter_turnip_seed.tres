@@ -11,3 +11,5 @@ kind = 1
 max_stack = 99
 tint = Color(0.78, 0.66, 0.30, 1)
 crop_to_plant = ExtResource("2_crop")
+buy_price = 20
+sell_price = 10
