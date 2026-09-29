@@ -202,7 +202,8 @@ func get_selected_item_name() -> String:
 	var stack := inventory.get_selected_stack()
 	if stack == null or stack.is_empty():
 		return "Vazio"
-	return stack.item.display_name
+	var marker := InventorySlotData.get_quality_marker(stack.quality)
+	return "%s%s" % [stack.item.display_name, marker]
 
 func _primary_action_pressed() -> void:
 	var stack := inventory.get_selected_stack()
