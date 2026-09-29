@@ -301,6 +301,10 @@ func _plant_selected_seed(stack: InventorySlotData) -> void:
 		feedback_requested.emit(farm_field.get_cell_hint(target))
 		return
 
+	if not farm_field.can_plant_crop_now(crop):
+		feedback_requested.emit(farm_field.get_crop_season_hint(crop))
+		return
+
 	if not farm_field.plant_crop(target, crop):
 		return
 
