@@ -67,3 +67,13 @@ func _draw() -> void:
 	draw_line(Vector2(16, 0), Vector2(16, 17), Color(0.24, 0.14, 0.08), 5.0)
 	draw_circle(Vector2(0, -15), 6.0, Color(0.63, 0.66, 0.70))
 	draw_line(Vector2(-5, -19), Vector2(8, -8), Color(0.83, 0.86, 0.89), 3.0)
+	draw_circle(Vector2(23, -24), 8.0, Color(0.96, 0.80, 0.28, 0.95))
+	draw_string(
+		ThemeDB.fallback_font,
+		Vector2(20, -20),
+		"E",
+		HORIZONTAL_ALIGNMENT_LEFT,
+		-1,
+		10,
+		Color(0.12, 0.10, 0.06)
+	)
