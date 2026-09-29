@@ -34,16 +34,22 @@ func spend_gold(amount: int) -> bool:
 	gold_changed.emit(gold)
 	return true
 
-func queue_shipment(item: ItemDefinition, amount: int) -> bool:
+func queue_shipment(
+	item: ItemDefinition,
+	amount: int,
+	quality: int = InventorySlotData.Quality.NORMAL
+) -> bool:
 	if item == null or amount <= 0 or item.sell_price <= 0:
 		return false
 
-	var key := String(item.id)
+	var normalized_quality := InventorySlotData.clamp_quality(quality)
+	var key := "%s#%d" % [String(item.id), normalized_quality]
 	var entry: Dictionary = pending_shipments.get(key, {})
-	entry["item_id"] = key
+	entry["item_id"] = String(item.id)
 	entry["display_name"] = item.display_name
+	entry["quality"] = normalized_quality
 	entry["amount"] = int(entry.get("amount", 0)) + amount
-	entry["unit_price"] = item.sell_price
+	entry["unit_price"] = InventorySlotData.get_adjusted_sell_price(item.sell_price, normalized_quality)
 	pending_shipments[key] = entry
 
 	shipping_changed.emit(get_pending_total())
