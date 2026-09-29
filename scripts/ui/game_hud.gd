@@ -20,6 +20,7 @@ var _slot_names: Array[Label] = []
 var _slot_amounts: Array[Label] = []
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	call_deferred("_bind_player")
 	help_label.text = "WASD mover | 1-0/scroll hotbar | clique/ESPACO usar | E interagir | C calendario"
 	calendar_panel.visible = false
@@ -224,6 +225,8 @@ func _show_feedback(text: String) -> void:
 
 func _toggle_calendar() -> void:
 	calendar_panel.visible = not calendar_panel.visible
+	get_tree().paused = calendar_panel.visible
+
 	if calendar_panel.visible:
 		_refresh_calendar_panel()
 
