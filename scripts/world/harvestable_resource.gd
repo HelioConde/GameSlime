@@ -106,7 +106,7 @@ func _get_drop_amount() -> int:
 		GameClock.day * 104729
 		+ roundi(global_position.x) * 92821
 		+ roundi(global_position.y) * 68917
-		+ hash(String(name))
+		+ String(name).hash()
 	)
 	return rng.randi_range(minimum, maximum)
 
