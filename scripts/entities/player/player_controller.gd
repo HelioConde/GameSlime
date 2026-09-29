@@ -7,18 +7,27 @@ signal feedback_requested(text: String)
 @export var acceleration: float = 1050.0
 @export var deceleration: float = 1350.0
 @export_range(0.25, 1.0, 0.05) var charge_move_multiplier: float = 0.80
+@export var starting_seed_amount: int = 15
 
 @onready var energy: EnergyComponent = $Energy
 @onready var tools: ToolController = $ToolController
+@onready var inventory: InventoryComponent = $Inventory
 
 var facing: Vector2i = Vector2i.DOWN
 var farm_field: FarmField
+var _action_flash_cells: Array[Vector2i] = []
+var _action_flash_time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("player")
+
 	if not GameClock.day_started.is_connected(_on_day_started):
 		GameClock.day_started.connect(_on_day_started)
+
+	inventory.selected_slot_changed.connect(_on_selected_slot_changed)
+	_seed_starting_inventory()
 	call_deferred("_find_world_systems")
+	_sync_selected_item()
 	queue_redraw()
 
 func _physics_process(delta: float) -> void:
@@ -35,16 +44,30 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity.move_toward(target_velocity, rate * delta)
 
 	tools.update_charge(delta)
+
+	if _action_flash_time > 0.0:
+		_action_flash_time -= delta
+
 	move_and_slide()
 	queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			inventory.set_selected_slot(inventory.selected_slot - 1)
+			get_viewport().set_input_as_handled()
+			return
+
+		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			inventory.set_selected_slot(inventory.selected_slot + 1)
+			get_viewport().set_input_as_handled()
+			return
+
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				tools.begin_charge()
+				_primary_action_pressed()
 			else:
-				_release_tool()
+				_primary_action_released()
 			get_viewport().set_input_as_handled()
 			return
 
@@ -57,35 +80,75 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event.pressed:
+		var hotbar_index := _hotbar_index_from_key(event.physical_keycode)
+		if hotbar_index >= 0:
+			inventory.set_selected_slot(hotbar_index)
+			return
+
 		match event.physical_keycode:
 			KEY_SPACE:
-				tools.begin_charge()
+				_primary_action_pressed()
 			KEY_E:
 				_interact()
-			KEY_1:
-				tools.select_tool(ToolController.ToolType.HOE)
-			KEY_2:
-				tools.select_tool(ToolController.ToolType.WATERING_CAN)
 	else:
 		if event.physical_keycode == KEY_SPACE:
-			_release_tool()
+			_primary_action_released()
 
 func restore_after_sleep() -> void:
 	energy.restore_full()
+
+func refill_watering_can() -> void:
+	tools.refill_water()
 
 func get_target_cells() -> Array[Vector2i]:
 	if farm_field == null:
 		return []
 
-	var origin := farm_field.world_to_cell(global_position)
-	var stage := tools.charge_stage if tools.is_charging else 0
-	var raw_cells := GridTargeting.get_tool_cells(origin, facing, stage)
-	return farm_field.filter_valid_cells(raw_cells)
+	var stack := inventory.get_selected_stack()
+	if stack == null or stack.is_empty():
+		return []
 
-func _release_tool() -> void:
-	if not tools.is_charging:
+	var origin := farm_field.world_to_cell(global_position)
+
+	if stack.item.kind == ItemDefinition.ItemKind.SEED:
+		return farm_field.filter_valid_cells(
+			GridTargeting.get_tool_cells(origin, facing, 0)
+		)
+
+	if stack.item.kind != ItemDefinition.ItemKind.TOOL:
+		return []
+
+	var stage := tools.charge_stage if tools.is_charging else 0
+	return farm_field.filter_valid_cells(
+		GridTargeting.get_tool_cells(origin, facing, stage)
+	)
+
+func get_selected_item_name() -> String:
+	var stack := inventory.get_selected_stack()
+	if stack == null or stack.is_empty():
+		return "Vazio"
+	return stack.item.display_name
+
+func _primary_action_pressed() -> void:
+	var stack := inventory.get_selected_stack()
+	if stack == null or stack.is_empty():
+		feedback_requested.emit("Slot vazio.")
 		return
 
+	match stack.item.kind:
+		ItemDefinition.ItemKind.TOOL:
+			tools.select_tool(stack.item.tool_type)
+			tools.begin_charge()
+		ItemDefinition.ItemKind.SEED:
+			_plant_selected_seed(stack)
+		_:
+			feedback_requested.emit("%s ainda nao possui uso direto." % stack.item.display_name)
+
+func _primary_action_released() -> void:
+	if tools.is_charging:
+		_release_tool()
+
+func _release_tool() -> void:
 	var result := tools.release_charge()
 	if result.is_empty() or farm_field == null:
 		return
@@ -106,7 +169,12 @@ func _release_tool() -> void:
 		feedback_requested.emit("Energia insuficiente.")
 		return
 
+	if tool == ToolController.ToolType.WATERING_CAN and not tools.can_spend_water(stage):
+		feedback_requested.emit("O regador esta sem agua suficiente.")
+		return
+
 	var affected := 0
+
 	match tool:
 		ToolController.ToolType.HOE:
 			affected = farm_field.apply_hoe(cells)
@@ -119,6 +187,31 @@ func _release_tool() -> void:
 
 	energy.spend(energy_cost)
 
+	if tool == ToolController.ToolType.WATERING_CAN:
+		tools.spend_water(stage)
+
+	_flash_cells(cells)
+
+func _plant_selected_seed(stack: InventorySlotData) -> void:
+	if farm_field == null or stack.item.crop_to_plant == null:
+		return
+
+	var target := _get_front_cell()
+	if not farm_field.is_valid_cell(target):
+		feedback_requested.emit("Nao da para plantar aqui.")
+		return
+
+	if not farm_field.can_plant(target):
+		feedback_requested.emit(farm_field.get_cell_hint(target))
+		return
+
+	if not farm_field.plant_crop(target, stack.item.crop_to_plant):
+		return
+
+	inventory.remove_item(stack.item.id, 1)
+	feedback_requested.emit("Plantou %s." % stack.item.crop_to_plant.display_name)
+	_flash_cells([target])
+
 func _interact() -> void:
 	for node in get_tree().get_nodes_in_group("sleep_spot"):
 		var sleep_spot := node as SleepSpot
@@ -128,17 +221,104 @@ func _interact() -> void:
 				feedback_requested.emit(sleep_message)
 				return
 
+	for node in get_tree().get_nodes_in_group("water_source"):
+		var water_source := node as WaterSource
+		if water_source != null and water_source.can_interact(global_position):
+			var water_message := water_source.interact(self)
+			if not water_message.is_empty():
+				feedback_requested.emit(water_message)
+				return
+
 	if farm_field == null:
 		return
 
-	var origin := farm_field.world_to_cell(global_position)
-	var target_cells := GridTargeting.get_tool_cells(origin, facing, 0)
-	if target_cells.is_empty():
+	var target := _get_front_cell()
+	if not farm_field.is_valid_cell(target):
 		return
 
-	var message := farm_field.interact_cell(target_cells[0])
-	if not message.is_empty():
-		feedback_requested.emit(message)
+	if farm_field.can_harvest(target):
+		var cell_data := farm_field.get_cell(target)
+		if cell_data == null or cell_data.crop == null:
+			return
+
+		var harvest_item := inventory.get_definition(cell_data.crop.harvest_item_id)
+		if harvest_item == null:
+			feedback_requested.emit("Item de colheita nao registrado.")
+			return
+
+		if not inventory.can_add_item(harvest_item, 1):
+			feedback_requested.emit("Inventario cheio.")
+			return
+
+		var harvest := farm_field.harvest_cell(target)
+		if harvest.is_empty():
+			return
+
+		var amount := int(harvest["amount"])
+		inventory.add_item(harvest_item, amount)
+		feedback_requested.emit("Colheu %s x%d." % [harvest_item.display_name, amount])
+		_flash_cells([target])
+		return
+
+	feedback_requested.emit(farm_field.get_cell_hint(target))
+
+func _seed_starting_inventory() -> void:
+	var hoe := inventory.get_definition(&"hoe")
+	var watering_can := inventory.get_definition(&"watering_can")
+	var seeds := inventory.get_definition(&"starter_turnip_seed")
+
+	if hoe != null:
+		inventory.seed_slot(0, hoe, 1)
+	if watering_can != null:
+		inventory.seed_slot(1, watering_can, 1)
+	if seeds != null:
+		inventory.seed_slot(2, seeds, starting_seed_amount)
+
+func _sync_selected_item() -> void:
+	var stack := inventory.get_selected_stack()
+	if stack != null and not stack.is_empty() and stack.item.kind == ItemDefinition.ItemKind.TOOL:
+		tools.select_tool(stack.item.tool_type)
+	else:
+		tools.cancel_charge()
+	queue_redraw()
+
+func _on_selected_slot_changed(_index: int) -> void:
+	_sync_selected_item()
+
+func _get_front_cell() -> Vector2i:
+	var origin := farm_field.world_to_cell(global_position)
+	var cells := GridTargeting.get_tool_cells(origin, facing, 0)
+	return cells[0] if not cells.is_empty() else origin
+
+func _flash_cells(cells: Array[Vector2i]) -> void:
+	_action_flash_cells = cells.duplicate()
+	_action_flash_time = 0.16
+	queue_redraw()
+
+func _hotbar_index_from_key(keycode: Key) -> int:
+	match keycode:
+		KEY_1:
+			return 0
+		KEY_2:
+			return 1
+		KEY_3:
+			return 2
+		KEY_4:
+			return 3
+		KEY_5:
+			return 4
+		KEY_6:
+			return 5
+		KEY_7:
+			return 6
+		KEY_8:
+			return 7
+		KEY_9:
+			return 8
+		KEY_0:
+			return 9
+		_:
+			return -1
 
 func _read_movement_input() -> Vector2:
 	var direction := Vector2.ZERO
@@ -168,7 +348,8 @@ func _on_day_started(_day: int) -> void:
 
 func _draw() -> void:
 	_draw_player()
-	_draw_tool_preview()
+	_draw_target_preview()
+	_draw_action_flash()
 
 func _draw_player() -> void:
 	draw_circle(Vector2(0, -13), 8.0, Color(0.94, 0.78, 0.59))
@@ -179,13 +360,22 @@ func _draw_player() -> void:
 	var facing_line := Vector2(facing) * 18.0
 	draw_line(Vector2.ZERO, facing_line, Color(1.0, 0.93, 0.47), 2.0)
 
-func _draw_tool_preview() -> void:
+func _draw_target_preview() -> void:
 	if farm_field == null:
 		return
 
+	var stack := inventory.get_selected_stack()
+	if stack == null or stack.is_empty():
+		return
+
 	var preview_color := Color(0.75, 0.48, 0.22, 0.30)
-	if tools.selected_tool == ToolController.ToolType.WATERING_CAN:
+
+	if stack.item.kind == ItemDefinition.ItemKind.SEED:
+		preview_color = Color(0.55, 0.86, 0.32, 0.30)
+	elif stack.item.kind == ItemDefinition.ItemKind.TOOL and stack.item.tool_type == ToolController.ToolType.WATERING_CAN:
 		preview_color = Color(0.29, 0.69, 1.0, 0.30)
+	elif stack.item.kind != ItemDefinition.ItemKind.TOOL:
+		return
 
 	for cell in get_target_cells():
 		var center_global := farm_field.cell_to_world(cell)
@@ -194,3 +384,11 @@ func _draw_tool_preview() -> void:
 		var rect := Rect2(center_local - size * 0.5, size)
 		draw_rect(rect, preview_color, true)
 		draw_rect(rect, preview_color.lightened(0.35), false, 2.0)
+
+func _draw_action_flash() -> void:
+	if farm_field == null or _action_flash_time <= 0.0:
+		return
+
+	for cell in _action_flash_cells:
+		var center_local := to_local(farm_field.cell_to_world(cell))
+		draw_circle(center_local, 8.0, Color(1.0, 1.0, 1.0, 0.45))
