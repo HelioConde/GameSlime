@@ -56,6 +56,10 @@ shape = SubResource("WorldVerticalBoundary")
 position = Vector2(4176, 360)
 shape = SubResource("WorldVerticalBoundary")
 
+[node name="FarmEast" type="CollisionShape2D" parent="WorldBounds"]
+position = Vector2(1280, 360)
+shape = SubResource("WorldVerticalBoundary")
+
 [node name="Farmhouse" parent="." instance=ExtResource("10_house")]
 position = Vector2(380, 185)
 
