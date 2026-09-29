@@ -109,3 +109,23 @@ func _advance_calendar() -> void:
 		year_changed.emit(year)
 
 	season_changed.emit(year, season_index)
+
+func get_save_data() -> Dictionary:
+	return {
+		"day": day,
+		"minute_of_day": minute_of_day,
+		"year": year,
+		"season_index": season_index,
+		"day_of_season": day_of_season,
+	}
+
+func load_save_data(data: Dictionary) -> void:
+	day = maxi(int(data.get("day", 1)), 1)
+	minute_of_day = int(data.get("minute_of_day", START_MINUTE))
+	year = maxi(int(data.get("year", 1)), 1)
+	season_index = clampi(int(data.get("season_index", Season.SPRING)), Season.SPRING, Season.WINTER)
+	day_of_season = clampi(int(data.get("day_of_season", 1)), 1, DAYS_PER_SEASON)
+	_accumulator = 0.0
+
+	time_changed.emit(day, get_hour(), get_minute())
+	calendar_changed.emit(year, season_index, day_of_season)
