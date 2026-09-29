@@ -13,7 +13,16 @@ func _check(condition: bool, message: String) -> void:
 		_failures.append(message)
 
 func _run() -> void:
-	SaveManager.delete_save()
+	var save_manager = root.get_node_or_null("SaveManager")
+	var game_clock = root.get_node_or_null("GameClock")
+
+	_check(save_manager != null, "SaveManager autoload exists")
+	_check(game_clock != null, "GameClock autoload exists")
+	if save_manager == null or game_clock == null:
+		_finish()
+		return
+
+	save_manager.delete_save()
 
 	var packed := load("res://scenes/world/main.tscn") as PackedScene
 	_check(packed != null, "main scene loads")
@@ -72,23 +81,23 @@ func _run() -> void:
 			_check(player.global_position == entrance.target_position, "mine opens at pickaxe level 1")
 			_check(entered_message.contains("entrou"), "mine confirms entry")
 
-	var old_day := GameClock.day
-	GameClock.sleep_and_start_next_day()
+	var old_day := int(game_clock.day)
+	game_clock.sleep_and_start_next_day()
 	await process_frame
 	await process_frame
 
-	_check(GameClock.day == old_day + 1, "day rollover advances exactly one day")
-	_check(SaveManager.has_save(), "day rollover creates autosave")
+	_check(int(game_clock.day) == old_day + 1, "day rollover advances exactly one day")
+	_check(save_manager.has_save(), "day rollover creates autosave")
 
 	# Create a second save so the first one becomes the backup, then corrupt
 	# the primary file. load_game() must recover from the backup.
-	_check(SaveManager.save_game(), "second save succeeds and creates backup")
+	_check(save_manager.save_game(), "second save succeeds and creates backup")
 	var corrupt_file := FileAccess.open("user://savegame.json", FileAccess.WRITE)
 	_check(corrupt_file != null, "primary save can be opened for corruption test")
 	if corrupt_file != null:
 		corrupt_file.store_string("{corrupted")
 		corrupt_file.close()
-	_check(SaveManager.load_game(), "corrupt primary save falls back to backup")
+	_check(save_manager.load_game(), "corrupt primary save falls back to backup")
 
 	for node in patches:
 		var patch := node as DailyResourcePatch
@@ -101,7 +110,7 @@ func _run() -> void:
 				"daily resource exists before autosave: %s" % resource_name
 			)
 
-	SaveManager.delete_save()
+	save_manager.delete_save()
 	main.queue_free()
 	await process_frame
 	_finish()
