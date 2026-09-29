@@ -347,6 +347,29 @@ func _run() -> void:
 						_check(save_manager.load_game(), "repeated farm load succeeds")
 						_check(player.global_position.is_equal_approx(farm_save_position), "repeated farm load preserves position")
 
+				# Reaching 02:00 in a mine must pass out and return the player home tired.
+				player.global_position = Vector2(3700.0, 360.0)
+				player.energy.set_current_energy(25.0)
+				var passout_day := int(game_clock.day)
+				game_clock.minute_of_day = GameClock.END_MINUTE - 10
+				game_clock.advance_minutes(10)
+				await get_tree().process_frame
+				await get_tree().process_frame
+				_check(int(game_clock.day) == passout_day + 1, "02:00 passout advances to next day")
+				_check(game_clock.last_transition_was_passout, "02:00 rollover is marked as passout")
+				_check(player.global_position.is_equal_approx(player.morning_spawn_position), "passout returns player to morning spawn")
+				_check(
+					is_equal_approx(player.energy.current_energy, player.energy.maximum_energy * player.passout_energy_ratio),
+					"passout restores only configured partial energy"
+				)
+				_check(save_manager.has_save(), "passout day rollover keeps autosave valid")
+
+				game_clock.sleep_and_start_next_day()
+				await get_tree().process_frame
+				await get_tree().process_frame
+				_check(not game_clock.last_transition_was_passout, "voluntary sleep is not marked as passout")
+				_check(is_equal_approx(player.energy.current_energy, player.energy.maximum_energy), "voluntary sleep restores full energy")
+
 	var old_day := int(game_clock.day)
 	game_clock.sleep_and_start_next_day()
 	await get_tree().process_frame
