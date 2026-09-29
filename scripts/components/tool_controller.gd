@@ -161,3 +161,20 @@ func _stage_for_elapsed(elapsed: float) -> int:
 			break
 
 	return result
+
+func get_save_data() -> Dictionary:
+	return {
+		"hoe_level": hoe_level,
+		"watering_can_level": watering_can_level,
+		"axe_level": axe_level,
+		"pickaxe_level": pickaxe_level,
+		"current_water": current_water,
+	}
+
+func load_save_data(data: Dictionary) -> void:
+	hoe_level = clampi(int(data.get("hoe_level", hoe_level)), 0, 5)
+	watering_can_level = clampi(int(data.get("watering_can_level", watering_can_level)), 0, 5)
+	axe_level = clampi(int(data.get("axe_level", axe_level)), 0, 5)
+	pickaxe_level = clampi(int(data.get("pickaxe_level", pickaxe_level)), 0, 5)
+	current_water = clampi(int(data.get("current_water", get_water_capacity())), 0, get_water_capacity())
+	water_changed.emit(current_water, get_water_capacity())
