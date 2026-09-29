@@ -19,6 +19,14 @@ func interact(player: PlayerController) -> String:
 	if player == null or not can_interact(player.global_position):
 		return ""
 
+	var habitat := _find_habitat()
+	if habitat != null and not habitat.can_register():
+		return "%s esta cheio (%d/%d)." % [
+			habitat.habitat_name,
+			habitat.registered_slimes.size(),
+			habitat.capacity,
+		]
+
 	var candidates := _get_nearby_eligible_slimes()
 	if candidates.size() < 2:
 		return "Ninho: precisa de 2 slimes adultos e bem cuidados por perto."
@@ -44,6 +52,13 @@ func interact(player: PlayerController) -> String:
 		child.display_name,
 		child.get_genetics_text(),
 	]
+
+func _find_habitat() -> SlimeHabitat:
+	for node in get_tree().get_nodes_in_group("slime_habitat"):
+		var habitat := node as SlimeHabitat
+		if habitat != null and habitat.contains_position(global_position):
+			return habitat
+	return null
 
 func _get_nearby_eligible_slimes() -> Array[SlimeCreature]:
 	var result: Array[SlimeCreature] = []
