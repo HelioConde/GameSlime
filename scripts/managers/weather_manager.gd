@@ -40,6 +40,9 @@ func get_weather_name() -> String:
 func _on_day_started(_day: int) -> void:
 	_roll_weather_for_current_day()
 
+func refresh_for_current_day() -> void:
+	_roll_weather_for_current_day()
+
 func _roll_weather_for_current_day() -> void:
 	if GameClock.day == 1:
 		_set_weather(Weather.CLEAR)
