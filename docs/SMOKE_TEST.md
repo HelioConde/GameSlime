@@ -275,3 +275,39 @@ Execute `scenes/world/main.tscn`.
 6. Acerte pedra/cobre com Picareta e confirme particulas na cor do recurso.
 7. No golpe que destrui o recurso, confirme burst maior.
 8. Confirme que os efeitos somem sozinhos e nao deixam nodes permanentes.
+
+
+## 30. Mina Rasa / Ferro
+1. Com Picareta Nv.0, interaja com a entrada da Mina Rasa.
+2. Confirme bloqueio informando que precisa Picareta Nv.1.
+3. Melhore a Picareta para Nv.1 por 200g + 5 Cobre.
+4. Entre novamente e confirme teleporte imediato da camera.
+5. Confirme HUD "Mina Rasa" com nivel da Picareta e contagem de Fe/Ag/Au.
+6. Em dia de chuva/neve, confirme que o efeito climatico nao aparece dentro da mina.
+7. Quebre Ferro com Picareta Nv.1 e confirme 4 Minerios de Ferro por veio.
+8. Quebre um veio, salve/reabra no mesmo dia e confirme que continua destruido.
+9. Durma e confirme que a jazida diaria de Ferro se recompõe.
+10. Use a saida e confirme retorno a fazenda.
+
+## 31. Mina Profunda / Prata
+1. Com Picareta Nv.1, tente entrar na Mina Profunda a partir da Mina Rasa.
+2. Confirme requisito Picareta Nv.2.
+3. Upgrade Nv.2: 450g + 10 Cobre + 5 Ferro.
+4. Entre na Mina Profunda.
+5. Confirme HUD identificando "Mina Profunda".
+6. Quebre Prata com Picareta Nv.2 e confirme 3 Minerios de Prata por veio.
+7. Confirme persistencia de veios destruidos no save do mesmo dia.
+8. Durma e confirme recomposicao diaria da Prata.
+9. Confirme que Picareta Nv.1 nao quebra veio de Prata.
+
+## 32. Mina Abissal / Ouro / progressao final
+1. Com Picareta Nv.2, tente entrar na Mina Abissal.
+2. Confirme requisito Picareta Nv.3.
+3. Upgrade Nv.3: 900g + 15 Cobre + 10 Ferro + 5 Prata.
+4. Entre na Mina Abissal e confirme HUD correto.
+5. Quebre Ouro com Picareta Nv.3 e confirme 3 Minerios de Ouro por veio.
+6. Upgrade Nv.4: 1800g + 25 Cobre + 15 Ferro + 10 Prata + 5 Ouro.
+7. Produza pelo menos 2 Cristais de Slime no Cristalizador.
+8. Upgrade Nv.5: 3500g + 40 Cobre + 25 Ferro + 20 Prata + 10 Ouro + 2 Cristais de Slime.
+9. Confirme que o upgrade falha sem qualquer um dos materiais sem consumir os demais.
+10. Confirme ferramenta no Nv.5 apos pagamento completo.
