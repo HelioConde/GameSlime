@@ -10,6 +10,11 @@ extends Resource
 @export_range(0, 14, 1) var sprite_row: int = 0
 @export var harvest_item_id: StringName = &"starter_turnip"
 
+@export_group("Harvest")
+@export_range(1, 99, 1) var harvest_min: int = 1
+@export_range(1, 99, 1) var harvest_max: int = 1
+@export_range(0, 28, 1) var regrow_days: int = 0
+
 @export_group("Season")
 @export var grows_in_spring: bool = true
 @export var grows_in_summer: bool = false
@@ -40,3 +45,16 @@ func get_season_names() -> String:
 	if grows_in_winter:
 		names.append("Inverno")
 	return ", ".join(names)
+
+func get_harvest_amount(day_seed: int, cell: Vector2i) -> int:
+	var minimum := mini(harvest_min, harvest_max)
+	var maximum := maxi(harvest_min, harvest_max)
+	if minimum == maximum:
+		return minimum
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(day_seed * 104729 + cell.x * 92821 + cell.y * 68917 + hash(String(id)))
+	return rng.randi_range(minimum, maximum)
+
+func regrows_after_harvest() -> bool:
+	return regrow_days > 0
