@@ -7,6 +7,7 @@ enum ItemKind {
 	CROP,
 	MATERIAL,
 	FOOD,
+	FERTILIZER,
 }
 
 enum IconSheet {
@@ -32,6 +33,9 @@ enum IconSheet {
 
 @export_group("Consumable")
 @export_range(0, 999, 1) var energy_restore: int = 0
+
+@export_group("Farming")
+@export_range(0, 10, 1) var fertility_bonus: int = 0
 
 # Used only when kind == TOOL.
 @export var tool_type: int = -1
