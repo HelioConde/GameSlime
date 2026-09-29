@@ -12,6 +12,9 @@ const BACKUP_SAVE_PATH := "user://savegame.bak"
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 const SLIME_SCENE := preload("res://scenes/slimes/slime_creature.tscn")
 
+var last_successful_save_day: int = -1
+var last_successful_save_minute: int = -1
+
 func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH) or FileAccess.file_exists(BACKUP_SAVE_PATH)
 
@@ -63,6 +66,8 @@ func save_game() -> bool:
 		save_failed.emit("Nao foi possivel finalizar o save.")
 		return false
 
+	last_successful_save_day = GameClock.day
+	last_successful_save_minute = GameClock.minute_of_day
 	game_saved.emit(SAVE_PATH)
 	return true
 
@@ -116,8 +121,16 @@ func load_game() -> bool:
 		farm.load_save_data(farm_data)
 
 	_load_world_save_data(world_data, version)
+	last_successful_save_day = GameClock.day
+	last_successful_save_minute = GameClock.minute_of_day
 	game_loaded.emit(loaded_path)
 	return true
+
+func was_saved_at_current_clock() -> bool:
+	return (
+		last_successful_save_day == GameClock.day
+		and last_successful_save_minute == GameClock.minute_of_day
+	)
 
 func _read_save_dictionary(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
