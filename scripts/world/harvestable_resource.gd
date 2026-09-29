@@ -19,6 +19,8 @@ const FEEDBACK_BURST_SCENE := preload("res://scenes/vfx/world_feedback_burst.tsc
 @export_range(0, 5, 1) var minimum_tool_level: int = 0
 @export var drop_item_id: StringName = &"wood"
 @export_range(1, 99, 1) var drop_amount: int = 5
+@export_range(0, 99, 1) var drop_amount_min: int = 0
+@export_range(0, 99, 1) var drop_amount_max: int = 0
 @export var drop_tint: Color = Color(0.65, 0.39, 0.20)
 @export var hit_radius: float = 30.0
 
@@ -88,7 +90,25 @@ func _spawn_drop() -> void:
 
 	get_parent().call_deferred("add_child", drop)
 	drop.global_position = global_position + Vector2(0, 12)
-	drop.configure(drop_item_id, drop_amount, drop_tint)
+	drop.configure(drop_item_id, _get_drop_amount(), drop_tint)
+
+func _get_drop_amount() -> int:
+	if drop_amount_min <= 0 or drop_amount_max <= 0:
+		return drop_amount
+
+	var minimum := mini(drop_amount_min, drop_amount_max)
+	var maximum := maxi(drop_amount_min, drop_amount_max)
+	if minimum == maximum:
+		return minimum
+
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(
+		GameClock.day * 104729
+		+ roundi(global_position.x) * 92821
+		+ roundi(global_position.y) * 68917
+		+ hash(String(name))
+	)
+	return rng.randi_range(minimum, maximum)
 
 func _draw() -> void:
 	if visual != null and visual.texture != null:
