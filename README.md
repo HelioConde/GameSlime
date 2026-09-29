@@ -19,6 +19,25 @@ A fundacao segue os principios que fazem Stardew Valley funcionar bem:
 
 O objetivo nao e clonar Stardew Valley. O farming loop deve parecer familiar e forte; os slimes entram depois como o principal diferencial.
 
+## Prioridade atual: estabilizacao jogavel
+
+O desenvolvimento entrou em fase de estabilizacao.
+
+Regras atuais:
+- nenhuma expansao de slimes, breeding, genetica ou habitats
+- nenhuma feature grande ate o loop principal passar nos testes de regressao
+- prioridade para crash, softlock, save/load, perda/duplicacao de item, perda de Ouro e menus presos
+- regressao manual principal em `docs/PLAYABLE_REGRESSION.md`
+- CI executa parse, smoke da cena principal e regressao automatica de jogabilidade
+
+O save atual usa versao **6**, com:
+- migracao segura de saves v5
+- autosave tambem na virada natural das 02:00
+- respawn de jazidas concluido antes do autosave
+- gravacao via arquivo temporario
+- backup `.bak`
+- fallback automatico para backup se o save principal estiver corrompido
+
 ## Estado jogavel atual
 
 ### Fazenda
@@ -98,10 +117,10 @@ O repositorio possui GitHub Actions usando Godot 4.7.2 em modo headless para imp
 
 ## Proximo passo
 
-Completar o Marco 2 com upgrades compraveis, obstaculos que exigem nivel de ferramenta e mais feedback. Depois: calendario, estacoes, clima e save da virada do dia.
+Nao adicionar novos sistemas. Executar a campanha de regressao jogavel, corrigir os bugs encontrados e validar pelo menos 7 dias consecutivos sem crash, softlock ou perda de progresso.
 
 
-## Primeiro sistema de Slimes
+## Primeiro sistema de Slimes - congelado temporariamente
 
 A fundacao Stardew-first agora ja suporta o primeiro ciclo de criaturas:
 
