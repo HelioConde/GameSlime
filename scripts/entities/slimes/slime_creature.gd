@@ -46,6 +46,7 @@ var happiness: float
 var affection: float
 var age_days: int = 0
 var last_petted_day: int = -1
+var last_bred_day: int = -1
 
 var _home_position: Vector2
 var _wander_target: Vector2
@@ -160,9 +161,63 @@ func get_genetics_text() -> String:
 		gene_production,
 	]
 
+func can_breed() -> bool:
+	return (
+		age_days >= 3
+		and last_bred_day != GameClock.day
+		and satiety >= 60.0
+		and energy >= 50.0
+		and happiness >= 60.0
+		and affection >= 8.0
+	)
+
+func mark_bred() -> void:
+	last_bred_day = GameClock.day
+	satiety = maxf(satiety - 12.0, 0.0)
+	energy = maxf(energy - 18.0, 0.0)
+	happiness = minf(happiness + 3.0, 100.0)
+	needs_changed.emit(self)
+
+func configure_child_from_parents(parent_a: SlimeCreature, parent_b: SlimeCreature, seed_value: int) -> void:
+	var child_rng := RandomNumberGenerator.new()
+	child_rng.seed = seed_value
+
+	biological_sex = BiologicalSex.MALE if child_rng.randi_range(0, 1) == 0 else BiologicalSex.FEMALE
+	personality = parent_a.personality if child_rng.randf() < 0.5 else parent_b.personality
+
+	gene_size = _inherit_gene(parent_a.gene_size, parent_b.gene_size, child_rng)
+	gene_metabolism = _inherit_gene(parent_a.gene_metabolism, parent_b.gene_metabolism, child_rng)
+	gene_vitality = _inherit_gene(parent_a.gene_vitality, parent_b.gene_vitality, child_rng)
+	gene_production = clampf(
+		(parent_a.gene_production + parent_b.gene_production) * 0.5 + child_rng.randf_range(-0.05, 0.05),
+		0.75,
+		1.50
+	)
+
+	slime_color = parent_a.slime_color.lerp(parent_b.slime_color, child_rng.randf_range(0.38, 0.62))
+	slime_color.r = clampf(slime_color.r + child_rng.randf_range(-0.025, 0.025), 0.0, 1.0)
+	slime_color.g = clampf(slime_color.g + child_rng.randf_range(-0.025, 0.025), 0.0, 1.0)
+	slime_color.b = clampf(slime_color.b + child_rng.randf_range(-0.025, 0.025), 0.0, 1.0)
+
+	satiety = 82.0
+	energy = 88.0
+	happiness = 68.0
+	affection = 0.0
+	age_days = 0
+	last_petted_day = -1
+	last_bred_day = -1
+	_home_position = global_position
+	_choose_wander_target()
+	needs_changed.emit(self)
+	queue_redraw()
+
+func _inherit_gene(value_a: float, value_b: float, child_rng: RandomNumberGenerator) -> float:
+	return clampf((value_a + value_b) * 0.5 + child_rng.randf_range(-0.05, 0.05), 0.75, 1.35)
+
 func get_save_data() -> Dictionary:
 	return {
 		"node_name": String(name),
+		"display_name": display_name,
 		"slime_id": String(slime_id),
 		"position": [global_position.x, global_position.y],
 		"home_position": [_home_position.x, _home_position.y],
@@ -172,6 +227,7 @@ func get_save_data() -> Dictionary:
 		"affection": affection,
 		"age_days": age_days,
 		"last_petted_day": last_petted_day,
+		"last_bred_day": last_bred_day,
 		"biological_sex": biological_sex,
 		"personality": personality,
 		"gene_size": gene_size,
@@ -197,7 +253,9 @@ func load_save_data(data: Dictionary) -> void:
 	happiness = clampf(float(data.get("happiness", starting_happiness)), 0.0, 100.0)
 	affection = clampf(float(data.get("affection", starting_affection)), 0.0, 100.0)
 	age_days = maxi(int(data.get("age_days", 0)), 0)
+	display_name = str(data.get("display_name", display_name))
 	last_petted_day = int(data.get("last_petted_day", -1))
+	last_bred_day = int(data.get("last_bred_day", -1))
 	biological_sex = clampi(int(data.get("biological_sex", biological_sex)), BiologicalSex.MALE, BiologicalSex.FEMALE)
 	personality = clampi(int(data.get("personality", personality)), Personality.CURIOUS, Personality.SHY)
 	gene_size = clampf(float(data.get("gene_size", gene_size)), 0.75, 1.35)
