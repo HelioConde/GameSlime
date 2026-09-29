@@ -45,11 +45,34 @@
 - [x] drops fisicos
 - [x] coleta automatica por proximidade
 - [x] madeira e pedra integradas ao inventario
-- [x] upgrades de ferramenta com Ouro + Minerio de Cobre
+- [x] upgrades de ferramenta por tiers: Cobre -> Ferro -> Prata -> Ouro -> Cristal de Slime
 - [x] obstaculos que exigem nivel de ferramenta
-- [x] primeiro minerio: Cobre com jazida diaria
+- [x] Cobre com jazida diaria
+- [x] Ferro com jazida diaria
+- [x] Prata com jazida diaria
+- [x] Ouro com jazida diaria
 - [ ] feedback sonoro por material
 - [x] particulas de impacto
+
+
+## Marco 2B - exploracao e progressao da mina
+- [x] entrada de mina com requisito de Picareta
+- [x] teleporte entre areas sem trocar a cena principal
+- [x] camera acompanha as areas de mina
+- [x] clima externo oculto dentro das cavernas
+- [x] Mina Rasa - Picareta Nv.1
+- [x] Minerio de Ferro na Mina Rasa
+- [x] Mina Profunda - Picareta Nv.2
+- [x] Minerio de Prata na Mina Profunda
+- [x] Mina Abissal - Picareta Nv.3
+- [x] Minerio de Ouro na Mina Abissal
+- [x] HUD identifica area da mina e minérios carregados
+- [x] minérios da mina recompõem no novo dia
+- [x] save do mesmo dia preserva veios destruidos
+- [x] upgrade Nv.5 exige Cristal de Slime
+- [x] progressao manual de ferramenta Nv.0 -> Nv.5 fechada
+- [ ] andares procedurais / layout variavel
+- [ ] recompensas especiais de exploracao
 
 ## Marco 3 - calendario vivo
 - [x] 28 dias por estacao
