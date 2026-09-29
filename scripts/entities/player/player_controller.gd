@@ -25,6 +25,7 @@ signal shop_requested(shop: SeedShop)
 @export var tool_action_animation_fps: float = 10.0
 @export var morning_spawn_position: Vector2 = Vector2(640.0, 560.0)
 @export_range(0.1, 1.0, 0.05) var passout_energy_ratio: float = 0.65
+@export_range(0.5, 1.0, 0.05) var late_sleep_min_energy_ratio: float = 0.70
 @export_range(0.2, 1.0, 0.05) var exhausted_move_multiplier: float = 0.65
 
 @export_group("Starting Items")
@@ -173,8 +174,22 @@ func _on_energy_exhausted() -> void:
 	Sfx.play_cue(&"warning")
 	feedback_requested.emit("Voce esta exausto · coma algo ou durma para recuperar energia.")
 
+func get_sleep_energy_ratio(bedtime_minute: int) -> float:
+	const LATE_SLEEP_START := 24 * 60
+	if bedtime_minute <= LATE_SLEEP_START:
+		return 1.0
+
+	var clamped_bedtime := clampi(bedtime_minute, LATE_SLEEP_START, GameClock.END_MINUTE)
+	var late_progress := inverse_lerp(
+		float(LATE_SLEEP_START),
+		float(GameClock.END_MINUTE),
+		float(clamped_bedtime)
+	)
+	return lerpf(1.0, late_sleep_min_energy_ratio, late_progress)
+
 func restore_after_sleep() -> void:
-	energy.restore_full()
+	var ratio := get_sleep_energy_ratio(GameClock.last_day_end_minute)
+	energy.set_current_energy(energy.maximum_energy * ratio)
 
 func refill_watering_can() -> void:
 	tools.refill_water()
@@ -845,7 +860,7 @@ func _on_day_started(_day: int) -> void:
 		feedback_requested.emit("Voce desmaiou as 02:00 e acordou cansado.")
 		return
 
-	energy.restore_full()
+	restore_after_sleep()
 
 func _draw() -> void:
 	_draw_target_preview()
