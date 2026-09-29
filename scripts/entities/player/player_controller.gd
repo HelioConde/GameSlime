@@ -24,6 +24,7 @@ signal shop_requested(shop: SeedShop)
 @export var tool_action_animation_fps: float = 10.0
 @export var morning_spawn_position: Vector2 = Vector2(640.0, 560.0)
 @export_range(0.1, 1.0, 0.05) var passout_energy_ratio: float = 0.65
+@export_range(0.2, 1.0, 0.05) var exhausted_move_multiplier: float = 0.65
 
 @export_group("Starting Items")
 @export var starter_hoe_item: ItemDefinition
@@ -76,6 +77,8 @@ func _ready() -> void:
 		GameClock.day_started.connect(_on_day_started)
 
 	inventory.selected_slot_changed.connect(_on_selected_slot_changed)
+	if not energy.exhausted.is_connected(_on_energy_exhausted):
+		energy.exhausted.connect(_on_energy_exhausted)
 	_seed_starting_inventory()
 	call_deferred("_find_world_systems")
 	_sync_selected_item()
@@ -91,7 +94,7 @@ func _physics_process(delta: float) -> void:
 		if input_direction != Vector2.ZERO:
 			_update_facing(input_direction)
 
-		var speed_multiplier := charge_move_multiplier if tools.is_charging else 1.0
+		var speed_multiplier := get_movement_speed_multiplier()
 		var target_velocity := input_direction.normalized() * move_speed * speed_multiplier
 		var rate := acceleration if input_direction != Vector2.ZERO else deceleration
 		velocity = velocity.move_toward(target_velocity, rate * delta)
@@ -156,6 +159,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	else:
 		if event.physical_keycode == KEY_SPACE:
 			_primary_action_released()
+
+func get_movement_speed_multiplier() -> float:
+	var multiplier := charge_move_multiplier if tools.is_charging else 1.0
+	if energy.current_energy <= 0.0:
+		multiplier *= exhausted_move_multiplier
+	return multiplier
+
+func _on_energy_exhausted() -> void:
+	feedback_requested.emit("Voce esta exausto · coma algo ou durma para recuperar energia.")
 
 func restore_after_sleep() -> void:
 	energy.restore_full()
