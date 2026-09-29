@@ -18,7 +18,7 @@ size = Vector2(60, 30)
 script = ExtResource("1_shop")
 spring_seed_items = Array[Resource]([ExtResource("2_spring_a"), ExtResource("3_spring_b")])
 summer_seed_items = Array[Resource]([ExtResource("4_summer_a"), ExtResource("5_summer_b")])
-fall_seed_items = Array[Resource]([ExtResource("6_fall_a"), ExtResource("7_fall_b")])
+fall_seed_items = Array[Resource]([ExtResource("6_fall_a"), ExtResource("7_fall_b"), ExtResource("5_summer_b")])
 winter_seed_items = Array[Resource]([ExtResource("8_winter_a"), ExtResource("9_winter_b")])
 always_available_items = Array[Resource]([ExtResource("10_fertilizer")])
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
