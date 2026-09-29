@@ -1,12 +1,20 @@
 class_name SlimeHabitat
 extends Node2D
 
+enum HabitatBiome {
+	MEADOW,
+	GROVE,
+	WETLAND,
+	FROST,
+}
+
 signal slime_registered(slime: SlimeCreature)
 signal slime_unregistered(slime: SlimeCreature)
 
 @export var habitat_size: Vector2 = Vector2(300, 190)
 @export_range(1, 20, 1) var capacity: int = 6
 @export var habitat_name: String = "Habitat Verde"
+@export var biome_type: HabitatBiome = HabitatBiome.MEADOW
 
 var registered_slimes: Array[SlimeCreature] = []
 
@@ -68,7 +76,25 @@ func clamp_inside(world_position: Vector2, margin: float = 18.0) -> Vector2:
 	return to_global(local)
 
 func get_status_text() -> String:
-	return "%s · %d/%d slimes" % [habitat_name, registered_slimes.size(), capacity]
+	return "%s · %s · %d/%d slimes" % [
+		habitat_name,
+		get_biome_name(),
+		registered_slimes.size(),
+		capacity,
+	]
+
+func get_biome_name() -> String:
+	match biome_type:
+		HabitatBiome.MEADOW:
+			return "Prado"
+		HabitatBiome.GROVE:
+			return "Bosque"
+		HabitatBiome.WETLAND:
+			return "Umido"
+		HabitatBiome.FROST:
+			return "Gelado"
+		_:
+			return "Habitat"
 
 func _register_nearby_slimes() -> void:
 	for node in get_tree().get_nodes_in_group("slime_creature"):
