@@ -21,13 +21,16 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] quatro estacoes
 - [x] mudanca de ano
 - [x] calendario e eventos
+- [x] ciclo visual amanhecer/dia/entardecer/noite
+- [x] sono tardio reduz gradualmente a energia do dia seguinte
 - [x] autosave na virada do dia
 
 ## 3. Clima
 - [x] sol, nublado, chuva e neve
 - [x] clima deterministico por data
 - [x] previsao do dia seguinte
-- [x] chuva rega solo arado
+- [x] chuva rega solo arado e faz a cultura avancar normalmente
+- [x] clima altera pesos do forrageio diario
 - [x] clima externo oculto nas minas
 
 ## 4. Energia e alimentacao
@@ -67,6 +70,8 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] mesclar
 - [x] dividir stack
 - [x] organizar
+- [x] soltar 1 item ou stack no mundo
+- [x] ferramentas essenciais protegidas contra descarte
 - [x] selecao persistente
 - [x] save/load da ordem
 - [x] stacks de qualidades diferentes permanecem separados
@@ -89,6 +94,8 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 ## 8. Recursos naturais
 - [x] arvores destrutiveis
 - [x] pedras destrutiveis
+- [x] arvores e pedras naturais regeneram em ciclos semanais
+- [x] layout semanal deterministico com persistencia da destruicao no mesmo ciclo
 - [x] drops fisicos
 - [x] coleta automatica por proximidade
 - [x] rendimento variavel e deterministico de madeira/pedra
@@ -129,6 +136,7 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] itens de forrageio possuem valor de venda
 - [x] adubo vendido como insumo permanente
 - [x] qualidade Prata/Ouro aumenta valor da remessa
+- [x] stacks descartados preservam qualidade no mundo e no save
 
 ## 11. Minas
 - [x] Mina Rasa
@@ -168,6 +176,7 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] loja
 - [x] status de mina
 - [x] feedback de interacao
+- [x] feedback sonoro procedural para ferramentas, materiais e transacoes
 - [x] menus pausam o mundo
 - [x] fechamento restaura o tempo
 - [x] ESC fecha menus
@@ -189,6 +198,9 @@ Este documento define o que significa "base jogavel completa" antes de voltar a 
 - [x] fertilizante, qualidade e valor de venda
 - [x] desmaio as 02:00 e penalidade de exaustao
 - [x] ecologia persistente com expiracao/cap
+- [x] regeneracao semanal de arvores/pedras com save
+- [x] ciclo visual dia/noite
+- [x] descarte/recoleta preservando qualidade
 - [ ] campanha manual completa em gameplay real
 
 ## Fora da definicao de "mecanica basica v1"
