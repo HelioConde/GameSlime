@@ -33,6 +33,8 @@ const INVENTORY_SLOT_WIDGET := preload("res://scripts/ui/inventory_slot_widget.g
 @onready var shop_close_button: Button = $ShopPanel/Margin/Content/CloseButton
 @onready var machine_panel: PanelContainer = $MachinePanel
 @onready var machine_status: Label = $MachinePanel/Margin/Status
+@onready var mine_panel: PanelContainer = $MinePanel
+@onready var mine_status: Label = $MinePanel/Margin/Status
 
 var player: PlayerController
 var _feedback_time_left: float = 0.0
@@ -56,6 +58,7 @@ func _ready() -> void:
 	inventory_panel.visible = false
 	shop_panel.visible = false
 	machine_panel.visible = false
+	mine_panel.visible = false
 
 	inventory_organize_button.pressed.connect(_on_inventory_organize_pressed)
 	inventory_close_button.pressed.connect(_close_inventory)
@@ -94,6 +97,7 @@ func _process(delta: float) -> void:
 	_refresh_hotbar()
 	_refresh_nearby_slime()
 	_refresh_nearby_machine()
+	_refresh_mine_status()
 
 func _bind_player() -> void:
 	player = get_tree().get_first_node_in_group("player") as PlayerController
@@ -822,3 +826,26 @@ func _refresh_nearby_machine() -> void:
 
 	machine_panel.visible = true
 	machine_status.text = nearest.get_status_text()
+
+
+func _refresh_mine_status() -> void:
+	if player == null:
+		mine_panel.visible = false
+		return
+
+	var active_mine: MineArea = null
+	for node in get_tree().get_nodes_in_group("mine_area"):
+		var mine := node as MineArea
+		if mine != null and mine.contains_position(player.global_position):
+			active_mine = mine
+			break
+
+	if active_mine == null:
+		mine_panel.visible = false
+		return
+
+	mine_panel.visible = true
+	mine_status.text = "Mina Rasa · Picareta Nv.%d · Ferro: %d" % [
+		player.tools.get_tool_level(ToolController.ToolType.PICKAXE),
+		player.inventory.count_item(&"iron_ore"),
+	]
