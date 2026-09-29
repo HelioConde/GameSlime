@@ -62,3 +62,30 @@ offset_right = 920.0
 offset_bottom = 130.0
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
+
+[node name="CalendarPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 360.0
+offset_top = 150.0
+offset_right = 920.0
+offset_bottom = 520.0
+
+[node name="Margin" type="MarginContainer" parent="CalendarPanel"]
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="Content" type="VBoxContainer" parent="CalendarPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="CalendarPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="CalendarPanel/Margin/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
