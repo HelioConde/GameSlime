@@ -1,6 +1,18 @@
 class_name SlimeCreature
 extends CharacterBody2D
 
+enum BiologicalSex {
+	MALE,
+	FEMALE,
+}
+
+enum Personality {
+	CURIOUS,
+	CALM,
+	PLAYFUL,
+	SHY,
+}
+
 signal needs_changed(slime: SlimeCreature)
 signal affection_changed(slime: SlimeCreature, affection: float)
 signal product_created(slime: SlimeCreature, item_id: StringName, amount: int)
@@ -13,6 +25,14 @@ const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 @export var move_speed: float = 38.0
 @export var wander_radius: float = 110.0
 @export var interaction_radius: float = 48.0
+@export var biological_sex: BiologicalSex = BiologicalSex.MALE
+@export var personality: Personality = Personality.CURIOUS
+
+@export_group("Genetics")
+@export_range(0.75, 1.35, 0.01) var gene_size: float = 1.0
+@export_range(0.75, 1.35, 0.01) var gene_metabolism: float = 1.0
+@export_range(0.75, 1.35, 0.01) var gene_vitality: float = 1.0
+@export_range(0.75, 1.50, 0.01) var gene_production: float = 1.0
 
 @export_group("Needs")
 @export_range(0.0, 100.0, 0.1) var starting_satiety: float = 82.0
@@ -84,21 +104,60 @@ func interact(player: PlayerController) -> String:
 		return "%s ja recebeu carinho hoje. Afeto %.0f%%" % [display_name, affection]
 
 	last_petted_day = GameClock.day
-	affection = minf(affection + 4.0, 100.0)
-	happiness = minf(happiness + 6.0, 100.0)
+	var affection_gain := 4.0
+	var happiness_gain := 6.0
+
+	match personality:
+		Personality.PLAYFUL:
+			affection_gain = 6.0
+			happiness_gain = 9.0
+		Personality.SHY:
+			affection_gain = 2.5
+			happiness_gain = 4.0
+		Personality.CALM:
+			happiness_gain = 5.0
+
+	affection = minf(affection + affection_gain, 100.0)
+	happiness = minf(happiness + happiness_gain, 100.0)
 	affection_changed.emit(self, affection)
 	needs_changed.emit(self)
 
 	return "Voce fez carinho em %s. Afeto %.0f%%" % [display_name, affection]
 
 func get_status_text() -> String:
-	return "%s · Fome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
+	return "%s · %s · %s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
 		display_name,
+		get_sex_name(),
+		get_personality_name(),
 		satiety,
 		energy,
 		happiness,
 		affection,
 		age_days,
+	]
+
+func get_personality_name() -> String:
+	match personality:
+		Personality.CURIOUS:
+			return "Curioso"
+		Personality.CALM:
+			return "Calmo"
+		Personality.PLAYFUL:
+			return "Brincalhao"
+		Personality.SHY:
+			return "Timido"
+		_:
+			return "Slime"
+
+func get_sex_name() -> String:
+	return "Macho" if biological_sex == BiologicalSex.MALE else "Femea"
+
+func get_genetics_text() -> String:
+	return "Tam %.2f · Met %.2f · Vit %.2f · Prod %.2f" % [
+		gene_size,
+		gene_metabolism,
+		gene_vitality,
+		gene_production,
 	]
 
 func get_save_data() -> Dictionary:
@@ -113,6 +172,13 @@ func get_save_data() -> Dictionary:
 		"affection": affection,
 		"age_days": age_days,
 		"last_petted_day": last_petted_day,
+		"biological_sex": biological_sex,
+		"personality": personality,
+		"gene_size": gene_size,
+		"gene_metabolism": gene_metabolism,
+		"gene_vitality": gene_vitality,
+		"gene_production": gene_production,
+		"slime_color": [slime_color.r, slime_color.g, slime_color.b, slime_color.a],
 	}
 
 func load_save_data(data: Dictionary) -> void:
@@ -132,6 +198,22 @@ func load_save_data(data: Dictionary) -> void:
 	affection = clampf(float(data.get("affection", starting_affection)), 0.0, 100.0)
 	age_days = maxi(int(data.get("age_days", 0)), 0)
 	last_petted_day = int(data.get("last_petted_day", -1))
+	biological_sex = clampi(int(data.get("biological_sex", biological_sex)), BiologicalSex.MALE, BiologicalSex.FEMALE)
+	personality = clampi(int(data.get("personality", personality)), Personality.CURIOUS, Personality.SHY)
+	gene_size = clampf(float(data.get("gene_size", gene_size)), 0.75, 1.35)
+	gene_metabolism = clampf(float(data.get("gene_metabolism", gene_metabolism)), 0.75, 1.35)
+	gene_vitality = clampf(float(data.get("gene_vitality", gene_vitality)), 0.75, 1.35)
+	gene_production = clampf(float(data.get("gene_production", gene_production)), 0.75, 1.50)
+
+	var saved_color: Array = data.get("slime_color", [])
+	if saved_color.size() >= 4:
+		slime_color = Color(
+			float(saved_color[0]),
+			float(saved_color[1]),
+			float(saved_color[2]),
+			float(saved_color[3])
+		)
+
 	_choose_wander_target()
 	needs_changed.emit(self)
 	queue_redraw()
@@ -149,7 +231,18 @@ func _tick_wander(delta: float) -> void:
 		return
 
 	var direction := global_position.direction_to(_wander_target)
-	velocity = direction * move_speed
+	var personality_speed := 1.0
+	match personality:
+		Personality.CURIOUS:
+			personality_speed = 1.12
+		Personality.CALM:
+			personality_speed = 0.82
+		Personality.PLAYFUL:
+			personality_speed = 1.18
+		Personality.SHY:
+			personality_speed = 0.90
+
+	velocity = direction * move_speed * personality_speed
 
 func _choose_wander_target() -> void:
 	var angle := _rng.randf_range(0.0, TAU)
@@ -164,10 +257,10 @@ func _feed() -> void:
 	affection_changed.emit(self, affection)
 
 func _on_time_changed(_day: int, _hour: int, _minute: int) -> void:
-	satiety = maxf(satiety - 0.18, 0.0)
+	satiety = maxf(satiety - (0.18 * gene_metabolism), 0.0)
 
 	if velocity.length_squared() > 1.0:
-		energy = maxf(energy - 0.10, 0.0)
+		energy = maxf(energy - (0.10 / gene_vitality), 0.0)
 	else:
 		energy = minf(energy + 0.03, 100.0)
 
@@ -180,7 +273,7 @@ func _on_time_changed(_day: int, _hour: int, _minute: int) -> void:
 
 func _on_day_started(_day: int) -> void:
 	age_days += 1
-	energy = minf(energy + 32.0, 100.0)
+	energy = minf(energy + (32.0 * gene_vitality), 100.0)
 
 	if satiety >= 55.0 and happiness >= 55.0:
 		_create_daily_product()
@@ -194,16 +287,19 @@ func _create_daily_product() -> void:
 
 	get_parent().add_child(drop)
 	drop.global_position = global_position + Vector2(_rng.randf_range(-12.0, 12.0), 12.0)
-	drop.configure(&"slime_gel", 1, slime_color)
-	product_created.emit(self, &"slime_gel", 1)
+	var amount := 2 if gene_production >= 1.20 else 1
+	drop.configure(&"slime_gel", amount, slime_color)
+	product_created.emit(self, &"slime_gel", amount)
 
 func _draw() -> void:
 	var squash := sin(_bounce_time * 4.0) * 1.2
-	var body_y := 14.0 - squash
+	var body_y := (14.0 - squash) * gene_size
+	var side_offset := 8.0 * gene_size
+	var lobe_radius := 8.5 * gene_size
 
 	draw_circle(Vector2(0, 2 + squash), body_y, slime_color)
-	draw_circle(Vector2(-8, -4 + squash), 8.5, slime_color.lightened(0.05))
-	draw_circle(Vector2(8, -4 + squash), 8.5, slime_color.lightened(0.05))
+	draw_circle(Vector2(-side_offset, -4 + squash), lobe_radius, slime_color.lightened(0.05))
+	draw_circle(Vector2(side_offset, -4 + squash), lobe_radius, slime_color.lightened(0.05))
 
 	draw_circle(Vector2(-5, -3 + squash), 2.0, Color(0.06, 0.08, 0.07))
 	draw_circle(Vector2(5, -3 + squash), 2.0, Color(0.06, 0.08, 0.07))
