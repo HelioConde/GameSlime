@@ -105,6 +105,38 @@ Regra:
 9. Avancar para estacao incompatível e confirmar murcha.
 10. Confirmar que a banca muda para sementes da nova estacao.
 
+## Sessao J - qualidade, descarte e feedback
+1. Adubar um tile vazio antes de plantar e confirmar preview marrom.
+2. Tentar adubar uma planta ja existente e confirmar bloqueio com mensagem clara.
+3. Colher planta adubada e confirmar qualidade Prata/Ouro visivel no inventario.
+4. Confirmar que stacks Normal/Prata/Ouro nao se misturam.
+5. Enviar Prata/Ouro pela caixa e conferir valor maior que a qualidade Normal.
+6. Soltar um item com Q e um stack com Shift+Q.
+7. Confirmar que o item nao volta instantaneamente para o inventario.
+8. Confirmar anel visual Prata/Ouro no item no chao.
+9. Salvar/reabrir com item de qualidade no chao e confirmar qualidade preservada.
+10. Tentar soltar ferramenta essencial e confirmar bloqueio.
+11. Ouvir diferenca entre enxada/regador/machado/picareta, madeira/pedra e confirmacoes.
+
+## Sessao K - tempo, luz e energia
+1. Observar transicao visual 06:00 -> manha -> tarde -> entardecer -> noite.
+2. Entrar na mina a noite e confirmar que o tint externo nao escurece a caverna novamente.
+3. Dormir antes da meia-noite e confirmar energia completa.
+4. Dormir depois da meia-noite e confirmar energia parcial proporcional ao horario.
+5. Permanecer acordado ate 02:00 e confirmar retorno para casa com 65% de energia.
+6. Zerar energia e confirmar movimento mais lento.
+7. Comer um forrageavel e confirmar que a velocidade normal retorna ao recuperar energia.
+
+## Sessao L - regeneracao natural
+1. Conferir duas arvores e duas pedras naturais adicionais no mapa novo.
+2. Derrubar/quebrar uma delas, salvar e reabrir no mesmo ciclo semanal.
+3. Confirmar que o recurso destruido nao reaparece no load.
+4. Avancar sete dias e confirmar renovacao do conjunto natural.
+5. Confirmar que recursos remanescentes do ciclo anterior sao renovados sem dano parcial.
+6. Confirmar que o layout semanal e consistente ao recarregar a mesma data.
+7. Conferir que os forrageaveis nao coletados persistem ate expirar e nunca passam do limite global.
+8. Em chuva, observar maior presenca de forrageio umido/cogumelos; em neve, maior peso de raizes.
+
 ## Criterio para liberar novas features
 O jogo precisa completar:
 - 7 dias seguidos
