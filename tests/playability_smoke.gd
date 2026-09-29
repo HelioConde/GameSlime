@@ -15,10 +15,12 @@ func _check(condition: bool, message: String) -> void:
 func _run() -> void:
 	var save_manager = get_tree().root.get_node_or_null("SaveManager")
 	var game_clock = get_tree().root.get_node_or_null("GameClock")
+	var economy = get_tree().root.get_node_or_null("Economy")
 
 	_check(save_manager != null, "SaveManager autoload exists")
 	_check(game_clock != null, "GameClock autoload exists")
-	if save_manager == null or game_clock == null:
+	_check(economy != null, "Economy autoload exists")
+	if save_manager == null or game_clock == null or economy == null:
 		_finish()
 		return
 
@@ -65,6 +67,14 @@ func _run() -> void:
 				"daily resource spawned: %s" % resource_name
 			)
 
+	var hud := main.get_node_or_null("GameHUD")
+	_check(hud != null, "game HUD exists")
+	if hud != null:
+		hud.call("_toggle_inventory")
+		_check(get_tree().paused, "inventory pauses the game")
+		hud.call("_close_all_menus")
+		_check(not get_tree().paused, "closing menus resumes the game")
+
 	if player != null:
 		var entrance := main.get_node_or_null("MineEntrance") as WorldTransition
 		_check(entrance != null, "shallow mine entrance exists")
@@ -109,6 +119,31 @@ func _run() -> void:
 				main.has_node(NodePath(resource_name)),
 				"daily resource exists before autosave: %s" % resource_name
 			)
+
+	if player != null:
+		var shop := main.get_node_or_null("SeedShop") as SeedShop
+		_check(shop != null, "seed shop exists")
+		if shop != null:
+			var offers := shop.get_current_offers()
+			_check(not offers.is_empty(), "seasonal shop has offers")
+			if not offers.is_empty():
+				var stone := player.inventory.get_definition(&"stone")
+				_check(stone != null, "stone definition available for full-inventory test")
+				if stone != null:
+					for index in range(player.inventory.slots.size()):
+						player.inventory.seed_slot(index, stone, stone.max_stack)
+
+					var gold_before := int(economy.gold)
+					var offer := offers[0] as ItemDefinition
+					var purchase_message := shop.purchase(player, offer.id, 1)
+					_check(
+						int(economy.gold) == gold_before,
+						"full inventory purchase does not spend gold"
+					)
+					_check(
+						purchase_message.contains("sem espaco"),
+						"full inventory purchase explains why it failed"
+					)
 
 	save_manager.delete_save()
 	main.queue_free()
