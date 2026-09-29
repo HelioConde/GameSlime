@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -16,6 +16,8 @@
 [ext_resource type="PackedScene" path="res://scenes/slimes/slime_creature.tscn" id="14_slime"]
 [ext_resource type="PackedScene" path="res://scenes/slimes/slime_breeding_nest.tscn" id="15_nest"]
 [ext_resource type="PackedScene" path="res://scenes/slimes/slime_habitat.tscn" id="16_habitat"]
+[ext_resource type="PackedScene" path="res://scenes/world/shipping_bin.tscn" id="17_shipping"]
+[ext_resource type="PackedScene" path="res://scenes/world/seed_shop.tscn" id="18_shop"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -26,6 +28,12 @@ position = Vector2(380, 185)
 
 [node name="ToolUpgradeStation" parent="." instance=ExtResource("11_upgrade")]
 position = Vector2(520, 180)
+
+[node name="ShippingBin" parent="." instance=ExtResource("17_shipping")]
+position = Vector2(330, 295)
+
+[node name="SeedShop" parent="." instance=ExtResource("18_shop")]
+position = Vector2(330, 360)
 
 [node name="FarmField" parent="." instance=ExtResource("3_farm")]
 position = Vector2(448, 240)
