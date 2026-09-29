@@ -9,7 +9,10 @@ const WILD_MUSHROOM: ItemDefinition = preload("res://resources/items/wild_mushro
 const WILD_ROOT: ItemDefinition = preload("res://resources/items/wild_root.tres")
 const WOOD: ItemDefinition = preload("res://resources/items/wood.tres")
 const STONE: ItemDefinition = preload("res://resources/items/stone.tres")
-const STARTER_SEED: ItemDefinition = preload("res://resources/items/starter_turnip_seed.tres")
+const SPRING_SEED: ItemDefinition = preload("res://resources/items/starter_turnip_seed.tres")
+const SUMMER_SEED: ItemDefinition = preload("res://resources/items/summer_tomato_seed.tres")
+const FALL_SEED: ItemDefinition = preload("res://resources/items/fall_pumpkin_seed.tres")
+const WINTER_SEED: ItemDefinition = preload("res://resources/items/winter_root_seed.tres")
 
 const MIN_DAILY_SPAWNS := 4
 const MAX_DAILY_SPAWNS := 7
@@ -122,22 +125,22 @@ func _pick_item_for_season(rng: RandomNumberGenerator) -> ItemDefinition:
 		GameClock.Season.SPRING:
 			pool = [
 				WILD_FLOWER, WILD_FLOWER, WILD_BERRY,
-				WOOD, STONE, STARTER_SEED,
+				WOOD, STONE, SPRING_SEED,
 			]
 		GameClock.Season.SUMMER:
 			pool = [
 				WILD_BERRY, WILD_BERRY, WILD_FLOWER,
-				WOOD, STONE,
+				WOOD, STONE, SUMMER_SEED,
 			]
 		GameClock.Season.FALL:
 			pool = [
 				WILD_MUSHROOM, WILD_MUSHROOM, WILD_BERRY,
-				WOOD, STONE,
+				WOOD, STONE, FALL_SEED,
 			]
 		GameClock.Season.WINTER:
 			pool = [
 				WILD_ROOT, WILD_ROOT, STONE,
-				WOOD,
+				WOOD, WINTER_SEED,
 			]
 		_:
 			pool = [WOOD, STONE]
