@@ -204,10 +204,26 @@ func get_cell_hint(cell: Vector2i) -> String:
 			return "Solo adubado · selecione uma semente."
 		return "Selecione uma semente na hotbar."
 	if data.ready_to_harvest:
-		return "Pronto para colher."
+		return "%s esta pronto para colher." % data.crop.display_name
+
+	var remaining_days := maxi(data.crop.growth_days - data.growth_days_completed, 0)
+	var day_word := "dia" if remaining_days == 1 else "dias"
+	var fertilizer_text := " · adubado" if data.fertility_bonus > 0 else ""
+
 	if not data.watered_today:
-		return "A planta precisa de agua hoje."
-	return "%s esta crescendo." % data.crop.display_name
+		return "%s precisa de agua · faltam %d %s%s." % [
+			data.crop.display_name,
+			remaining_days,
+			day_word,
+			fertilizer_text,
+		]
+
+	return "%s crescendo · faltam %d %s%s." % [
+		data.crop.display_name,
+		remaining_days,
+		day_word,
+		fertilizer_text,
+	]
 
 func _on_season_changed(_year: int, new_season: int) -> void:
 	var withered := 0
