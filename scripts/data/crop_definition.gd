@@ -53,7 +53,7 @@ func get_harvest_amount(day_seed: int, cell: Vector2i) -> int:
 		return minimum
 
 	var rng := RandomNumberGenerator.new()
-	rng.seed = int(day_seed * 104729 + cell.x * 92821 + cell.y * 68917 + hash(String(id)))
+	rng.seed = int(day_seed * 104729 + cell.x * 92821 + cell.y * 68917 + String(id).hash())
 	return rng.randi_range(minimum, maximum)
 
 func regrows_after_harvest() -> bool:
