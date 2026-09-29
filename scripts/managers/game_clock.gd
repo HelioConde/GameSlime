@@ -28,6 +28,7 @@ var day_of_season: int = 1
 
 var _accumulator: float = 0.0
 var last_transition_was_passout: bool = false
+var last_day_end_minute: int = START_MINUTE
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -85,6 +86,7 @@ func get_date_text() -> String:
 
 func _finish_day(was_passout: bool = false) -> void:
 	last_transition_was_passout = was_passout
+	last_day_end_minute = minute_of_day
 	day_ended.emit(day)
 
 	day += 1
@@ -129,6 +131,7 @@ func load_save_data(data: Dictionary) -> void:
 	day_of_season = clampi(int(data.get("day_of_season", 1)), 1, DAYS_PER_SEASON)
 	_accumulator = 0.0
 	last_transition_was_passout = false
+	last_day_end_minute = START_MINUTE
 
 	time_changed.emit(day, get_hour(), get_minute())
 	calendar_changed.emit(year, season_index, day_of_season)
