@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/main_world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/rock_resource.tscn" id="8_rock"]
 [ext_resource type="PackedScene" path="res://scenes/ui/weather_fx.tscn" id="9_weather"]
 [ext_resource type="PackedScene" path="res://scenes/world/farmhouse.tscn" id="10_house"]
+[ext_resource type="PackedScene" path="res://scenes/world/tool_upgrade_station.tscn" id="11_upgrade"]
 
 [node name="Main" type="Node2D"]
 texture_filter = 1
@@ -17,6 +18,9 @@ script = ExtResource("1_world")
 
 [node name="Farmhouse" parent="." instance=ExtResource("10_house")]
 position = Vector2(380, 185)
+
+[node name="ToolUpgradeStation" parent="." instance=ExtResource("11_upgrade")]
+position = Vector2(520, 180)
 
 [node name="FarmField" parent="." instance=ExtResource("3_farm")]
 position = Vector2(448, 240)
