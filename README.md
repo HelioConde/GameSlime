@@ -156,3 +156,23 @@ Precos iniciais de balanceamento:
 - Minerio de Cobre: 12g
 
 Esses valores ainda sao de balanceamento inicial e podem mudar conforme o loop de progressao crescer.
+
+
+## Inventario completo
+
+A hotbar de 12 slots agora possui uma interface completa aberta com `I`:
+
+- grade 4x3
+- o jogo pausa enquanto o inventario esta aberto
+- clique seleciona o mesmo slot usado pela hotbar
+- drag-and-drop entre slots
+- merge automatico de stacks iguais
+- troca de itens diferentes
+- divisao de stack por clique direito em origem e destino vazio
+- botao Organizar stacks para juntar duplicatas e compactar espacos
+- detalhes do item selecionado
+- preco de compra/venda quando existir
+- nivel para ferramentas
+- cultura, tempo de crescimento e estacao para sementes
+
+A ordem dos slots continua sendo a propria ordem salva pelo inventario; nao existe um inventario paralelo apenas para a interface.
