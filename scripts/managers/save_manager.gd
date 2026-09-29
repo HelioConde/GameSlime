@@ -5,7 +5,7 @@ signal game_saved(path: String)
 signal game_loaded(path: String)
 signal save_failed(message: String)
 
-const SAVE_VERSION := 5
+const SAVE_VERSION := 6
 const SAVE_PATH := "user://savegame.json"
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 const SLIME_SCENE := preload("res://scenes/slimes/slime_creature.tscn")
@@ -87,7 +87,7 @@ func load_game() -> bool:
 	if farm != null:
 		farm.load_save_data(farm_data)
 
-	_load_world_save_data(world_data)
+	_load_world_save_data(world_data, version)
 	game_loaded.emit(SAVE_PATH)
 	return true
 
@@ -136,13 +136,18 @@ func _get_world_save_data() -> Dictionary:
 		"processors": processors,
 	}
 
-func _load_world_save_data(data: Dictionary) -> void:
+func _load_world_save_data(data: Dictionary, save_version: int = SAVE_VERSION) -> void:
 	for node in get_tree().get_nodes_in_group("daily_resource_patch"):
 		var patch := node as DailyResourcePatch
 		if patch != null:
 			patch.ensure_resources()
 
-	_load_resource_state(data)
+	# Saves v5 were created before the complete mine/resource catalog existed.
+	# Applying their old alive-resource whitelist would delete every resource
+	# added later. For the one-time v5 -> v6 migration, keep scene resources
+	# intact; the next autosave writes a complete v6 snapshot.
+	if save_version >= 6:
+		_load_resource_state(data)
 	_load_slime_state(data)
 	_load_processor_state(data)
 	_load_drop_state(data)
