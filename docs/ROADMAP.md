@@ -24,9 +24,16 @@
 - [x] bloqueio de colheita quando inventario esta cheio
 - [x] feedback visual simples de acao
 - [x] CI Godot 4.7.2
-- [ ] sprites e animacoes reais do player
+- [x] sprite real do player
+- [x] animacao direcional do player
+- [ ] animacoes de uso das ferramentas
 - [ ] feedback sonoro
 - [ ] particulas finais
+- [x] agua animada com Sprout Lands
+- [x] plantacoes usando atlas real
+- [x] arvore e pedra usando sprites reais
+- [x] grama e solo arado usando tiles reais
+- [x] hotbar visual com icones de ferramentas
 - [ ] painel completo de inventario
 - [ ] drag-and-drop de slots
 
