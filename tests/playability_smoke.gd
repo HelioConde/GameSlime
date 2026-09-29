@@ -80,6 +80,16 @@ func _run() -> void:
 	_check(GameClock.day == old_day + 1, "day rollover advances exactly one day")
 	_check(SaveManager.has_save(), "day rollover creates autosave")
 
+	# Create a second save so the first one becomes the backup, then corrupt
+	# the primary file. load_game() must recover from the backup.
+	_check(SaveManager.save_game(), "second save succeeds and creates backup")
+	var corrupt_file := FileAccess.open("user://savegame.json", FileAccess.WRITE)
+	_check(corrupt_file != null, "primary save can be opened for corruption test")
+	if corrupt_file != null:
+		corrupt_file.store_string("{corrupted")
+		corrupt_file.close()
+	_check(SaveManager.load_game(), "corrupt primary save falls back to backup")
+
 	for node in patches:
 		var patch := node as DailyResourcePatch
 		if patch == null:
