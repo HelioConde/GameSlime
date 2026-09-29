@@ -69,6 +69,7 @@ func _ready() -> void:
 
 	GameClock.time_changed.connect(_on_time_changed)
 	GameClock.day_started.connect(_on_day_started)
+	call_deferred("_register_discovery")
 	queue_redraw()
 
 func _physics_process(delta: float) -> void:
@@ -82,6 +83,9 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	queue_redraw()
+
+func _register_discovery() -> void:
+	SlimeDiscovery.register_slime(self)
 
 func can_interact(player_position: Vector2) -> bool:
 	return global_position.distance_to(player_position) <= interaction_radius
@@ -211,6 +215,7 @@ func configure_child_from_parents(parent_a: SlimeCreature, parent_b: SlimeCreatu
 	_home_position = global_position
 	_choose_wander_target()
 	needs_changed.emit(self)
+	SlimeDiscovery.register_slime(self)
 	queue_redraw()
 
 func _inherit_gene(value_a: float, value_b: float, child_rng: RandomNumberGenerator) -> float:
@@ -276,6 +281,7 @@ func load_save_data(data: Dictionary) -> void:
 
 	_choose_wander_target()
 	needs_changed.emit(self)
+	SlimeDiscovery.register_slime(self)
 	queue_redraw()
 
 func _tick_wander(delta: float) -> void:
