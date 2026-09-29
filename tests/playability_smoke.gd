@@ -641,6 +641,35 @@ func _run() -> void:
 				break
 		_check(has_summer_seed, "seed shop switches to summer offers")
 
+	# Multi-season crops must survive a compatible season boundary.
+	if farm != null:
+		var corn_crop := load("res://resources/crops/summer_corn.tres") as CropDefinition
+		var corn_cell := Vector2i(4, 2)
+		farm.apply_hoe([corn_cell])
+		_check(corn_crop != null and corn_crop.can_grow_in_season(GameClock.Season.FALL), "corn supports summer and fall")
+		if corn_crop != null:
+			_check(farm.plant_crop(corn_cell, corn_crop), "multi-season corn can be planted in summer")
+			game_clock.load_save_data({
+				"day": 56,
+				"minute_of_day": GameClock.START_MINUTE,
+				"year": 1,
+				"season_index": GameClock.Season.SUMMER,
+				"day_of_season": 28,
+			})
+			game_clock.sleep_and_start_next_day()
+			await get_tree().process_frame
+			await get_tree().process_frame
+			_check(game_clock.season_index == GameClock.Season.FALL, "summer day 28 advances to fall")
+			_check(farm.get_cell(corn_cell).crop == corn_crop, "compatible multi-season crop survives season change")
+			if seasonal_shop != null:
+				var fall_offers := seasonal_shop.get_current_offers()
+				var has_fall_corn_seed := false
+				for offer in fall_offers:
+					if offer != null and offer.id == &"summer_corn_seed":
+						has_fall_corn_seed = true
+						break
+				_check(has_fall_corn_seed, "fall shop keeps multi-season corn seed available")
+
 	game_clock.load_save_data({
 		"day": 112,
 		"minute_of_day": GameClock.START_MINUTE,
