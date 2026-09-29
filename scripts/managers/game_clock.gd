@@ -41,7 +41,7 @@ func sleep_and_start_next_day() -> void:
 	_finish_day()
 
 func get_hour() -> int:
-	var raw_hour := minute_of_day / 60
+	var raw_hour: int = int(floor(float(minute_of_day) / 60.0))
 	return raw_hour % 24
 
 func get_minute() -> int:
