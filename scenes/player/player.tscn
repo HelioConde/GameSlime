@@ -100,5 +100,5 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 limit_left = 0
 limit_top = 0
-limit_right = 1280
+limit_right = 2360
 limit_bottom = 720
