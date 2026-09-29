@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/game_hud.gd" id="1_hud"]
+
+[node name="GameHUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="StatusPanel" type="PanelContainer" parent="."]
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 255.0
+offset_bottom = 112.0
+
+[node name="Margin" type="MarginContainer" parent="StatusPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Status" type="Label" parent="StatusPanel/Margin"]
+layout_mode = 2
+text = "Carregando..."
+
+[node name="HelpPanel" type="PanelContainer" parent="."]
+offset_left = 18.0
+offset_top = 650.0
+offset_right = 1262.0
+offset_bottom = 702.0
+
+[node name="Margin" type="MarginContainer" parent="HelpPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Help" type="Label" parent="HelpPanel/Margin"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Feedback" type="Label" parent="."]
+offset_left = 400.0
+offset_top = 92.0
+offset_right = 880.0
+offset_bottom = 130.0
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
