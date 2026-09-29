@@ -358,6 +358,10 @@ func _refresh_bestiary_panel() -> void:
 				float(record.get("gene_production", 1.0)),
 			])
 
+			var rarity_reasons := str(record.get("rarity_reasons", ""))
+			if not rarity_reasons.is_empty():
+				lines.append("  Motivos: %s" % rarity_reasons)
+
 	lines.append("")
 	lines.append("Descobertas geneticas:")
 	if traits.is_empty():
