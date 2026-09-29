@@ -28,6 +28,7 @@ Regras atuais:
 - nenhuma feature grande ate o loop principal passar nos testes de regressao
 - prioridade para crash, softlock, save/load, perda/duplicacao de item, perda de Ouro e menus presos
 - regressao manual principal em `docs/PLAYABLE_REGRESSION.md`
+- mapa completo da base v1 em `docs/BASIC_MECHANICS.md`
 - CI executa parse, smoke da cena principal e regressao automatica de jogabilidade
 
 O save atual usa versao **6**, com:
