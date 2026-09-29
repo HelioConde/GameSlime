@@ -221,3 +221,19 @@ A maquina:
 - segura o produto pronto se o inventario estiver cheio
 
 Isso inaugura a progressao `produto cru -> produto artesanal` sem automatizar a fazenda.
+
+
+## Feedback visual de acoes
+
+Foi adicionado um sistema leve de particulas desenhadas em codigo, sem shaders ou assets adicionais:
+
+- Enxada: poeira marrom
+- Regador: respingos azuis
+- Plantio: burst verde
+- Colheita: particulas baseadas na cor do produto
+- Machado/Picareta: impacto baseado na cor do recurso
+- destruicao de arvore/pedra/minerio: burst maior
+
+Os efeitos sao nodes temporarios que se removem automaticamente. O sistema funciona em Godot 4.7.2 e passou pelo smoke test headless.
+
+Feedback sonoro continua aberto porque o repositorio atual nao contem arquivos de audio apropriados; nenhum som generico foi adicionado apenas para preencher o checklist.
