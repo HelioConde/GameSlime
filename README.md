@@ -237,3 +237,52 @@ Foi adicionado um sistema leve de particulas desenhadas em codigo, sem shaders o
 Os efeitos sao nodes temporarios que se removem automaticamente. O sistema funciona em Godot 4.7.2 e passou pelo smoke test headless.
 
 Feedback sonoro continua aberto porque o repositorio atual nao contem arquivos de audio apropriados; nenhum som generico foi adicionado apenas para preencher o checklist.
+
+
+## Mina e progressao completa de ferramentas
+
+A primeira estrutura de exploracao da mina foi adicionada na mesma cena do mundo para manter a arquitetura simples nesta etapa. As areas sao isoladas por colisao e conectadas por passagens que exigem nivel de Picareta.
+
+### Mina Rasa
+- desbloqueio: Picareta Nv.1
+- recurso principal: Minerio de Ferro
+- 4 Ferro por veio
+- Ferro vende por 30g
+
+### Mina Profunda
+- desbloqueio: Picareta Nv.2
+- recurso principal: Minerio de Prata
+- 3 Prata por veio
+- Prata vende por 55g
+
+### Mina Abissal
+- desbloqueio: Picareta Nv.3
+- recurso principal: Minerio de Ouro
+- 3 Ouro por veio
+- Ouro vende por 90g
+
+Cada mina:
+- possui limites fisicos
+- tem entrada/saida propria
+- oculta chuva/neve enquanto o jogador esta dentro
+- mostra area atual e contagem de Fe/Ag/Au no HUD
+- possui jazida diaria
+- preserva veios quebrados ao carregar um save do mesmo dia
+- recompõe a jazida somente na virada do dia
+
+### Custos das ferramentas
+
+| Upgrade | Ouro | Cobre | Ferro | Prata | Minerio de Ouro | Cristal de Slime |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Nv.0 -> 1 | 200g | 5 | 0 | 0 | 0 | 0 |
+| Nv.1 -> 2 | 450g | 10 | 5 | 0 | 0 | 0 |
+| Nv.2 -> 3 | 900g | 15 | 10 | 5 | 0 | 0 |
+| Nv.3 -> 4 | 1800g | 25 | 15 | 10 | 5 | 0 |
+| Nv.4 -> 5 | 3500g | 40 | 25 | 20 | 10 | 2 |
+
+O ultimo nivel conecta os tres loops centrais do jogo:
+- agricultura/economia para gerar Ouro
+- mineracao para Cobre/Ferro/Prata/Ouro
+- criacao de slimes e processamento para Cristais de Slime
+
+Isso fecha a progressao manual de ferramentas antes de qualquer automacao.
