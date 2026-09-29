@@ -1,5 +1,26 @@
 # Roadmap - Stardew-first
 
+## Marco 0 - estabilizacao jogavel (PRIORIDADE ATUAL)
+- [x] congelar expansao de slimes temporariamente
+- [x] CI Godot 4.7.2 com parse + smoke da cena
+- [x] teste automatico de jogabilidade basica
+- [x] corrigir respawn de jazidas antes do autosave
+- [x] autosave tambem na virada natural das 02:00
+- [x] fallback jogavel quando save esta ausente/invalido
+- [x] migracao segura de saves v5 para v6
+- [ ] campanha de testes manuais sem slimes
+- [ ] validar 7 dias consecutivos sem softlock
+- [ ] validar save/load repetido em fazenda e minas
+- [ ] validar inventario cheio em compra/colheita/coleta
+- [ ] validar todos os menus e ESC sem prender o jogo
+- [ ] validar economia sem duplicacao/perda de itens
+- [ ] validar Minas Rasa/Profunda/Abissal ida e volta
+- [ ] corrigir bugs encontrados antes de qualquer feature nova
+
+Regra deste marco:
+**nenhuma feature grande e nenhuma expansao de slime ate o loop principal passar nos testes de estabilidade.**
+
+
 ## Marco 1 - sensacao de jogo e agricultura basica
 - [x] movimento do player
 - [x] facing cardinal
@@ -104,7 +125,7 @@
 - [x] primeiro processamento manual de produtos
 - [x] primeiro produto artesanal: Cristal de Slime
 
-## Marco 4 - slimes como identidade central
+## Marco 4 - slimes como identidade central (CONGELADO)
 - [x] slime base
 - [x] fome
 - [x] humor
@@ -117,7 +138,7 @@
 - [x] habitat
 - [x] producao de recursos
 
-## Marco 5 - breeding e descobertas
+## Marco 5 - breeding e descobertas (CONGELADO)
 - [x] reproducao controlada no ninho
 - [x] heranca dos pais
 - [x] mutacoes por ambiente
