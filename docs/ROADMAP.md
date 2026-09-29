@@ -78,8 +78,8 @@
 - [x] jazida de Cobre se recompõe no novo dia
 - [x] ferreiro consome Ouro + Cobre
 - [x] menu de loja com multiplos produtos por estacao
-- [ ] processamento de produtos
-- [ ] produtos artesanais
+- [x] primeiro processamento manual de produtos
+- [x] primeiro produto artesanal: Cristal de Slime
 
 ## Marco 4 - slimes como identidade central
 - [x] slime base
