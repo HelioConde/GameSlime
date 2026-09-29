@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/slimes/slime_worker.gd" id="1_slime"]
+
+[sub_resource type="CircleShape2D" id="CircleShape_slime"]
+radius = 14.0
+
+[node name="SlimeWorker" type="CharacterBody2D"]
+script = ExtResource("1_slime")
+collision_layer = 2
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape_slime")
