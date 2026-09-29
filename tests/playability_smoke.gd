@@ -50,6 +50,23 @@ func _run() -> void:
 	_check(player != null, "player exists")
 	_check(farm != null, "farm exists")
 
+	var day_night_tint := main.get_node_or_null("DayNightTint") as CanvasModulate
+	_check(day_night_tint != null, "outdoor day-night tint exists")
+	if day_night_tint != null:
+		var midday_color: Color = main.call("get_daylight_color", 12 * 60)
+		var night_color: Color = main.call("get_daylight_color", 23 * 60)
+		var midday_light := midday_color.r + midday_color.g + midday_color.b
+		var night_light := night_color.r + night_color.g + night_color.b
+		_check(night_light < midday_light, "night lighting is darker than midday")
+		if player != null:
+			var lighting_original_position := player.global_position
+			player.global_position = Vector2(3700.0, 360.0)
+			main.call("_process", 0.0)
+			_check(not day_night_tint.visible, "outdoor day-night tint is disabled inside mines")
+			player.global_position = lighting_original_position
+			main.call("_process", 0.0)
+			_check(day_night_tint.visible, "outdoor day-night tint returns on farm")
+
 	var world_spawner := main.get_node_or_null("WorldSpawnManager") as WorldSpawnManager
 	_check(world_spawner != null, "world spawn manager exists")
 	if world_spawner != null:
