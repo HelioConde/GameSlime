@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_definition.gd" id="1_item"]
+[ext_resource type="Resource" path="res://resources/crops/summer_corn.tres" id="2_crop"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"summer_corn_seed"
+display_name = "Semente de Milho Dourado"
+kind = 1
+max_stack = 99
+tint = Color(0.86, 0.68, 0.18, 1)
+buy_price = 50
+sell_price = 25
+crop_to_plant = ExtResource("2_crop")
