@@ -120,6 +120,7 @@ func _run() -> void:
 		_check(player.inventory.get_definition(&"wild_berry") != null, "wild berry definition registered")
 		_check(player.inventory.get_definition(&"wild_mushroom") != null, "wild mushroom definition registered")
 		_check(player.inventory.get_definition(&"wild_root") != null, "wild root definition registered")
+		_check(player.inventory.get_definition(&"basic_fertilizer") != null, "basic fertilizer definition registered")
 
 		var forage_food := player.inventory.get_definition(&"wild_berry")
 		if forage_food != null:
@@ -161,6 +162,39 @@ func _run() -> void:
 		_check(player.energy.spend(2.0), "tool energy can be spent")
 		_check(is_equal_approx(player.energy.current_energy, 8.0), "energy spends exact tool cost")
 		player.energy.restore_full()
+
+	if player != null and farm != null:
+		var fertilizer := player.inventory.get_definition(&"basic_fertilizer")
+		var starter_crop := player.starter_seed_item.crop_to_plant
+		_check(fertilizer != null, "fertilizer is available to player inventory catalog")
+		if fertilizer != null and starter_crop != null:
+			var fertilizer_cell := Vector2i(8, 4)
+			farm.apply_hoe([fertilizer_cell])
+			player.inventory.seed_slot(10, fertilizer, 1)
+			player.inventory.set_selected_slot(10)
+			player.global_position = farm.cell_to_world(fertilizer_cell) - Vector2(farm.cell_size, 0)
+			player.facing = Vector2i.RIGHT
+			player.call("_primary_action_pressed")
+			var fertilized_data := farm.get_cell(fertilizer_cell)
+			_check(fertilized_data.fertility_bonus == fertilizer.fertility_bonus, "fertilizer applies configured soil bonus")
+			_check(player.inventory.count_item(&"basic_fertilizer") == 0, "fertilizer use consumes exactly one item")
+			_check(farm.plant_crop(fertilizer_cell, starter_crop), "crop can be planted on fertilized soil")
+			fertilized_data.ready_to_harvest = true
+			fertilized_data.growth_days_completed = starter_crop.growth_days
+			fertilized_data.crop_stage = starter_crop.visual_stages
+			var base_fertilized_yield := starter_crop.get_harvest_amount(game_clock.day, fertilizer_cell)
+			_check(
+				farm.get_harvest_amount(fertilizer_cell) == base_fertilized_yield + fertilizer.fertility_bonus,
+				"fertilizer increases harvest by exact configured bonus"
+			)
+			_check(save_manager.save_game(), "fertilized soil save succeeds")
+			fertilized_data.fertility_bonus = 0
+			_check(save_manager.load_game(), "fertilized soil reload succeeds")
+			fertilized_data = farm.get_cell(fertilizer_cell)
+			_check(fertilized_data.fertility_bonus == fertilizer.fertility_bonus, "fertilizer survives save and load")
+			var fertilizer_harvest := farm.harvest_cell(fertilizer_cell)
+			_check(not fertilizer_harvest.is_empty(), "fertilized crop harvest succeeds")
+			_check(farm.get_cell(fertilizer_cell).fertility_bonus == 0, "single-cycle crop clears fertilizer after harvest")
 
 	var patches := get_tree().get_nodes_in_group("daily_resource_patch")
 	_check(patches.size() >= 4, "daily resource patches exist")
@@ -333,6 +367,12 @@ func _run() -> void:
 		if shop != null:
 			var offers := shop.get_current_offers()
 			_check(not offers.is_empty(), "seasonal shop has offers")
+			var has_fertilizer_offer := false
+			for shop_offer in offers:
+				if shop_offer != null and shop_offer.id == &"basic_fertilizer":
+					has_fertilizer_offer = true
+					break
+			_check(has_fertilizer_offer, "seed shop always offers basic fertilizer")
 			if not offers.is_empty():
 				var stone := player.inventory.get_definition(&"stone")
 				_check(stone != null, "stone definition available for full-inventory test")
