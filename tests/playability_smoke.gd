@@ -266,6 +266,17 @@ func _run() -> void:
 			_check(int(fertilizer_harvest.get("quality", -1)) == fertilized_quality, "harvest returns deterministic fertilizer quality")
 			_check(farm.get_cell(fertilizer_cell).fertility_bonus == 0, "single-cycle crop clears fertilizer after harvest")
 
+			var planted_without_fertilizer := Vector2i(7, 5)
+			farm.apply_hoe([planted_without_fertilizer])
+			_check(
+				farm.plant_crop(planted_without_fertilizer, starter_crop),
+				"unfertilized crop can be planted for fertilizer-order test"
+			)
+			_check(
+				not farm.can_fertilize(planted_without_fertilizer),
+				"fertilizer cannot be applied retroactively after planting"
+			)
+
 		var recovery_cell := Vector2i(9, 5)
 		farm.apply_hoe([recovery_cell])
 		var recovery_data := farm.get_cell(recovery_cell)
@@ -438,7 +449,20 @@ func _run() -> void:
 				await get_tree().process_frame
 				await get_tree().process_frame
 				_check(not game_clock.last_transition_was_passout, "voluntary sleep is not marked as passout")
-				_check(is_equal_approx(player.energy.current_energy, player.energy.maximum_energy), "voluntary sleep restores full energy")
+				_check(is_equal_approx(player.energy.current_energy, player.energy.maximum_energy), "early voluntary sleep restores full energy")
+
+				player.energy.set_current_energy(10.0)
+				game_clock.minute_of_day = 25 * 60
+				var expected_late_ratio := player.get_sleep_energy_ratio(game_clock.minute_of_day)
+				game_clock.sleep_and_start_next_day()
+				await get_tree().process_frame
+				await get_tree().process_frame
+				_check(expected_late_ratio < 1.0, "sleep after midnight has reduced recovery ratio")
+				_check(expected_late_ratio > player.passout_energy_ratio, "late sleep remains better than 02:00 passout")
+				_check(
+					is_equal_approx(player.energy.current_energy, player.energy.maximum_energy * expected_late_ratio),
+					"late voluntary sleep applies gradual energy penalty"
+				)
 
 	var old_day := int(game_clock.day)
 	game_clock.sleep_and_start_next_day()
