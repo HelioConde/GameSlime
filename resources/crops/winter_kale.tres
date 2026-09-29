@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CropDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/crop_definition.gd" id="1_crop"]
+
+[resource]
+script = ExtResource("1_crop")
+id = &"winter_kale"
+display_name = "Couve de Neve"
+growth_days = 5
+visual_stages = 4
+sell_value = 52
+crop_color = Color(0.46, 0.76, 0.68, 1)
+sprite_row = 13
+harvest_item_id = &"winter_kale"
+grows_in_spring = false
+grows_in_summer = false
+grows_in_fall = false
+grows_in_winter = true
