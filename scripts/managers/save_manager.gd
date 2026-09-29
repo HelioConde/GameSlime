@@ -54,31 +54,38 @@ func load_game() -> bool:
 		save_failed.emit("Save invalido.")
 		return false
 
-	var data := parsed as Dictionary
+	var data: Dictionary = parsed
 	if int(data.get("version", 0)) != SAVE_VERSION:
-		save_failed.emit("Versao de save incompatível.")
+		save_failed.emit("Versao de save incompativel.")
 		return false
 
-	GameClock.load_save_data(data.get("clock", {}) as Dictionary)
+	var clock_data: Dictionary = data.get("clock", {})
+	var player_data: Dictionary = data.get("player", {})
+	var farm_data: Dictionary = data.get("farm", {})
+	var world_data: Dictionary = data.get("world", {})
+
+	GameClock.load_save_data(clock_data)
 	WeatherManager.refresh_for_current_day()
 
 	var player := get_tree().get_first_node_in_group("player") as PlayerController
 	var farm := get_tree().get_first_node_in_group("farm_field") as FarmField
 
 	if player != null:
-		player.load_save_data(data.get("player", {}) as Dictionary)
+		player.load_save_data(player_data)
 
 	if farm != null:
-		farm.load_save_data(data.get("farm", {}) as Dictionary)
+		farm.load_save_data(farm_data)
 
-	_load_world_save_data(data.get("world", {}) as Dictionary)
+	_load_world_save_data(world_data)
 	game_loaded.emit(SAVE_PATH)
 	return true
 
 func delete_save() -> bool:
 	if not has_save():
 		return true
-	return DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH)) == OK
+
+	var absolute_path := ProjectSettings.globalize_path(SAVE_PATH)
+	return DirAccess.remove_absolute(absolute_path) == OK
 
 func _get_world_save_data() -> Dictionary:
 	var alive_resources: Array[String] = []
@@ -100,5 +107,6 @@ func _load_world_save_data(data: Dictionary) -> void:
 	for node in get_tree().get_nodes_in_group("harvestable_resource"):
 		if not (node is HarvestableResource):
 			continue
+
 		if not alive_lookup.has(String(node.name)):
 			node.queue_free()
