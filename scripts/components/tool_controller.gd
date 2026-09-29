@@ -5,6 +5,7 @@ signal tool_changed(tool: int)
 signal charge_started
 signal charge_stage_changed(stage: int)
 signal charge_released(tool: int, stage: int)
+signal water_changed(current: int, maximum: int)
 
 enum ToolType {
 	HOE,
@@ -12,6 +13,8 @@ enum ToolType {
 }
 
 const CHARGE_THRESHOLDS := [0.0, 0.45, 0.90, 1.35, 1.80, 2.25]
+const WATER_CAPACITY_BY_LEVEL := [40, 55, 70, 85, 100, 130]
+const WATER_COST_BY_STAGE := [1, 2, 3, 4, 5, 6]
 
 @export_range(0, 5, 1) var hoe_level: int = 0
 @export_range(0, 5, 1) var watering_can_level: int = 0
@@ -20,6 +23,11 @@ var selected_tool: int = ToolType.HOE
 var is_charging: bool = false
 var charge_elapsed: float = 0.0
 var charge_stage: int = 0
+var current_water: int = 0
+
+func _ready() -> void:
+	current_water = get_water_capacity()
+	water_changed.emit(current_water, get_water_capacity())
 
 func select_tool(tool: int) -> void:
 	if is_charging:
@@ -88,6 +96,28 @@ func get_energy_cost(stage: int) -> float:
 			return 2.0 + float(clampi(stage, 0, 5)) * 2.0
 		_:
 			return 0.0
+
+func get_water_capacity() -> int:
+	return WATER_CAPACITY_BY_LEVEL[clampi(watering_can_level, 0, 5)]
+
+func get_water_cost(stage: int) -> int:
+	return WATER_COST_BY_STAGE[clampi(stage, 0, 5)]
+
+func can_spend_water(stage: int) -> bool:
+	return current_water >= get_water_cost(stage)
+
+func spend_water(stage: int) -> bool:
+	var cost := get_water_cost(stage)
+	if current_water < cost:
+		return false
+
+	current_water -= cost
+	water_changed.emit(current_water, get_water_capacity())
+	return true
+
+func refill_water() -> void:
+	current_water = get_water_capacity()
+	water_changed.emit(current_water, get_water_capacity())
 
 func get_tool_name() -> String:
 	match selected_tool:
