@@ -85,7 +85,12 @@ func apply_water(cells: Array[Vector2i]) -> int:
 
 func can_fertilize(cell: Vector2i) -> bool:
 	var data := get_cell(cell)
-	return data != null and data.tilled and data.fertility_bonus <= 0
+	return (
+		data != null
+		and data.tilled
+		and data.crop == null
+		and data.fertility_bonus <= 0
+	)
 
 func apply_fertilizer(cell: Vector2i, bonus: int) -> bool:
 	if bonus <= 0 or not can_fertilize(cell):
