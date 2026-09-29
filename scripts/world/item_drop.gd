@@ -76,4 +76,14 @@ func _draw() -> void:
 	var bob := sin(_bob_time * 3.0) * 2.0
 	draw_circle(Vector2(0, bob), 7.0, tint)
 	draw_circle(Vector2(0, bob), 3.0, tint.lightened(0.35))
-	draw_arc(Vector2(0, bob), 8.0, 0.0, TAU, 20, Color(0.05, 0.07, 0.06, 0.75), 1.5)
+
+	var outline := Color(0.05, 0.07, 0.06, 0.75)
+	var width := 1.5
+	if quality == InventorySlotData.Quality.SILVER:
+		outline = Color(0.78, 0.84, 0.90, 0.95)
+		width = 2.0
+	elif quality == InventorySlotData.Quality.GOLD:
+		outline = Color(1.0, 0.82, 0.28, 0.98)
+		width = 2.5
+
+	draw_arc(Vector2(0, bob), 8.0, 0.0, TAU, 20, outline, width)
