@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_definition.gd" id="1_item"]
+[ext_resource type="Resource" path="res://resources/crops/fall_eggplant.tres" id="2_crop"]
+
+[resource]
+script = ExtResource("1_item")
+id = &"fall_eggplant_seed"
+display_name = "Semente de Berinjela Roxa"
+kind = 1
+max_stack = 99
+tint = Color(0.52, 0.30, 0.68, 1)
+buy_price = 40
+sell_price = 20
+crop_to_plant = ExtResource("2_crop")
