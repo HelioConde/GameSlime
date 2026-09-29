@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
@@ -29,6 +29,7 @@
 [ext_resource type="Resource" path="res://resources/items/fall_eggplant.tres" id="27_fall_eggplant_crop"]
 [ext_resource type="Resource" path="res://resources/items/winter_kale_seed.tres" id="28_winter_kale_seed"]
 [ext_resource type="Resource" path="res://resources/items/winter_kale.tres" id="29_winter_kale_crop"]
+[ext_resource type="Resource" path="res://resources/items/slime_crystal.tres" id="30_slime_crystal"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -61,6 +62,7 @@ fall_eggplant_seed_item = ExtResource("26_fall_eggplant_seed")
 fall_eggplant_crop_item = ExtResource("27_fall_eggplant_crop")
 winter_kale_seed_item = ExtResource("28_winter_kale_seed")
 winter_kale_crop_item = ExtResource("29_winter_kale_crop")
+slime_crystal_item = ExtResource("30_slime_crystal")
 
 [node name="Visual" type="Sprite2D" parent="."]
 texture_filter = 1
