@@ -30,35 +30,50 @@ func interact(player: PlayerController) -> String:
 	var cost := player.tools.get_upgrade_cost(tool_type)
 	var gold_cost := int(cost.get("gold", 0))
 	var copper_cost := int(cost.get("copper", 0))
+	var iron_cost := int(cost.get("iron", 0))
 	var copper_owned := player.inventory.count_item(&"copper_ore")
+	var iron_owned := player.inventory.count_item(&"iron_ore")
 
-	if Economy.gold < gold_cost or copper_owned < copper_cost:
-		return "Upgrade Nv.%d -> %d: %dg + %d Cobre. Voce tem %dg + %d." % [
+	if (
+		Economy.gold < gold_cost
+		or copper_owned < copper_cost
+		or iron_owned < iron_cost
+	):
+		return "Upgrade Nv.%d -> %d: %dg + %d Cobre + %d Ferro. Voce tem %dg + %d + %d." % [
 			current_level,
 			current_level + 1,
 			gold_cost,
 			copper_cost,
+			iron_cost,
 			Economy.gold,
 			copper_owned,
+			iron_owned,
 		]
 
 	if not player.inventory.remove_item(&"copper_ore", copper_cost):
 		return "Falha ao consumir Minerio de Cobre."
 
+	if not player.inventory.remove_item(&"iron_ore", iron_cost):
+		player.inventory.add_item(player.copper_ore_item, copper_cost)
+		return "Falha ao consumir Minerio de Ferro."
+
 	if not Economy.spend_gold(gold_cost):
 		player.inventory.add_item(player.copper_ore_item, copper_cost)
+		player.inventory.add_item(player.iron_ore_item, iron_cost)
 		return "Ouro insuficiente."
 
 	if not player.tools.upgrade_tool(tool_type):
 		Economy.add_gold(gold_cost)
 		player.inventory.add_item(player.copper_ore_item, copper_cost)
+		player.inventory.add_item(player.iron_ore_item, iron_cost)
 		return "Nao foi possivel melhorar a ferramenta."
 
-	return "%s melhorada para nivel %d por %dg + %d Cobre!" % [
+	return "%s melhorada para nivel %d por %dg + %d Cobre + %d Ferro!" % [
 		player.tools.get_tool_display_name(tool_type),
 		player.tools.get_tool_level(tool_type),
 		gold_cost,
 		copper_cost,
+		iron_cost,
 	]
 
 func _draw() -> void:
