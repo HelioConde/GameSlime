@@ -52,9 +52,12 @@ func get_daylight_color(game_minute: int) -> Color:
 		if minute < left_minute or minute > right_minute:
 			continue
 		var ratio := inverse_lerp(float(left_minute), float(right_minute), float(minute))
-		return (left["color"] as Color).lerp(right["color"] as Color, ratio)
+		var left_color: Color = left.get("color", Color.WHITE)
+		var right_color: Color = right.get("color", Color.WHITE)
+		return left_color.lerp(right_color, ratio)
 
-	return keyframes[keyframes.size() - 1]["color"] as Color
+	var last_keyframe := keyframes[keyframes.size() - 1] as Dictionary
+	return last_keyframe.get("color", Color.WHITE)
 
 func _is_player_in_mine(player: PlayerController) -> bool:
 	for node in get_tree().get_nodes_in_group("mine_area"):
