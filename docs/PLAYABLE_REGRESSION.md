@@ -80,6 +80,31 @@ Regra:
 7. Repetir operacoes com 12 slots ocupados.
 8. Confirmar que nenhum item some ou duplica.
 
+
+## Sessao H - mundo vivo e forrageio
+1. Iniciar um novo dia e confirmar entre 4 e 7 spawns naturais.
+2. Confirmar que os spawns aparecem somente em pontos seguros.
+3. Salvar/reabrir e confirmar os mesmos itens/posicoes no mesmo dia.
+4. Dormir e confirmar um novo conjunto diario.
+5. Confirmar Flor/Fruta/Cogumelo/Raiz conforme a estacao.
+6. Confirmar semente silvestre compativel com a estacao.
+7. Encher o inventario e confirmar que o item no chao nao desaparece.
+8. Liberar um slot e confirmar coleta normal.
+9. Comer um forrageavel com energia baixa e confirmar recuperacao.
+10. Vender um forrageavel e confirmar valor correto.
+
+## Sessao I - crescimento avancado
+1. Plantar uma cultura e nao regar no primeiro dia.
+2. Dormir e confirmar crescimento = 0.
+3. Regar diariamente ate amadurecer naturalmente.
+4. Confirmar quantidade de colheita dentro do intervalo configurado.
+5. Salvar/reabrir antes da colheita e confirmar o mesmo rendimento no mesmo dia.
+6. Colher uma cultura de rebrota.
+7. Confirmar que a planta permanece no solo e volta ao estado de crescimento.
+8. Regar pelos dias de rebrota e confirmar nova colheita.
+9. Avancar para estacao incompatível e confirmar murcha.
+10. Confirmar que a banca muda para sementes da nova estacao.
+
 ## Criterio para liberar novas features
 O jogo precisa completar:
 - 7 dias seguidos
