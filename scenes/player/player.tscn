@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=23 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
@@ -15,6 +15,12 @@
 [ext_resource type="Texture2D" path="res://assets/sprout_lands/characters/player_premium.png" id="13_player_texture"]
 [ext_resource type="Resource" path="res://resources/items/slime_gel.tres" id="14_slime_gel"]
 [ext_resource type="Resource" path="res://resources/items/copper_ore.tres" id="15_copper"]
+[ext_resource type="Resource" path="res://resources/items/summer_tomato_seed.tres" id="16_summer_seed"]
+[ext_resource type="Resource" path="res://resources/items/summer_tomato.tres" id="17_summer_crop"]
+[ext_resource type="Resource" path="res://resources/items/fall_pumpkin_seed.tres" id="18_fall_seed"]
+[ext_resource type="Resource" path="res://resources/items/fall_pumpkin.tres" id="19_fall_crop"]
+[ext_resource type="Resource" path="res://resources/items/winter_root_seed.tres" id="20_winter_seed"]
+[ext_resource type="Resource" path="res://resources/items/winter_root.tres" id="21_winter_crop"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -33,6 +39,12 @@ wood_item = ExtResource("11_wood")
 stone_item = ExtResource("12_stone")
 slime_gel_item = ExtResource("14_slime_gel")
 copper_ore_item = ExtResource("15_copper")
+summer_seed_item = ExtResource("16_summer_seed")
+summer_crop_item = ExtResource("17_summer_crop")
+fall_seed_item = ExtResource("18_fall_seed")
+fall_crop_item = ExtResource("19_fall_crop")
+winter_seed_item = ExtResource("20_winter_seed")
+winter_crop_item = ExtResource("21_winter_crop")
 
 [node name="Visual" type="Sprite2D" parent="."]
 texture_filter = 1
