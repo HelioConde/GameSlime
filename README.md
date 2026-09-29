@@ -90,7 +90,7 @@ Madeira, pedra e nabos colhidos ocupam os slots disponiveis.
 
 ## Prototipo
 
-Enxada e regador estao temporariamente no nivel 2 para facilitar o teste de carga. Machado e picareta permanecem nivel 0 para demonstrar a progressao por quantidade de golpes.
+Todas as ferramentas agora iniciam no nivel 0. A bancada de ferramentas perto da casa consome Madeira e Pedra para liberar os niveis seguintes. Enxada e Regador passam de 1 tile para areas maiores conforme os upgrades; Machado e Picareta reduzem a quantidade de golpes e liberam obstaculos de nivel.
 
 ## Validacao
 
