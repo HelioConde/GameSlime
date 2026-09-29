@@ -87,6 +87,41 @@ func _run() -> void:
 		_check(not stale_spawn_found, "expired natural spawns are pruned automatically")
 		_check(get_tree().get_nodes_in_group("daily_world_spawn").size() <= WorldSpawnManager.MAX_NATURAL_SPAWNS, "world spawn cap remains stable across multiple days")
 
+		var saved_weather := int(WeatherManager.current_weather)
+		var saved_clock := GameClock.get_save_data()
+		GameClock.load_save_data({
+			"day": 15,
+			"minute_of_day": GameClock.START_MINUTE,
+			"year": 1,
+			"season_index": GameClock.Season.SPRING,
+			"day_of_season": 15,
+		})
+		WeatherManager.current_weather = WeatherManager.Weather.CLOUDY
+		var cloudy_pool := world_spawner.get_current_spawn_pool_ids()
+		WeatherManager.current_weather = WeatherManager.Weather.RAIN
+		var rainy_pool := world_spawner.get_current_spawn_pool_ids()
+		_check(
+			rainy_pool.count(&"wild_mushroom") > cloudy_pool.count(&"wild_mushroom"),
+			"spring rain adds mushroom weight to natural forage pool"
+		)
+		GameClock.load_save_data({
+			"day": 85,
+			"minute_of_day": GameClock.START_MINUTE,
+			"year": 1,
+			"season_index": GameClock.Season.WINTER,
+			"day_of_season": 1,
+		})
+		WeatherManager.current_weather = WeatherManager.Weather.CLOUDY
+		var winter_cloudy_pool := world_spawner.get_current_spawn_pool_ids()
+		WeatherManager.current_weather = WeatherManager.Weather.SNOW
+		var winter_snow_pool := world_spawner.get_current_spawn_pool_ids()
+		_check(
+			winter_snow_pool.count(&"wild_root") > winter_cloudy_pool.count(&"wild_root"),
+			"snow adds wild-root weight to winter forage pool"
+		)
+		GameClock.load_save_data(saved_clock)
+		WeatherManager.current_weather = saved_weather
+
 	var world_bounds := main.get_node_or_null("WorldBounds") as StaticBody2D
 	_check(world_bounds != null, "world bounds exist")
 	if world_bounds != null:
