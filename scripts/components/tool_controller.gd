@@ -10,6 +10,8 @@ signal water_changed(current: int, maximum: int)
 enum ToolType {
 	HOE,
 	WATERING_CAN,
+	AXE,
+	PICKAXE,
 }
 
 const CHARGE_THRESHOLDS := [0.0, 0.45, 0.90, 1.35, 1.80, 2.25]
@@ -18,6 +20,8 @@ const WATER_COST_BY_STAGE := [1, 2, 3, 4, 5, 6]
 
 @export_range(0, 5, 1) var hoe_level: int = 0
 @export_range(0, 5, 1) var watering_can_level: int = 0
+@export_range(0, 5, 1) var axe_level: int = 0
+@export_range(0, 5, 1) var pickaxe_level: int = 0
 
 var selected_tool: int = ToolType.HOE
 var is_charging: bool = false
@@ -37,8 +41,11 @@ func select_tool(tool: int) -> void:
 	selected_tool = tool
 	tool_changed.emit(selected_tool)
 
+func is_chargeable_tool(tool: int = selected_tool) -> bool:
+	return tool in [ToolType.HOE, ToolType.WATERING_CAN]
+
 func begin_charge() -> void:
-	if is_charging:
+	if is_charging or not is_chargeable_tool():
 		return
 	is_charging = true
 	charge_elapsed = 0.0
@@ -79,21 +86,32 @@ func cancel_charge() -> void:
 	charge_elapsed = 0.0
 	charge_stage = 0
 
-func get_max_charge_stage() -> int:
-	match selected_tool:
+func get_tool_level(tool: int = selected_tool) -> int:
+	match tool:
 		ToolType.HOE:
 			return hoe_level
 		ToolType.WATERING_CAN:
 			return watering_can_level
+		ToolType.AXE:
+			return axe_level
+		ToolType.PICKAXE:
+			return pickaxe_level
 		_:
 			return 0
 
-func get_energy_cost(stage: int) -> float:
-	match selected_tool:
+func get_max_charge_stage() -> int:
+	if not is_chargeable_tool():
+		return 0
+	return get_tool_level()
+
+func get_energy_cost(stage: int = 0, tool: int = selected_tool) -> float:
+	match tool:
 		ToolType.HOE:
 			return 2.0
 		ToolType.WATERING_CAN:
 			return 2.0 + float(clampi(stage, 0, 5)) * 2.0
+		ToolType.AXE, ToolType.PICKAXE:
+			return 2.0
 		_:
 			return 0.0
 
@@ -125,6 +143,10 @@ func get_tool_name() -> String:
 			return "Enxada"
 		ToolType.WATERING_CAN:
 			return "Regador"
+		ToolType.AXE:
+			return "Machado"
+		ToolType.PICKAXE:
+			return "Picareta"
 		_:
 			return "Ferramenta"
 
