@@ -9,3 +9,5 @@ display_name = "Gel de Slime"
 kind = 3
 max_stack = 999
 tint = Color(0.36, 0.90, 0.52, 1)
+buy_price = 0
+sell_price = 60
