@@ -23,16 +23,24 @@ func interact(player: PlayerController) -> String:
 		return "%s nao pode ser enviado para venda." % player.get_selected_item_name()
 
 	var amount := stack.amount
-	var value := amount * item.sell_price
+	var quality := stack.quality
+	var unit_price := InventorySlotData.get_adjusted_sell_price(item.sell_price, quality)
+	var value := amount * unit_price
 
-	if not player.inventory.remove_item(item.id, amount):
+	if not player.inventory.remove_from_slot(player.inventory.selected_slot, amount):
 		return "Nao foi possivel retirar os itens do inventario."
 
-	if not Economy.queue_shipment(item, amount):
-		player.inventory.add_item(item, amount)
+	if not Economy.queue_shipment(item, amount, quality):
+		player.inventory.add_item(item, amount, quality)
 		return "Nao foi possivel registrar a remessa."
 
-	return "Enviado: %s x%d · %dg amanha." % [item.display_name, amount, value]
+	var quality_name := InventorySlotData.get_quality_name(quality)
+	return "Enviado: %s x%d · %s · %dg amanha." % [
+		item.display_name,
+		amount,
+		quality_name,
+		value,
+	]
 
 func _draw() -> void:
 	draw_rect(Rect2(-25, -19, 50, 38), Color(0.34, 0.20, 0.10), true)
