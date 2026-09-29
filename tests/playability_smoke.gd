@@ -335,6 +335,44 @@ func _run() -> void:
 			_check(player.inventory.count_item(&"stone") == total_stone_before, "inventory operations conserve stone")
 			_check(player.inventory.count_item(&"wood") == total_wood_before, "inventory operations conserve wood")
 
+	if player != null:
+		# World drops must remain when inventory is full and collect after space is freed.
+		var forage_def := player.inventory.get_definition(&"wild_flower")
+		var stone_for_fill := player.inventory.get_definition(&"stone")
+		if forage_def != null and stone_for_fill != null:
+			for index in range(player.inventory.slots.size()):
+				player.inventory.seed_slot(index, stone_for_fill, stone_for_fill.max_stack)
+			var test_drop := load("res://scenes/world/item_drop.tscn").instantiate() as ItemDrop
+			main.add_child(test_drop)
+			test_drop.configure(forage_def.id, 1, forage_def.tint)
+			_check(test_drop.try_collect(player.inventory) == 0, "full inventory leaves world drop uncollected")
+			_check(test_drop.amount == 1, "blocked pickup preserves world drop amount")
+			player.inventory.get_slot(11).clear()
+			player.inventory.inventory_changed.emit()
+			_check(test_drop.try_collect(player.inventory) == 1, "world drop collects after freeing inventory space")
+			await get_tree().process_frame
+
+		# Tool upgrades must consume exact resources once and fail atomically.
+		var upgrade_station := main.get_node_or_null("ToolUpgradeStation") as ToolUpgradeStation
+		if upgrade_station != null:
+			player.inventory.clear_all()
+			player.inventory.seed_slot(0, player.starter_pickaxe_item, 1)
+			player.inventory.seed_slot(1, player.copper_ore_item, 5)
+			player.inventory.set_selected_slot(0)
+			player.tools.pickaxe_level = 0
+			player.global_position = upgrade_station.global_position
+			economy.gold = 500
+			var upgrade_message := upgrade_station.interact(player)
+			_check(upgrade_message.contains("nivel 1"), "pickaxe level one upgrade succeeds")
+			_check(player.tools.pickaxe_level == 1, "pickaxe upgrade changes exactly one level")
+			_check(player.inventory.count_item(&"copper_ore") == 0, "pickaxe upgrade consumes exact copper")
+			_check(int(economy.gold) == 300, "pickaxe upgrade consumes exact gold")
+			var failed_gold_before := int(economy.gold)
+			var failed_level_before := player.tools.pickaxe_level
+			upgrade_station.interact(player)
+			_check(int(economy.gold) == failed_gold_before, "failed upgrade does not spend gold")
+			_check(player.tools.pickaxe_level == failed_level_before, "failed upgrade does not change tool level")
+
 	# Crop growth must advance only after watered days.
 	if player != null and farm != null:
 		var natural_crop := player.starter_seed_item.crop_to_plant
