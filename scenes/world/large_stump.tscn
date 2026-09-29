@@ -17,6 +17,8 @@ required_tool_type = 2
 minimum_tool_level = 1
 drop_item_id = &"wood"
 drop_amount = 12
+drop_amount_min = 10
+drop_amount_max = 16
 drop_tint = Color(0.66, 0.40, 0.20, 1)
 
 [node name="Visual" type="Sprite2D" parent="."]
