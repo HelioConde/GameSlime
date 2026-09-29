@@ -17,5 +17,5 @@ harvest_max = 2
 regrow_days = 4
 grows_in_spring = false
 grows_in_summer = true
-grows_in_fall = false
+grows_in_fall = true
 grows_in_winter = false
