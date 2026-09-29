@@ -394,6 +394,37 @@ func _run() -> void:
 		corrupt_file.close()
 	_check(save_manager.load_game(), "corrupt primary save falls back to backup")
 
+	# Save v6 must remain loadable after additive v7 farm/ecology fields.
+	_check(save_manager.save_game(), "v7 save exists before v6 compatibility test")
+	var v6_file := FileAccess.open("user://savegame.json", FileAccess.READ)
+	_check(v6_file != null, "save can be read for v6 compatibility test")
+	if v6_file != null:
+		var v6_data = JSON.parse_string(v6_file.get_as_text())
+		v6_file.close()
+		if v6_data is Dictionary:
+			v6_data["version"] = 6
+			var v6_farm: Dictionary = v6_data.get("farm", {})
+			var v6_cells: Array = v6_farm.get("cells", [])
+			for cell_entry_variant in v6_cells:
+				if cell_entry_variant is Dictionary:
+					var cell_entry := cell_entry_variant as Dictionary
+					cell_entry.erase("fertility_bonus")
+					cell_entry.erase("idle_tilled_days")
+			var v6_world: Dictionary = v6_data.get("world", {})
+			var v6_drops: Array = v6_world.get("drops", [])
+			for drop_entry_variant in v6_drops:
+				if drop_entry_variant is Dictionary:
+					var drop_entry := drop_entry_variant as Dictionary
+					drop_entry.erase("natural_spawn")
+					drop_entry.erase("spawned_day")
+					drop_entry.erase("expires_after_days")
+			var v6_write := FileAccess.open("user://savegame.json", FileAccess.WRITE)
+			_check(v6_write != null, "synthetic v6 save can be written")
+			if v6_write != null:
+				v6_write.store_string(JSON.stringify(v6_data))
+				v6_write.close()
+				_check(save_manager.load_game(), "additive v6 save loads successfully in save v7")
+
 	for node in patches:
 		var patch := node as DailyResourcePatch
 		if patch == null:
