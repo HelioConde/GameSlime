@@ -167,6 +167,7 @@ func get_movement_speed_multiplier() -> float:
 	return multiplier
 
 func _on_energy_exhausted() -> void:
+	Sfx.play_cue(&"warning")
 	feedback_requested.emit("Voce esta exausto · coma algo ou durma para recuperar energia.")
 
 func restore_after_sleep() -> void:
@@ -249,6 +250,7 @@ func _apply_selected_fertilizer(stack: InventorySlotData) -> void:
 		return
 
 	inventory.remove_item(fertilizer_item.id, 1)
+	Sfx.play_cue(&"plant")
 	feedback_requested.emit("Solo adubado · +%d na colheita." % fertilizer_item.fertility_bonus)
 	_flash_cells([target])
 	_spawn_feedback_burst(
@@ -275,6 +277,7 @@ func _eat_selected_food(stack: InventorySlotData) -> void:
 
 	var before := energy.current_energy
 	energy.restore(float(item.energy_restore))
+	Sfx.play_cue(&"confirm")
 	var restored := roundi(energy.current_energy - before)
 	feedback_requested.emit("Comeu %s · +%d energia." % [item.display_name, restored])
 
@@ -325,6 +328,7 @@ func _release_tool() -> void:
 	if tool == ToolController.ToolType.WATERING_CAN:
 		tools.spend_water(stage)
 
+	Sfx.play_tool(tool, false)
 	_flash_cells(cells)
 
 	var burst_color := Color(0.64, 0.42, 0.22)
@@ -357,7 +361,9 @@ func _use_instant_tool(tool_type: int) -> void:
 	energy.spend(energy_cost)
 
 	var remaining := int(result.get("remaining_hits", 0))
-	if bool(result.get("depleted", false)):
+	var depleted := bool(result.get("depleted", false))
+	Sfx.play_tool(tool_type, depleted)
+	if depleted:
 		feedback_requested.emit("Recurso quebrado!")
 	else:
 		feedback_requested.emit("Golpe acertou. Faltam %d." % remaining)
@@ -391,6 +397,7 @@ func _collect_nearby_drops() -> void:
 		if collected > 0:
 			var definition := inventory.get_definition(drop.item_id)
 			var item_name := definition.display_name if definition != null else str(drop.item_id)
+			Sfx.play_cue(&"pickup")
 			feedback_requested.emit("Coletou %s x%d." % [item_name, collected])
 
 func _plant_selected_seed(stack: InventorySlotData) -> void:
@@ -417,6 +424,7 @@ func _plant_selected_seed(stack: InventorySlotData) -> void:
 		return
 
 	inventory.remove_item(seed_id, 1)
+	Sfx.play_cue(&"plant")
 	feedback_requested.emit("Plantou %s." % crop.display_name)
 	_flash_cells([target])
 	_spawn_feedback_burst(
@@ -529,6 +537,7 @@ func _interact() -> void:
 		var amount := int(harvest["amount"])
 		var quality := int(harvest.get("quality", InventorySlotData.Quality.NORMAL))
 		inventory.add_item(harvest_item, amount, quality)
+		Sfx.play_cue(&"harvest")
 		var quality_text := InventorySlotData.get_quality_name(quality)
 		feedback_requested.emit("Colheu %s x%d · %s." % [harvest_item.display_name, amount, quality_text])
 		_flash_cells([target])
@@ -793,6 +802,7 @@ func _on_day_started(_day: int) -> void:
 		global_position = morning_spawn_position
 		velocity = Vector2.ZERO
 		energy.set_current_energy(energy.maximum_energy * passout_energy_ratio)
+		Sfx.play_cue(&"warning")
 		feedback_requested.emit("Voce desmaiou as 02:00 e acordou cansado.")
 		return
 
