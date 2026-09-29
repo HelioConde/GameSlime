@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/world/farm_field.gd" id="1_farm"]
 
 [node name="FarmField" type="Node2D"]
+texture_filter = 1
 script = ExtResource("1_farm")
 grid_size = Vector2i(12, 8)
 cell_size = 32
