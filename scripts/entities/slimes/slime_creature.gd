@@ -13,6 +13,14 @@ enum Personality {
 	SHY,
 }
 
+enum RarityTier {
+	COMMON,
+	UNCOMMON,
+	RARE,
+	EPIC,
+	LEGENDARY,
+}
+
 signal needs_changed(slime: SlimeCreature)
 signal affection_changed(slime: SlimeCreature, affection: float)
 signal product_created(slime: SlimeCreature, item_id: StringName, amount: int)
@@ -134,10 +142,12 @@ func interact(player: PlayerController) -> String:
 
 func get_status_text() -> String:
 	var mutation_text := "" if mutation_tag.is_empty() else " · Mutacao %s" % mutation_tag
-	return "%s · %s · %s%s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
+	return "%s · %s · %s\n%s · %s%s\nFome %.0f%% · Energia %.0f%% · Humor %.0f%% · Afeto %.0f%% · %d dias" % [
 		display_name,
 		get_sex_name(),
 		get_personality_name(),
+		get_species_name(),
+		get_rarity_name(),
 		mutation_text,
 		satiety,
 		energy,
@@ -161,6 +171,71 @@ func get_personality_name() -> String:
 
 func get_sex_name() -> String:
 	return "Macho" if biological_sex == BiologicalSex.MALE else "Femea"
+
+func get_species_name() -> String:
+	match slime_id:
+		&"green_slime":
+			return "Slime Verde"
+		&"moss_slime":
+			return "Slime Musgo"
+		&"storm_slime":
+			return "Slime Tempestade"
+		&"frost_slime":
+			return "Slime Geada"
+		&"solar_slime":
+			return "Slime Solar"
+		&"moon_slime":
+			return "Slime Lunar"
+		_:
+			return String(slime_id).capitalize()
+
+func get_rarity_tier() -> int:
+	var score := get_rarity_score()
+
+	if score >= 7:
+		return RarityTier.LEGENDARY
+	if score >= 5:
+		return RarityTier.EPIC
+	if score >= 3:
+		return RarityTier.RARE
+	if score >= 2:
+		return RarityTier.UNCOMMON
+	return RarityTier.COMMON
+
+func get_rarity_name() -> String:
+	match get_rarity_tier():
+		RarityTier.COMMON:
+			return "Comum"
+		RarityTier.UNCOMMON:
+			return "Incomum"
+		RarityTier.RARE:
+			return "Raro"
+		RarityTier.EPIC:
+			return "Epico"
+		RarityTier.LEGENDARY:
+			return "Lendario"
+		_:
+			return "Comum"
+
+func get_rarity_score() -> int:
+	var score := 0
+
+	for gene in [gene_size, gene_metabolism, gene_vitality, gene_production]:
+		if gene <= 0.85 or gene >= 1.20:
+			score += 1
+
+	if not mutation_tag.is_empty():
+		score += 2
+
+	match slime_id:
+		&"moss_slime", &"storm_slime":
+			score += 2
+		&"frost_slime", &"solar_slime":
+			score += 3
+		&"moon_slime":
+			score += 4
+
+	return score
 
 func get_genetics_text() -> String:
 	return "Tam %.2f · Met %.2f · Vit %.2f · Prod %.2f" % [
@@ -209,7 +284,9 @@ func configure_child_from_parents(parent_a: SlimeCreature, parent_b: SlimeCreatu
 	slime_color.b = clampf(slime_color.b + child_rng.randf_range(-0.025, 0.025), 0.0, 1.0)
 
 	mutation_tag = ""
+	slime_id = &"green_slime"
 	_apply_environmental_mutation(child_rng)
+	_apply_special_species_conditions(child_rng, parent_a, parent_b)
 
 	satiety = 82.0
 	energy = 88.0
@@ -250,6 +327,59 @@ func _apply_environmental_mutation(child_rng: RandomNumberGenerator) -> void:
 		slime_color = slime_color.lerp(Color(0.88, 0.48, 0.24), 0.25)
 		gene_metabolism = clampf(gene_metabolism - 0.05, 0.75, 1.35)
 
+func _apply_special_species_conditions(
+	child_rng: RandomNumberGenerator,
+	parent_a: SlimeCreature,
+	parent_b: SlimeCreature
+) -> void:
+	var hour := GameClock.get_hour()
+	var parent_habitat := parent_a.habitat if parent_a.habitat != null else parent_b.habitat
+	var biome := SlimeHabitat.HabitatBiome.MEADOW
+	if parent_habitat != null:
+		biome = parent_habitat.biome_type
+
+	# Extremely rare night lineage. High affection makes the condition intentional,
+	# not something the player gets by accident immediately.
+	if (hour >= 22 or hour < 2) and parent_a.affection >= 40.0 and parent_b.affection >= 40.0:
+		if child_rng.randf() < 0.16:
+			slime_id = &"moon_slime"
+			slime_color = slime_color.lerp(Color(0.58, 0.48, 0.95), 0.48)
+			gene_vitality = clampf(gene_vitality + 0.06, 0.75, 1.35)
+			return
+
+	if WeatherManager.is_snowing() and GameClock.season_index == GameClock.Season.WINTER:
+		if child_rng.randf() < 0.32:
+			slime_id = &"frost_slime"
+			slime_color = slime_color.lerp(Color(0.70, 0.94, 1.0), 0.55)
+			gene_vitality = clampf(gene_vitality + 0.06, 0.75, 1.35)
+			return
+
+	if WeatherManager.is_raining() and (hour >= 18 or hour < 6):
+		if child_rng.randf() < 0.28:
+			slime_id = &"storm_slime"
+			slime_color = slime_color.lerp(Color(0.28, 0.48, 0.82), 0.52)
+			gene_production = clampf(gene_production + 0.05, 0.75, 1.50)
+			return
+
+	if (
+		GameClock.season_index == GameClock.Season.SUMMER
+		and WeatherManager.current_weather == WeatherManager.Weather.CLEAR
+		and hour >= 11
+		and hour <= 16
+	):
+		if child_rng.randf() < 0.24:
+			slime_id = &"solar_slime"
+			slime_color = slime_color.lerp(Color(1.0, 0.78, 0.22), 0.50)
+			gene_vitality = clampf(gene_vitality + 0.04, 0.75, 1.35)
+			return
+
+	if biome == SlimeHabitat.HabitatBiome.GROVE:
+		if GameClock.season_index in [GameClock.Season.SPRING, GameClock.Season.FALL]:
+			if child_rng.randf() < 0.26:
+				slime_id = &"moss_slime"
+				slime_color = slime_color.lerp(Color(0.24, 0.55, 0.25), 0.48)
+				gene_metabolism = clampf(gene_metabolism - 0.04, 0.75, 1.35)
+
 func _inherit_gene(value_a: float, value_b: float, child_rng: RandomNumberGenerator) -> float:
 	return clampf((value_a + value_b) * 0.5 + child_rng.randf_range(-0.05, 0.05), 0.75, 1.35)
 
@@ -258,6 +388,7 @@ func get_save_data() -> Dictionary:
 		"node_name": String(name),
 		"display_name": display_name,
 		"slime_id": String(slime_id),
+		"rarity_tier": get_rarity_tier(),
 		"position": [global_position.x, global_position.y],
 		"home_position": [_home_position.x, _home_position.y],
 		"satiety": satiety,
@@ -294,6 +425,7 @@ func load_save_data(data: Dictionary) -> void:
 	affection = clampf(float(data.get("affection", starting_affection)), 0.0, 100.0)
 	age_days = maxi(int(data.get("age_days", 0)), 0)
 	display_name = str(data.get("display_name", display_name))
+	slime_id = StringName(str(data.get("slime_id", String(slime_id))))
 	last_petted_day = int(data.get("last_petted_day", -1))
 	last_bred_day = int(data.get("last_bred_day", -1))
 	biological_sex = clampi(int(data.get("biological_sex", biological_sex)), BiologicalSex.MALE, BiologicalSex.FEMALE)
