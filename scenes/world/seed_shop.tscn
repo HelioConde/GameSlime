@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/seed_shop.gd" id="1_shop"]
 [ext_resource type="Resource" path="res://resources/items/starter_turnip_seed.tres" id="2_spring_a"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://resources/items/fall_eggplant_seed.tres" id="7_fall_b"]
 [ext_resource type="Resource" path="res://resources/items/winter_root_seed.tres" id="8_winter_a"]
 [ext_resource type="Resource" path="res://resources/items/winter_kale_seed.tres" id="9_winter_b"]
+[ext_resource type="Resource" path="res://resources/items/basic_fertilizer.tres" id="10_fertilizer"]
 
 [sub_resource type="RectangleShape2D" id="SeedShopCollision"]
 size = Vector2(60, 30)
@@ -19,6 +20,7 @@ spring_seed_items = Array[Resource]([ExtResource("2_spring_a"), ExtResource("3_s
 summer_seed_items = Array[Resource]([ExtResource("4_summer_a"), ExtResource("5_summer_b")])
 fall_seed_items = Array[Resource]([ExtResource("6_fall_a"), ExtResource("7_fall_b")])
 winter_seed_items = Array[Resource]([ExtResource("8_winter_a"), ExtResource("9_winter_b")])
+always_available_items = Array[Resource]([ExtResource("10_fertilizer")])
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
