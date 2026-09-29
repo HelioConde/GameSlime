@@ -309,7 +309,7 @@ func _drop_selected_item(drop_all: bool = false) -> void:
 		return
 
 	get_parent().add_child(drop)
-	drop.global_position = global_position + Vector2(facing) * 28.0
+	drop.global_position = global_position + Vector2(facing) * 40.0
 	drop.configure(item.id, amount, item.tint, quality)
 	Sfx.play_cue(&"pickup")
 
