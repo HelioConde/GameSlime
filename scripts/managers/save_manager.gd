@@ -8,6 +8,7 @@ signal save_failed(message: String)
 const SAVE_VERSION := 2
 const SAVE_PATH := "user://savegame.json"
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
+const SLIME_SCENE := preload("res://scenes/slimes/slime_creature.tscn")
 
 func has_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
@@ -144,22 +145,48 @@ func _load_slime_state(data: Dictionary) -> void:
 	if saved_slimes.is_empty():
 		return
 
-	var by_name: Dictionary = {}
+	var existing: Dictionary = {}
+	for node in get_tree().get_nodes_in_group("slime_creature"):
+		var slime := node as SlimeCreature
+		if slime != null:
+			existing[String(slime.name)] = slime
+
+	var saved_names: Dictionary = {}
+
 	for entry_variant in saved_slimes:
 		if not (entry_variant is Dictionary):
 			continue
+
 		var entry: Dictionary = entry_variant
-		by_name[str(entry.get("node_name", ""))] = entry
+		var node_name := str(entry.get("node_name", ""))
+		if node_name.is_empty():
+			continue
+
+		saved_names[node_name] = true
+		var slime: SlimeCreature = existing.get(node_name) as SlimeCreature
+
+		if slime == null:
+			slime = SLIME_SCENE.instantiate() as SlimeCreature
+			if slime == null:
+				continue
+
+			slime.name = node_name
+
+			var position_data: Array = entry.get("position", [])
+			if position_data.size() >= 2:
+				slime.position = Vector2(float(position_data[0]), float(position_data[1]))
+
+			get_tree().current_scene.add_child(slime)
+
+		slime.load_save_data(entry)
 
 	for node in get_tree().get_nodes_in_group("slime_creature"):
 		var slime := node as SlimeCreature
 		if slime == null:
 			continue
 
-		var key := String(slime.name)
-		if by_name.has(key):
-			var slime_data: Dictionary = by_name[key]
-			slime.load_save_data(slime_data)
+		if not saved_names.has(String(slime.name)):
+			slime.queue_free()
 
 func _load_drop_state(data: Dictionary) -> void:
 	for node in get_tree().get_nodes_in_group("world_drop"):
