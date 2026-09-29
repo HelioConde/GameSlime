@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/player/player_controller.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/components/energy_component.gd" id="2_energy"]
@@ -14,6 +14,7 @@
 [ext_resource type="Resource" path="res://resources/items/stone.tres" id="12_stone"]
 [ext_resource type="Texture2D" path="res://assets/sprout_lands/characters/player_premium.png" id="13_player_texture"]
 [ext_resource type="Resource" path="res://resources/items/slime_gel.tres" id="14_slime_gel"]
+[ext_resource type="Resource" path="res://resources/items/copper_ore.tres" id="15_copper"]
 
 [sub_resource type="CapsuleShape2D" id="Capsule_player"]
 radius = 8.0
@@ -31,6 +32,7 @@ starter_crop_item = ExtResource("8_crop")
 wood_item = ExtResource("11_wood")
 stone_item = ExtResource("12_stone")
 slime_gel_item = ExtResource("14_slime_gel")
+copper_ore_item = ExtResource("15_copper")
 
 [node name="Visual" type="Sprite2D" parent="."]
 texture_filter = 1
