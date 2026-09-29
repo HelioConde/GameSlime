@@ -204,8 +204,30 @@ func _primary_action_pressed() -> void:
 				_use_instant_tool(stack.item.tool_type)
 		ItemDefinition.ItemKind.SEED:
 			_plant_selected_seed(stack)
+		ItemDefinition.ItemKind.FOOD:
+			_eat_selected_food(stack)
 		_:
 			feedback_requested.emit("%s ainda nao possui uso direto." % stack.item.display_name)
+
+func _eat_selected_food(stack: InventorySlotData) -> void:
+	if stack == null or stack.is_empty() or stack.item == null:
+		return
+	if stack.item.energy_restore <= 0:
+		feedback_requested.emit("%s nao recupera energia." % stack.item.display_name)
+		return
+	if energy.current_energy >= energy.maximum_energy:
+		feedback_requested.emit("Energia ja esta cheia.")
+		return
+
+	var item := stack.item
+	if not inventory.remove_item(item.id, 1):
+		return
+
+	var before := energy.current_energy
+	energy.restore(float(item.energy_restore))
+	var restored := roundi(energy.current_energy - before)
+	feedback_requested.emit("Comeu %s · +%d energia." % [item.display_name, restored])
+
 
 func _primary_action_released() -> void:
 	if tools.is_charging:
