@@ -7,11 +7,13 @@ signal save_failed(message: String)
 
 const SAVE_VERSION := 6
 const SAVE_PATH := "user://savegame.json"
+const TEMP_SAVE_PATH := "user://savegame.tmp"
+const BACKUP_SAVE_PATH := "user://savegame.bak"
 const DROP_SCENE := preload("res://scenes/world/item_drop.tscn")
 const SLIME_SCENE := preload("res://scenes/slimes/slime_creature.tscn")
 
 func has_save() -> bool:
-	return FileAccess.file_exists(SAVE_PATH)
+	return FileAccess.file_exists(SAVE_PATH) or FileAccess.file_exists(BACKUP_SAVE_PATH)
 
 func save_game() -> bool:
 	var player := get_tree().get_first_node_in_group("player") as PlayerController
@@ -31,39 +33,65 @@ func save_game() -> bool:
 		"economy": Economy.get_save_data(),
 	}
 
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(TEMP_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
-		save_failed.emit("Nao foi possivel abrir o arquivo de save.")
+		save_failed.emit("Nao foi possivel criar o arquivo temporario de save.")
 		return false
 
 	file.store_string(JSON.stringify(data))
+	file.flush()
 	file.close()
+
+	var save_absolute := ProjectSettings.globalize_path(SAVE_PATH)
+	var temp_absolute := ProjectSettings.globalize_path(TEMP_SAVE_PATH)
+	var backup_absolute := ProjectSettings.globalize_path(BACKUP_SAVE_PATH)
+
+	if FileAccess.file_exists(BACKUP_SAVE_PATH):
+		DirAccess.remove_absolute(backup_absolute)
+
+	if FileAccess.file_exists(SAVE_PATH):
+		var backup_error := DirAccess.rename_absolute(save_absolute, backup_absolute)
+		if backup_error != OK:
+			DirAccess.remove_absolute(temp_absolute)
+			save_failed.emit("Nao foi possivel preparar o backup do save.")
+			return false
+
+	var replace_error := DirAccess.rename_absolute(temp_absolute, save_absolute)
+	if replace_error != OK:
+		if FileAccess.file_exists(BACKUP_SAVE_PATH):
+			DirAccess.rename_absolute(backup_absolute, save_absolute)
+		save_failed.emit("Nao foi possivel finalizar o save.")
+		return false
+
 	game_saved.emit(SAVE_PATH)
 	return true
 
 func load_game() -> bool:
-	if not has_save():
+	var candidates := [SAVE_PATH, BACKUP_SAVE_PATH]
+	var data: Dictionary = {}
+	var loaded_path := ""
+
+	for path in candidates:
+		if not FileAccess.file_exists(path):
+			continue
+
+		var candidate := _read_save_dictionary(path)
+		if candidate.is_empty():
+			continue
+
+		var candidate_version := int(candidate.get("version", 0))
+		if candidate_version < 1 or candidate_version > SAVE_VERSION:
+			continue
+
+		data = candidate
+		loaded_path = path
+		break
+
+	if data.is_empty():
+		save_failed.emit("Nenhum save valido encontrado.")
 		return false
 
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
-	if file == null:
-		save_failed.emit("Nao foi possivel abrir o save.")
-		return false
-
-	var json_text := file.get_as_text()
-	file.close()
-
-	var parsed = JSON.parse_string(json_text)
-	if not (parsed is Dictionary):
-		save_failed.emit("Save invalido.")
-		return false
-
-	var data: Dictionary = parsed
 	var version := int(data.get("version", 0))
-	if version < 1 or version > SAVE_VERSION:
-		save_failed.emit("Versao de save incompativel.")
-		return false
-
 	var clock_data: Dictionary = data.get("clock", {})
 	var player_data: Dictionary = data.get("player", {})
 	var farm_data: Dictionary = data.get("farm", {})
@@ -88,15 +116,32 @@ func load_game() -> bool:
 		farm.load_save_data(farm_data)
 
 	_load_world_save_data(world_data, version)
-	game_loaded.emit(SAVE_PATH)
+	game_loaded.emit(loaded_path)
 	return true
 
-func delete_save() -> bool:
-	if not has_save():
-		return true
+func _read_save_dictionary(path: String) -> Dictionary:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return {}
 
-	var absolute_path := ProjectSettings.globalize_path(SAVE_PATH)
-	return DirAccess.remove_absolute(absolute_path) == OK
+	var json_text := file.get_as_text()
+	file.close()
+
+	var parsed = JSON.parse_string(json_text)
+	if not (parsed is Dictionary):
+		return {}
+
+	return parsed as Dictionary
+
+func delete_save() -> bool:
+	var success := true
+	for path in [SAVE_PATH, TEMP_SAVE_PATH, BACKUP_SAVE_PATH]:
+		if not FileAccess.file_exists(path):
+			continue
+		var absolute_path := ProjectSettings.globalize_path(path)
+		if DirAccess.remove_absolute(absolute_path) != OK:
+			success = false
+	return success
 
 func _get_world_save_data() -> Dictionary:
 	var alive_resources: Array[String] = []
