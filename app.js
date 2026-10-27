@@ -40,6 +40,7 @@ function goTo(index) {
   const firstLeft = cards[0].offsetLeft;
   const targetLeft = Math.min(maxScroll(), Math.max(0, cards[clamped].offsetLeft - firstLeft));
   track.scrollTo({ left: targetLeft, behavior: reduced.matches ? "auto" : "smooth" });
+  if (reduced.matches) updateControls();
   // Scroll events update the controls during motion. This covers engines which
   // only fire one scroll event after the animation finishes.
   window.setTimeout(updateControls, reduced.matches ? 0 : 450);
