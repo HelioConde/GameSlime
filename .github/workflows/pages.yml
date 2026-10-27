@@ -1,21 +1,23 @@
 name: GameSlime — Qualidade e GitHub Pages
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: gameslime-pages
   cancel-in-progress: false
+
 jobs:
   qa:
-    outputs:
-      pages_enabled: ${{ steps.pages.outputs.enabled }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -37,24 +39,40 @@ jobs:
           name: gameslime-visual-qa
           path: visual-qa/
           if-no-files-found: ignore
-      - name: Verificar Pages antes de publicar
-        if: github.event_name != 'pull_request'
-        id: pages
+
+  pages-readiness:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Verificar configuracao existente do GitHub Pages
+        id: check
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
         run: |
-          mode="$(gh api "repos/${{ github.repository }}/pages" --jq '.build_type // "legacy"' 2>/dev/null || echo unavailable)"
-          if [ "$mode" = "workflow" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-            echo "Pages configurado para GitHub Actions: publicacao via workflow autorizada." >> "$GITHUB_STEP_SUMMARY"
+          code="$(curl --silent --show-error --output /tmp/pages-response.json --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            "https://api.github.com/repos/${GH_REPOSITORY}/pages")"
+          if [ "$code" = 200 ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "GitHub Pages ja esta habilitado." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Publicacao separada::Pages em modo $mode. O QA passou; use a branch gh-pages, ou altere Settings > Pages > GitHub Actions se quiser publicar pelo workflow."
-            echo "QA aprovado. Pages em modo $mode: a branch gh-pages publica a versao estatica; o deploy do workflow foi ignorado intencionalmente." >> "$GITHUB_STEP_SUMMARY"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=GitHub Pages nao habilitado::Abra Settings > Pages e selecione Source: GitHub Actions. A verificacao visual continua ativa; publicacao fica pendente."
+            {
+              echo "## Publicação pendente (HTTP ${code})"
+              echo "Os testes podem passar, mas **este workflow não publicou o site**."
+              echo "Ative Settings → Pages → Build and deployment → Source: GitHub Actions e execute novamente o workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
+
   deploy:
-    if: github.event_name != 'pull_request' && needs.qa.outputs.pages_enabled == 'true'
-    needs: qa
+    if: github.event_name != 'pull_request' && needs.pages-readiness.outputs.configured == 'true'
+    needs: [qa, pages-readiness]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -66,7 +84,7 @@ jobs:
           mkdir -p dist-pages
           cp index.html styles.css app.js favicon.svg .nojekyll dist-pages/
           test "$(find dist-pages -type f | wc -l)" -eq 5
-          ! find dist-pages -type f | grep -Ei '\\.(zip|php|sql|env)$'
+          ! find dist-pages -type f | grep -Ei '\.(zip|php|sql|env)$'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
