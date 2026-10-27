@@ -23,6 +23,6 @@ Não reutilize assets premium sem conferir licença e atribuição. Não os use 
 
 - Tokens, acessibilidade, carousel com teclado e suporte a `prefers-reduced-motion` em [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
 - Capturas Playwright e testes responsivos em `tests/`, via GitHub Actions.
-- GitHub Pages: publicar com GitHub Actions ou pela branch `main` na pasta `/(root)`, quando Pages estiver habilitado.
+- GitHub Pages: publicar com GitHub Actions ou pela branch `gh-pages` na pasta `/(root)`, quando Pages estiver habilitado. O teste em 27/10/2026 passou, mas o deploy automático foi bloqueado porque a integração não podia habilitar Pages; configurar em Settings → Pages é uma etapa do proprietário.
 
 Arquivado por [Hélio Conde](https://github.com/HelioConde); assets de Sprout Lands: **Cup Nooble**.

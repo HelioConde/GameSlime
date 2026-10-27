@@ -14,6 +14,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   qa:
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -35,8 +37,22 @@ jobs:
           name: gameslime-visual-qa
           path: visual-qa/
           if-no-files-found: ignore
+      - name: Verificar Pages antes de publicar
+        if: github.event_name != 'pull_request'
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" >/dev/null 2>&1; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "Pages habilitado; publicacao sera executada." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Ative o GitHub Pages::Escolha Settings > Pages > GitHub Actions ou Deploy from a branch > gh-pages. O QA foi aprovado."
+            echo "O QA passou. Pages ainda precisa ser habilitado manualmente em Settings > Pages para que a publicacao aconteca." >> "$GITHUB_STEP_SUMMARY"
+          fi
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && needs.qa.outputs.pages_enabled == 'true'
     needs: qa
     runs-on: ubuntu-latest
     environment:
@@ -51,8 +67,6 @@ jobs:
           test "$(find dist-pages -type f | wc -l)" -eq 5
           ! find dist-pages -type f | grep -Ei '\\.(zip|php|sql|env)$'
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist-pages
