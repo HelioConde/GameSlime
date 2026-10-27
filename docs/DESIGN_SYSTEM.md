@@ -27,3 +27,9 @@ Uma vitrine histórica aconchegante, distinta do jogo completo. Nenhuma captura,
 
 ## QA
 Playwright: 390x844, 768x1024, 1366x768 e 1600x900; overflow, controles de carrossel, links, console, acessibilidade básica, screenshots. CI inclui inspeção que impede ZIP premium no HEAD.
+## Complemento de QA (27/10/2026)
+- O carrossel anuncia o cartão em foco via `role=status` sem poluir a interface visual; no desktop, avisa quando todos estão visíveis.
+- Com foco na região do carrossel, `←/→` muda um cartão e `Home/End` vai ao início/fim. Quando um link interno está focado, essas teclas não são interceptadas pelo carrossel.
+- Scroll limitado à trilha para não mover a página inteira, com `auto` sob `prefers-reduced-motion`.
+- Playwright em 360, 390, 768, 1366 e 1600px testa estados disabled, movimento das setas, Home/End, anúncios acessíveis, overflow, requisições e capturas.
+- Publicação: assets seguros já são idênticos entre `main` e `gh-pages`; se `configure-pages` retornar erro, conferir **Settings → Pages → Build and deployment** ou limites da conta. QA não prova que a página já esteja online.
