@@ -26,3 +26,12 @@ Não reutilize assets premium sem conferir licença e atribuição. Não os use 
 - GitHub Pages: publicar com GitHub Actions ou pela branch `gh-pages` na pasta `/(root)`, quando Pages estiver habilitado. O teste em 27/10/2026 passou, mas o deploy automático foi bloqueado porque a integração não podia habilitar Pages; configurar em Settings → Pages é uma etapa do proprietário.
 
 Arquivado por [Hélio Conde](https://github.com/HelioConde); assets de Sprout Lands: **Cup Nooble**.
+
+
+## Status de publicação no GitHub Pages
+
+Em 27/10/2026, o teste de interface Playwright foi aprovado, mas o deploy foi bloqueado antes do envio dos arquivos. A mensagem do GitHub foi `Create Pages site failed: Resource not accessible by integration`. O token automático do workflow não pode habilitar o Pages em nome do administrador.
+
+A partir deste ajuste, `qa` permanece obrigatório e grava capturas de tela em todas as alterações; `pages-readiness` distingue **Pages ainda não habilitado** de um deploy real; `deploy` só executa quando a API confirma a configuração. Um workflow de QA verde com `deploy` pulado **não significa que a página esteja publicada**.
+
+Para ativar a publicação uma única vez, acesse **Settings → Pages → Build and deployment → Source: GitHub Actions**. Depois, execute o workflow manualmente ou faça um novo push em `main`. A versão gerada é apenas HTML/CSS/JS sem banco de dados, autenticação ou redistribuição do pacote premium. Não é necessário alterar a visibilidade dos outros repositórios.
