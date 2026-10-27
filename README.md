@@ -1,43 +1,28 @@
-<div align="center">
-  <h1>🌱 GameSlime — Arquivo histórico de assets</h1>
-  <p><strong>Um registro de recursos visuais usados em experimentos iniciais do universo Slimekeepers.</strong></p>
-  <p><img alt="Status" src="https://img.shields.io/badge/status-arquivo%20hist%C3%B3rico-64748b"></p>
-</div>
+# GameSlime — arquivo histórico
 
-## O que existe neste repositório?
+Este repositório preserva o contexto dos primeiros experimentos que inspiraram **Slimekeepers**. Não é um jogo jogável, tampouco distribui sprites premium.
 
-O **GameSlime** não é uma versão executável de Slimekeepers. O projeto contém apenas o README e a pasta `sprites/`, com material de referência associado a um pacote de pixel art.
+## Apresentação estática
 
-| Conteúdo | Descrição |
-| --- | --- |
-| `sprites/Sprout Lands - Sprites - premium pack.zip` | Pacote premium de terceiros; **uso sujeito à licença do autor** |
-| `sprites/read_me.txt` | Termos de licença e atribuição originais |
-| `sprites/readme` | Arquivo histórico complementar |
+A página `index.html` é uma vitrine histórica em HTML/CSS/JavaScript, sem conta nem banco de dados, apropriada ao GitHub Pages.
 
-**Não há `project.godot`, projeto web, scripts de jogo ou build para executar neste repositório.**
+- [Slimekeepers: Lost Valley / Slime-Harvest](https://github.com/HelioConde/Slime-Harvest) — jogo em desenvolvimento.
+- [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley) — experiências relacionadas.
 
-## ⚠️ Licença e redistribuição dos sprites
+Para rodar localmente, inicie `python -m http.server 4173` e acesse `http://localhost:4173`.
 
-O arquivo de licença fornecido com **Sprout Lands Premium Pack**, criado por **Cup Nooble**, informa que:
+## Licenciamento dos arquivos de terceiros
 
-- É permitido usar e modificar os recursos em projetos comerciais e não comerciais, respeitando os termos.
-- **Não é permitido redistribuir ou revender o pacote de assets isoladamente**, mesmo com pequenas modificações.
-- **NFTs e treinamento de IA** estão proibidos pelos termos incluídos.
-- A **atribuição a Cup Nooble** é obrigatória.
+O antigo arquivo `sprites/Sprout Lands - Sprites - premium pack.zip` **foi retirado do HEAD deste repositório**. A licença do autor **Cup Nooble** não permite redistribuir o pacote premium isoladamente. Os termos originais permanecem em [sprites/read_me.txt](sprites/read_me.txt).
 
-**A presença do ZIP premium neste repositório deve ser revisada pelo mantenedor:** a licença fornecida não autoriza sua distribuição como pacote separado. É recomendado retirar esse arquivo do acesso público e avaliar se há cópias no histórico Git. Atualizar este README **não corrige** a possível questão de licenciamento.
+**Importante:** a remoção do ZIP do branch atual **não apaga cópias de commits anteriores, forks ou caches**. A revisão do histórico e possíveis procedimentos adicionais devem ser feitos com cuidado pelo mantenedor, sem reescrever indiscriminadamente o histórico de desenvolvimento.
 
-Para detalhes, consulte os [termos originais](sprites/read_me.txt). O conteúdo é resumido aqui, não substitui o texto da licença.
+Não reutilize assets premium sem conferir licença e atribuição. Não os use para treinamento de IA ou NFTs, conforme os termos incluídos.
 
-## Projetos jogáveis relacionados
+## Design e QA
 
-- [**Slimekeepers: Lost Valley — Slime-Harvest**](https://github.com/HelioConde/Slime-Harvest): jogo Godot 2D em desenvolvimento.
-- [**Clareira Encantada**](https://github.com/HelioConde/Slimekeepers-Lost-Valley): outra implementação Godot do universo Slimekeepers.
+- Tokens, acessibilidade, carousel com teclado e suporte a `prefers-reduced-motion` em [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+- Capturas Playwright e testes responsivos em `tests/`, via GitHub Actions.
+- GitHub Pages: publicar com GitHub Actions ou pela branch `main` na pasta `/(root)`, quando Pages estiver habilitado.
 
-As duas implementações têm projetos e estruturas próprios; **não copie sprites premium ou cenas entre repositórios sem verificar licença e compatibilidade**.
-
-## Estado
-
-**Arquivo histórico / organização pendente.** Prioridade: revisar a distribuição do pacote premium, preservar as notas de autoria e manter aqui somente arquivos com permissão de publicação.
-
-Organização do projeto: [Hélio Conde](https://github.com/HelioConde). **Assets de Sprout Lands: Cup Nooble**.
+Arquivado por [Hélio Conde](https://github.com/HelioConde); assets de Sprout Lands: **Cup Nooble**.
