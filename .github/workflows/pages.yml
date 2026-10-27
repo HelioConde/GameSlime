@@ -43,13 +43,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh api "repos/${{ github.repository }}/pages" >/dev/null 2>&1; then
+          mode="$(gh api "repos/${{ github.repository }}/pages" --jq '.build_type // "legacy"' 2>/dev/null || echo unavailable)"
+          if [ "$mode" = "workflow" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
-            echo "Pages habilitado; publicacao sera executada." >> "$GITHUB_STEP_SUMMARY"
+            echo "Pages configurado para GitHub Actions: publicacao via workflow autorizada." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=Ative o GitHub Pages::Escolha Settings > Pages > GitHub Actions ou Deploy from a branch > gh-pages. O QA foi aprovado."
-            echo "O QA passou. Pages ainda precisa ser habilitado manualmente em Settings > Pages para que a publicacao aconteca." >> "$GITHUB_STEP_SUMMARY"
+            echo "::notice title=Publicacao separada::Pages em modo $mode. O QA passou; use a branch gh-pages, ou altere Settings > Pages > GitHub Actions se quiser publicar pelo workflow."
+            echo "QA aprovado. Pages em modo $mode: a branch gh-pages publica a versao estatica; o deploy do workflow foi ignorado intencionalmente." >> "$GITHUB_STEP_SUMMARY"
           fi
   deploy:
     if: github.event_name != 'pull_request' && needs.qa.outputs.pages_enabled == 'true'
