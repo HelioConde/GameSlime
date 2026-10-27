@@ -33,7 +33,7 @@ const results = [];
           if (!(await previous.isDisabled())) errors.push("Seta anterior deveria iniciar desativada");
           await next.click();
           await page.waitForFunction(() => document.getElementById("projects-track").scrollLeft > 10);
-          if (await previous.isDisabled()) errors.push("Anterior não habilitou após avançar");
+          await page.waitForFunction(() => !document.getElementById("prev").disabled);
           await page.locator("#projects-track").focus();
           await page.keyboard.press("End");
           await page.waitForFunction(() => document.getElementById("next").disabled);
