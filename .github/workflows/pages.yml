@@ -58,15 +58,32 @@ jobs:
             --header "Authorization: Bearer ${GH_TOKEN}" \
             "https://api.github.com/repos/${GH_REPOSITORY}/pages")"
           if [ "$code" = 200 ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-            echo "GitHub Pages ja esta habilitado." >> "$GITHUB_STEP_SUMMARY"
+            build_type="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('/tmp/pages-response.json').read_text())
+          print(data.get('build_type', 'legacy' if data.get('source') else 'unknown'))
+          PY
+            )"
+            if [ "$build_type" = "workflow" ]; then
+              echo "configured=true" >> "$GITHUB_OUTPUT"
+              echo "## GitHub Pages via GitHub Actions" >> "$GITHUB_STEP_SUMMARY"
+              echo "O job de deploy pode publicar os cinco arquivos estaticos." >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "configured=false" >> "$GITHUB_OUTPUT"
+              echo "::notice title=Pages por branch::Build type: ${build_type}. O deploy desta Action sera ignorado; o publicador gh-pages/(root) segue independente."
+              {
+                echo "## Publicação por branch ativa (build_type=${build_type})"
+                echo "Playwright continua obrigatório; o job de deploy por Actions fica **ignorado de propósito**."
+                echo "A branch gh-pages/(root) é publicada pelo mecanismo nativo de Pages."
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=GitHub Pages nao habilitado::Abra Settings > Pages e selecione Source: GitHub Actions. A verificacao visual continua ativa; publicacao fica pendente."
+            echo "::notice title=GitHub Pages nao habilitado::HTTP ${code}. Configure Source em Settings > Pages."
             {
-              echo "## Publicação pendente (HTTP ${code})"
-              echo "Os testes podem passar, mas **este workflow não publicou o site**."
-              echo "Ative Settings → Pages → Build and deployment → Source: GitHub Actions e execute novamente o workflow."
+              echo "## GitHub Pages nao confirmado (HTTP ${code})"
+              echo "Os testes do site continuam rodando, mas nenhum deploy foi solicitado."
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
