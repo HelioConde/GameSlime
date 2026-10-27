@@ -1,12 +1,12 @@
 # Publicação no GitHub Pages — GameSlime
 
 ## Verificação em 27/10/2026
-A execução QA passou com Playwright e screenshots, mas o deploy retornou `Create Pages site failed: Resource not accessible by integration`. O site **não pode ser considerado publicado até que Settings → Pages esteja configurado**.
+Houve um bloqueio inicial ao tentar habilitar Pages por integração, mas **a publicação por branch foi aprovada posteriormente** no [GitHub Actions #40481714642](https://github.com/HelioConde/GameSlime/actions/runs/40481714642). O QA completo passou em [#40482098932](https://github.com/HelioConde/GameSlime/actions/runs/40482098932). O site publicado usa apenas conteúdo estático e nenhum arquivo premium.
 
 ## Duas formas de publicar
 
 ### Método A — Deploy from a branch
-1. Acesse **Settings → Pages** do repositório GameSlime.
+1. Para consultar ou restaurar a configuração, acesse **Settings → Pages** do repositório GameSlime.
 2. Em Build and deployment, escolha **Deploy from a branch**.
 3. Selecione a branch **gh-pages** e a pasta **/(root)**.
 4. Salve; acompanhe a publicação e confirme o endereço `https://helioconde.github.io/GameSlime/`.

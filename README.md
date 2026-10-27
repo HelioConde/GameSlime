@@ -4,7 +4,7 @@ Este repositório preserva o contexto dos primeiros experimentos que inspiraram 
 
 ## Apresentação estática
 
-A página `index.html` é uma vitrine histórica em HTML/CSS/JavaScript, sem conta nem banco de dados, apropriada ao GitHub Pages.
+A página `index.html` é uma vitrine histórica em HTML/CSS/JavaScript, sem conta nem banco de dados, **publicada no GitHub Pages**: https://helioconde.github.io/GameSlime/.
 
 - [Slimekeepers: Lost Valley / Slime-Harvest](https://github.com/HelioConde/Slime-Harvest) — jogo em desenvolvimento.
 - [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley) — experiências relacionadas.
@@ -23,6 +23,6 @@ Não reutilize assets premium sem conferir licença e atribuição. Não os use 
 
 - Tokens, acessibilidade, carousel com teclado e suporte a `prefers-reduced-motion` em [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
 - Capturas Playwright e testes responsivos em `tests/`, via GitHub Actions.
-- GitHub Pages: publicar com GitHub Actions ou pela branch `gh-pages` na pasta `/(root)`, quando Pages estiver habilitado. O teste em 27/10/2026 passou, mas o deploy automático foi bloqueado porque a integração não podia habilitar Pages; configurar em Settings → Pages é uma etapa do proprietário.
+- GitHub Pages: publicar com GitHub Actions ou pela branch `gh-pages` na pasta `/(root)`, quando Pages estiver habilitado. A publicação via branch `gh-pages` foi aprovada em [Actions #40481714642](https://github.com/HelioConde/GameSlime/actions/runs/40481714642); o QA foi aprovado em [Actions #40482098932](https://github.com/HelioConde/GameSlime/actions/runs/40482098932). O workflow de `main` identifica o método de publicação para evitar conflito.
 
 Arquivado por [Hélio Conde](https://github.com/HelioConde); assets de Sprout Lands: **Cup Nooble**.
